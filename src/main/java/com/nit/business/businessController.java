@@ -20,26 +20,21 @@ public class businessController {
 		super();
 		this.businessService = businessService;
 	}
-
 	@PostMapping
 	public Business createBusiness(@RequestBody Business business) {
 		return businessService.saveBusiness(business);
 	}
-
 	@GetMapping
 	public List<Business> getAllBusinesses() {
 		return businessService.getAllBusinesses();
 	}
-
 	@GetMapping("/{id}")
 	public Business getBusinessById(@PathVariable Long id) {
 		return businessService.getBusinessById(id);
 	}
-
 	@DeleteMapping("/{id}")
 	public String deleteBusiness(@PathVariable Long id) {
 		businessService.deleteBusiness(id);
 		return "Business deleted successfully";
 	}
-
 }

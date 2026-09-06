@@ -12,22 +12,16 @@ public class AdminService {
 	public AdminService(AdminRepository adminRepository) {
         this.adminRepository = adminRepository;
     }
-
     public Admin saveAdmin(Admin admin) {
         return adminRepository.save(admin);
     }
-
     public List<Admin> getAllAdmins() {
         return adminRepository.findAll();
     }
-
     public Admin getAdminById(Long id) {
         return adminRepository.findById(id).orElse(null);
     }
-
     public void deleteAdmin(Long id) {
         adminRepository.deleteById(id);
     }
-	
-	
 }

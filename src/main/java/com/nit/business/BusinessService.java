@@ -12,21 +12,16 @@ public class BusinessService {
 		super();
 		this.businessRepository = businessRepository;
 	}
-
 	public Business saveBusiness(Business business) {
 		return businessRepository.save(business);
 	}
-
 	public List<Business> getAllBusinesses() {
 		return businessRepository.findAll();
 	}
-
 	public Business getBusinessById(Long id) {
 		return businessRepository.findById(id).orElse(null);
 	}
-
 	public void deleteBusiness(Long id) {
 		businessRepository.deleteById(id);
 	}
-
 }

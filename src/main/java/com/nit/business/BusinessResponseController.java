@@ -19,23 +19,19 @@ public class BusinessResponseController {
     public BusinessResponseController(BusinessResponseService businessResponseService) {
         this.businessResponseService = businessResponseService;
     }
-
     @PostMapping
     public BusinessResponse createBusinessResponse(
             @RequestBody BusinessResponse businessResponse) {
         return businessResponseService.saveBusinessResponse(businessResponse);
     }
-
     @GetMapping
     public List<BusinessResponse> getAllBusinessResponses() {
         return businessResponseService.getAllBusinessResponses();
     }
-
     @GetMapping("/{id}")
     public BusinessResponse getBusinessResponseById(@PathVariable Long id) {
         return businessResponseService.getBusinessResponseById(id);
     }
-
     @DeleteMapping("/{id}")
     public String deleteBusinessResponse(@PathVariable Long id) {
         businessResponseService.deleteBusinessResponse(id);

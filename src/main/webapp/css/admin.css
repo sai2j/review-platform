@@ -1,0 +1,73 @@
+body {
+	margin: 0;
+	font-family: Arial, sans-serif;
+	background: #f4f6f9;
+}
+.admin-container {
+	width: 900px;
+	max-width: 90%;
+	margin: 50px auto;
+	padding: 30px;
+	background: white;
+	border-radius: 10px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+}
+h1 {
+	text-align: center;
+	margin-bottom: 10px;
+}
+.admin-subtitle {
+	text-align: center;
+	color: #666;
+	font-size: 18px;
+}
+.report-card {
+	padding: 20px;
+	margin-bottom: 20px;
+	border: 1px solid #ddd;
+	border-radius: 8px;
+	background: #fafafa;
+}
+
+.report-card p {
+	margin: 8px 0;
+}
+
+.report-reason {
+	font-weight: bold;
+	color: #dc3545;
+}
+.delete-button {
+	margin-top: 12px;
+	padding: 9px 18px;
+	background: #dc3545;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
+.delete-button:hover {
+	background: #bb2d3b;
+}
+.message {
+	margin-top: 10px;
+	font-weight: bold;
+}
+.success-message {
+	color: green;
+}
+.error-message {
+	color: #dc3545;
+}
+.no-reports {
+	text-align: center;
+	color: #666;
+	padding: 30px;
+}
+.admin-container a {
+	color: #0d6efd;
+	text-decoration: none;
+}
+.admin-container a:hover {
+	text-decoration: underline;
+}

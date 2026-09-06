@@ -18,26 +18,21 @@ public class ReportController {
 	public ReportController(ReportService reportService) {
 		this.reportService = reportService;
 	}
-	
 	@PostMapping
 	public Report createReport(@RequestBody Report report) {
 		return reportService.saveReport(report);
 	}
-	
 	@GetMapping
 	public List<Report> getAllReports(){
 		return reportService.getallReports();
 	}
-	
 	@GetMapping("/{id}")
     public Report getReportById(@PathVariable Long id) {
         return reportService.getReportById(id);
     }
-
     @DeleteMapping("/{id}")
     public String deleteReport(@PathVariable Long id) {
         reportService.deleteReport(id);
         return "Report deleted successfully";
     }
-    
 }

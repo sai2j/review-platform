@@ -1,7 +1,7 @@
 package com.nit.review;
 
 import java.util.List;
-
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +19,10 @@ public class ReviewController {
 	public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
-
+	@GetMapping("/website/{websiteId}")
+	public List<Review> getReviewsByWebsiteId(@PathVariable Long websiteId) {
+	    return reviewService.getReviewsByWebsiteId(websiteId);
+	}
 	@PostMapping
 	public Review createReview(@RequestBody Review review) {
 		return reviewService.saveReview(review);
@@ -28,17 +31,20 @@ public class ReviewController {
 	public List<Review> getAllReviews(){
 		return reviewService.getAllReviews();
 	}
-	
 	@GetMapping("/{id}")
 	public Review getReviewById(@PathVariable Long id) {
 		return reviewService.getReviewById(id);
+	}
+	@PutMapping("/{id}")
+	public Review updateReview(
+	        @PathVariable Long id,
+	        @RequestBody Review review) {
+
+	    return reviewService.updateReview(id, review);
 	}
 	@DeleteMapping("/{id}")
 	public String deleteReview(@PathVariable Long id) {
 		reviewService.deleteReview(id);
 		return "Review delete Sucessfully";
 	}
-	
-	
-	
 }

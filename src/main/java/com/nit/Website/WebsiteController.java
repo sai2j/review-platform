@@ -19,22 +19,18 @@ public class WebsiteController {
 	public WebsiteController(WebsiteService websiteService) {
 		this.websiteService = websiteService;
 	}
-
 	@PostMapping
 	public Website createWebsite(@RequestBody Website website) {
 		return websiteService.saveWebsite(website);
 	}
-	
 	@GetMapping
 	public List<Website> getAllWebsites(){
 		return websiteService.getAllWebsites();
 	}
-	
 	@GetMapping("/{id}")
 	public Website getwebsiteById(@PathVariable Long id) {	
 		return websiteService.getWebsiteById(id);
 	}
-	
 	@DeleteMapping("/{id}")
 	public String deleteWebsite(@PathVariable Long id) {
 		websiteService.deleteWebsite(id);

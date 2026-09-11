@@ -1,0 +1,85 @@
+package com.nit.business;
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.nit.Website.Website;
+import com.nit.review.Review;
+import com.nit.review.ReviewService;
+
+@RestController
+@RequestMapping("/business-dashboard")
+public class BusinessDashboardController {
+
+    private final BusinessClamService businessClaimService;
+    private final BusinessService businessService;
+    private final ReviewService reviewService;
+
+    public BusinessDashboardController(
+            BusinessClamService businessClaimService,
+            BusinessService businessService,
+            ReviewService reviewService) {
+
+        this.businessClaimService = businessClaimService;
+        this.businessService = businessService;
+        this.reviewService = reviewService;
+    }
+
+    @GetMapping("/user/{userId}")
+    public Business getBusinessForUser(@PathVariable Long userId) {
+
+        BusinessClaim claim =
+                businessClaimService.getApprovedClaimByUserId(userId);
+
+        if (claim == null) {
+            return null;
+        }
+
+        return businessService.getBusinessById(
+                claim.getBusinessId()
+        );
+    }
+
+    @GetMapping("/user/{userId}/website")
+    public Website getWebsiteForUser(@PathVariable Long userId) {
+
+        BusinessClaim claim =
+                businessClaimService.getApprovedClaimByUserId(userId);
+
+        if (claim == null) {
+            return null;
+        }
+
+        return businessService.getWebsiteForBusiness(
+                claim.getBusinessId()
+        );
+    }
+
+    @GetMapping("/user/{userId}/reviews")
+    public List<Review> getBusinessReviews(@PathVariable Long userId) {
+
+        BusinessClaim claim =
+                businessClaimService.getApprovedClaimByUserId(userId);
+
+        if (claim == null) {
+            return List.of();
+        }
+
+        Website website =
+                businessService.getWebsiteForBusiness(
+                        claim.getBusinessId()
+                );
+
+        if (website == null) {
+            return List.of();
+        }
+
+        return reviewService.getReviewsByWebsiteId(
+                website.getId()
+        );
+    }
+}

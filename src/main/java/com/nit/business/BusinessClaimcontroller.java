@@ -13,24 +13,35 @@ public class BusinessClaimcontroller {
     public BusinessClaimcontroller(BusinessClamService businessClaimService) {
         this.businessClaimService = businessClaimService;
     }
+
     @PostMapping
     public BusinessClaim createBusinessClaim(@RequestBody BusinessClaim businessClaim) {
         return businessClaimService.saveBusinessClaim(businessClaim);
     }
+
     @GetMapping
     public List<BusinessClaim> getAllBusinessClaims() {
         return businessClaimService.getAllBusinessClaims();
     }
+
     @GetMapping("/{id}")
     public BusinessClaim getBusinessClaimById(@PathVariable Long id) {
         return businessClaimService.getBusinessClaimById(id);
     }
+
+    @GetMapping("/user/{userId}/approved")
+    public BusinessClaim getApprovedClaimByUserId(@PathVariable Long userId) {
+        return businessClaimService.getApprovedClaimByUserId(userId);
+    }
+
     @PutMapping("/{id}/status")
     public BusinessClaim updateClaimStatus(
             @PathVariable Long id,
             @RequestParam String status) {
+
         return businessClaimService.updateClaimStatus(id, status);
     }
+
     @DeleteMapping("/{id}")
     public String deleteBusinessClaim(@PathVariable Long id) {
         businessClaimService.deleteBusinessClaim(id);

@@ -2,50 +2,104 @@
 <html lang="en">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Review Platform</title>
-<link rel="stylesheet" href="css/style.css">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Review Platform</title>
+
+    <link rel="stylesheet" href="css/style.css">
+
 </head>
+
 <body>
-	<nav class="navbar">
-		<div class="logo">Review Platform</div>
-		<div class="nav-links">
-			<a href="index.html">Home</a>
-			<a href="#websites">Websites</a>
-			<a href="login.html">Login</a>
-			<a href="register.html">Register</a>
-		</div>
-	</nav>
-	<section class="hero">
-		<h1>Find & Review Websites</h1>
-		<p>Search websites, read reviews and share your experience.</p>
-		<div class="search-box">
-			<input type="text" id="searchInput" placeholder="Search website...">
-			<button id="searchButton">Search</button>
-		</div>
-	</section>
-	<section class="add-website">
-		<h2>Add New Website</h2>
-		<form id="websiteForm">
-			<div class="form-group">
-				<label for="websiteName"> Website Name </label> <input type="text" id="websiteName" placeholder="Enter website name" required>
-			</div>
-			<div class="form-group">
-				<label for="websiteUrl"> Website URL </label> <input type="url"id="websiteUrl" placeholder="https://example.com" required>
-			</div>
-			<div class="form-group">
-				<label for="websiteDescription"> Description </label>
-				<textarea id="websiteDescription" placeholder="Enter website description" required></textarea>
-			</div>
-			<button type="submit">Add Website</button>
-		</form>
-		<p id="websiteMessage"></p>
-	</section>
-	<section class="website-section" id="websites">
-		<h2>Available Websites</h2>
-		<div id="websiteList">Loading websites...</div>
-	</section>
-	<script src="js/script.js"></script>
+
+    <!-- ================= NAVBAR ================= -->
+
+    <nav class="navbar">
+
+        <div class="logo">
+            Review Platform
+        </div>
+
+        <div class="nav-links">
+
+            <a href="index.html">
+                Home
+            </a>
+
+            <a href="#websites">
+                Websites
+            </a>
+
+            <a href="login.html">
+                Login
+            </a>
+
+            <a href="register.html">
+                Register
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- ================= HERO ================= -->
+
+    <section class="hero">
+
+        <h1>
+            Find & Review Websites
+        </h1>
+
+        <p>
+            Search websites, read reviews and share your experience.
+        </p>
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search website..."
+            >
+
+            <button id="searchButton">
+                Search
+            </button>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= WEBSITE SECTION ================= -->
+
+    <section
+        class="website-section"
+        id="websites"
+    >
+
+        <h2>
+            Available Websites
+        </h2>
+
+        <div id="websiteList">
+
+            Loading websites...
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script src="js/script.js"></script>
+
 </body>
+
 </html>

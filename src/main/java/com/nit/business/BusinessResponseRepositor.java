@@ -1,6 +1,14 @@
 package com.nit.business;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BusinessResponseRepositor extends JpaRepository<BusinessResponse, Long> {
+public interface BusinessResponseRepositor
+        extends JpaRepository<BusinessResponse, Long> {
+
+    Optional<BusinessResponse> findByBusinessIdAndReviewId(
+            Long businessId,
+            Long reviewId
+    );
 }

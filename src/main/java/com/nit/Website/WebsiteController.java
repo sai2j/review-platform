@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/websites")
 public class WebsiteController {
@@ -19,20 +21,25 @@ public class WebsiteController {
 	public WebsiteController(WebsiteService websiteService) {
 		this.websiteService = websiteService;
 	}
+
 	@PostMapping
-	public Website createWebsite(@RequestBody Website website) {
+	public Website createWebsite(@Valid @RequestBody Website website) {
 		return websiteService.saveWebsite(website);
 	}
+
 	@GetMapping
-	public List<Website> getAllWebsites(){
+	public List<Website> getAllWebsites() {
 		return websiteService.getAllWebsites();
 	}
+
 	@GetMapping("/{id}")
-	public Website getwebsiteById(@PathVariable Long id) {	
+	public Website getwebsiteById(@PathVariable Long id) {
 		return websiteService.getWebsiteById(id);
 	}
+
 	@DeleteMapping("/{id}")
 	public String deleteWebsite(@PathVariable Long id) {
 		websiteService.deleteWebsite(id);
-		return " website delete sucessfully";	}
+		return " website delete sucessfully";
+	}
 }

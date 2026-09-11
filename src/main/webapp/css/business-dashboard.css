@@ -1,0 +1,159 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 30px;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #333;
+}
+
+.dashboard-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    margin-bottom: 8px;
+    color: #222;
+}
+
+.dashboard-subtitle {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.dashboard-section {
+    margin: 25px 0;
+}
+
+.dashboard-section h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.info-card {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.info-card p {
+    margin: 10px 0;
+}
+
+.summary-box {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.summary-card {
+    flex: 1;
+    min-width: 200px;
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 20px;
+    text-align: center;
+    border-radius: 8px;
+}
+
+.summary-card h3 {
+    margin-bottom: 10px;
+}
+
+.summary-card p {
+    font-size: 30px;
+    font-weight: bold;
+    margin: 0;
+}
+
+.review-card {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+}
+
+.review-card h3 {
+    margin-top: 0;
+}
+
+.review-card p {
+    line-height: 1.5;
+}
+
+.review-card button {
+    padding: 9px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #333;
+    color: white;
+}
+
+.review-card button:hover {
+    opacity: 0.85;
+}
+
+a {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+
+    body {
+        padding: 15px;
+    }
+
+    .dashboard-container {
+        padding: 20px;
+    }
+
+    .summary-box {
+        flex-direction: column;
+    }
+}
+.business-response {
+    margin-top: 15px;
+    padding: 15px;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.business-response h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.business-response p {
+    margin-bottom: 12px;
+}
+
+.business-response button {
+    padding: 9px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background: #333;
+    color: white;
+}
+
+.business-response button:hover {
+    opacity: 0.85;
+}

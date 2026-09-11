@@ -2,40 +2,273 @@
 <html lang="en">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Website Reviews</title>
-<link rel="stylesheet" href="css/review.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Website Reviews</title>
+
+    <link rel="stylesheet" href="css/review.css">
 </head>
+
 <body>
-	<div class="review-container">
-		<h1>Website Reviews</h1>
-		<div id="websiteInfo"></div>
-		<hr>
-		<h2>Add Your Review</h2>
-		<form id="reviewForm">
-			<div class="form-group">
-				<label>Rating</label> <select id="rating" required>
-					<option value="">Select Rating</option>
-					<option value="1">⭐ 1</option>
-					<option value="2">⭐⭐ 2</option>
-					<option value="3">⭐⭐⭐ 3</option>
-					<option value="4">⭐⭐⭐⭐ 4</option>
-					<option value="5">⭐⭐⭐⭐⭐ 5</option>
-				</select>
-			</div>
-			<div class="form-group">
-				<label>Comment</label>
-				<textarea id="comment" placeholder="Write your review..." required></textarea>
-			</div>
-			<button type="submit">Submit Review</button>
-		</form>
-		<p id="message"></p>
-		<hr>
-		<h2>Reviews</h2>
-		<div id="reviewList">Loading reviews...</div>
-		<br> <a href="index.html"> ← Back to Home </a>
-	</div>
-	<script src="js/review.js"></script>
+
+    <!-- Top Navigation -->
+    <nav class="top-navbar">
+
+        <div class="logo">
+            Review<span>Platform</span>
+        </div>
+
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="index.html#websites">Websites</a>
+            <a href="login.html">Log in</a>
+        </div>
+
+    </nav>
+
+
+    <!-- Main Profile -->
+    <main class="profile-container">
+
+        <!-- Website Profile Header -->
+        <section class="profile-header">
+
+            <div class="profile-main">
+
+                <div class="website-logo">
+                    W
+                </div>
+
+                <div class="website-details">
+
+                    <div class="profile-badge">
+                        Website Profile
+                    </div>
+
+                    <div id="websiteInfo">
+                        Loading website information...
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Rating Area -->
+        <section class="rating-area">
+
+            <!-- Left Rating Summary -->
+            <div class="rating-overview">
+
+                <h2>Rating Summary</h2>
+
+                <div id="averageRating" class="average-rating">
+                    Loading rating...
+                </div>
+
+                <div id="totalReviews" class="total-reviews">
+                    Loading reviews...
+                </div>
+
+                <button
+                    class="write-review-button"
+                    onclick="document.getElementById('reviewForm').scrollIntoView({ behavior: 'smooth' });">
+                    ✎ Write a review
+                </button>
+
+            </div>
+
+
+            <!-- Rating Distribution -->
+            <div class="rating-distribution">
+
+                <h3>Rating distribution</h3>
+
+                <div class="rating-row">
+
+                    <span>★★★★★</span>
+
+                    <div class="rating-bar">
+                        <div id="fiveStarBar"></div>
+                    </div>
+
+                    <strong id="fiveStarCount">0</strong>
+
+                </div>
+
+
+                <div class="rating-row">
+
+                    <span>★★★★</span>
+
+                    <div class="rating-bar">
+                        <div id="fourStarBar"></div>
+                    </div>
+
+                    <strong id="fourStarCount">0</strong>
+
+                </div>
+
+
+                <div class="rating-row">
+
+                    <span>★★★</span>
+
+                    <div class="rating-bar">
+                        <div id="threeStarBar"></div>
+                    </div>
+
+                    <strong id="threeStarCount">0</strong>
+
+                </div>
+
+
+                <div class="rating-row">
+
+                    <span>★★</span>
+
+                    <div class="rating-bar">
+                        <div id="twoStarBar"></div>
+                    </div>
+
+                    <strong id="twoStarCount">0</strong>
+
+                </div>
+
+
+                <div class="rating-row">
+
+                    <span>★</span>
+
+                    <div class="rating-bar">
+                        <div id="oneStarBar"></div>
+                    </div>
+
+                    <strong id="oneStarCount">0</strong>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- Add Review -->
+        <section class="write-review-section">
+
+            <h2>Share your experience</h2>
+
+            <p class="section-description">
+                Have you used this website? Share your experience with other users.
+            </p>
+
+            <form id="reviewForm">
+
+                <div class="form-group">
+
+                    <label for="rating">
+                        Your rating
+                    </label>
+
+                    <select id="rating" required>
+
+                        <option value="">
+                            Select Rating
+                        </option>
+
+                        <option value="1">
+                            ⭐ 1
+                        </option>
+
+                        <option value="2">
+                            ⭐⭐ 2
+                        </option>
+
+                        <option value="3">
+                            ⭐⭐⭐ 3
+                        </option>
+
+                        <option value="4">
+                            ⭐⭐⭐⭐ 4
+                        </option>
+
+                        <option value="5">
+                            ⭐⭐⭐⭐⭐ 5
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="comment">
+                        Your review
+                    </label>
+
+                    <textarea
+                        id="comment"
+                        placeholder="Share your experience..."
+                        required>
+                    </textarea>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="submit-review-button">
+                    Submit Review
+                </button>
+
+            </form>
+
+            <p id="message"></p>
+
+        </section>
+
+
+        <!-- Customer Reviews -->
+        <section class="customer-reviews">
+
+            <div class="reviews-heading">
+
+                <div>
+                    <h2>Customer Reviews</h2>
+
+                    <p>
+                        Read experiences shared by other users.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div id="reviewList">
+                Loading reviews...
+            </div>
+
+        </section>
+
+
+        <!-- Back -->
+        <div class="back-home">
+
+            <a href="index.html">
+                ← Back to Home
+            </a>
+
+        </div>
+
+    </main>
+
+
+    <script src="js/review.js"></script>
+
 </body>
+
 </html>

@@ -1,13 +1,18 @@
 const WEBSITE_API = "/review-platform/websites";
+
 const DISCOVERY_API = "/review-platform/discovery/search";
+
 const REVIEW_API = "/review-platform/reviews";
+
 const METADATA_API = "/review-platform/metadata/fetch";
 
 let allWebsites = [];
 
 
 /* =========================================================
+
    LOAD SAVED WEBSITES
+
 ========================================================= */
 
 function loadWebsites() {
@@ -17,10 +22,13 @@ function loadWebsites() {
         .then(function(response) {
 
             if (!response.ok) {
+
                 throw new Error("Website API error");
+
             }
 
             return response.json();
+
         })
 
         .then(function(websites) {
@@ -38,25 +46,34 @@ function loadWebsites() {
             document.getElementById("websiteList").innerHTML = `
 
                 <p class="error-message">
+
                     Unable to load websites.
+
                 </p>
 
             `;
+
         });
+
 }
 
 
 /* =========================================================
+
    DISPLAY SAVED WEBSITES
+
 ========================================================= */
 
 function displayWebsites(websites) {
 
     const websiteList =
+
         document.getElementById("websiteList");
 
     if (!websiteList) {
+
         return;
+
     }
 
     websiteList.innerHTML = "";
@@ -66,12 +83,15 @@ function displayWebsites(websites) {
         websiteList.innerHTML = `
 
             <p>
+
                 No websites available.
+
             </p>
 
         `;
 
         return;
+
     }
 
     websites.forEach(function(website) {
@@ -81,23 +101,33 @@ function displayWebsites(websites) {
             <div class="website-card">
 
                 <h3>
+
                     ${escapeHtml(website.name)}
+
                 </h3>
 
                 <p>
+
                     ${escapeHtml(
+
                         website.description || ""
+
                     )}
+
                 </p>
 
                 <p>
 
                     <strong>
+
                         URL:
+
                     </strong>
 
                     <a
+
                         href="${escapeAttribute(website.url)}"
+
                         target="_blank">
 
                         ${escapeHtml(website.url)}
@@ -107,7 +137,12 @@ function displayWebsites(websites) {
                 </p>
 
                 <button
-                    onclick="viewWebsite(${website.id})">
+
+                    type="button"
+
+                    class="view-website-button"
+
+                    data-website-id="${website.id}">
 
                     View Website & Review
 
@@ -116,20 +151,26 @@ function displayWebsites(websites) {
             </div>
 
         `;
+
     });
+
 }
 
 
 /* =========================================================
+
    SEARCH WEBSITES
+
 ========================================================= */
 
 function searchWebsites() {
 
     const searchInput =
+
         document.getElementById("searchInput");
 
     const keyword =
+
         searchInput.value.trim();
 
     if (keyword === "") {
@@ -137,34 +178,47 @@ function searchWebsites() {
         alert("Please enter a website name.");
 
         return;
+
     }
 
     const websiteList =
+
         document.getElementById("websiteList");
 
     websiteList.innerHTML = `
 
         <p>
+
             Searching for <strong>${escapeHtml(keyword)}</strong>...
+
         </p>
 
     `;
 
     fetch(
+
         DISCOVERY_API +
+
         "?keyword=" +
+
         encodeURIComponent(keyword)
+
     )
 
         .then(function(response) {
 
             if (!response.ok) {
+
                 throw new Error(
+
                     "Website search failed"
+
                 );
+
             }
 
             return response.json();
+
         })
 
         .then(function(results) {
@@ -186,23 +240,30 @@ function searchWebsites() {
                 </p>
 
             `;
+
         });
+
 }
 
 
 /* =========================================================
+
    DISPLAY SEARCH RESULT
+
 ========================================================= */
 
 function displaySearchResults(results) {
 
     const websiteList =
+
         document.getElementById("websiteList");
 
     websiteList.innerHTML = `
 
         <h2>
+
             Website Found
+
         </h2>
 
     `;
@@ -212,43 +273,59 @@ function displaySearchResults(results) {
         websiteList.innerHTML += `
 
             <p>
+
                 No website found.
+
             </p>
 
         `;
 
         return;
+
     }
 
     // Only one result
+
     const result = results[0];
 
     websiteList.innerHTML += `
 
         <p>
+
             Result for your search
+
         </p>
 
         <div class="website-card">
 
             <h3>
+
                 ${escapeHtml(result.title)}
+
             </h3>
 
             <p>
+
                 ${escapeHtml(
+
                     result.description || ""
+
                 )}
+
             </p>
 
             <p>
 
                 <strong>
+
                     URL:
+
                 </strong>
 
                 <a
+
                     href="${escapeAttribute(result.url)}"
+
                     target="_blank">
 
                     ${escapeHtml(result.url)}
@@ -258,11 +335,16 @@ function displaySearchResults(results) {
             </p>
 
             <button
-                onclick="openWebsiteForReview(
-                    '${escapeJs(result.title)}',
-                    '${escapeJs(result.url)}',
-                    '${escapeJs(result.description || "")}'
-                )">
+
+                type="button"
+
+                class="view-website-button search-website-button"
+
+                data-title="${escapeAttribute(result.title)}"
+
+                data-url="${escapeAttribute(result.url)}"
+
+                data-description="${escapeAttribute(result.description || "")}">
 
                 View Website & Review
 
@@ -271,38 +353,55 @@ function displaySearchResults(results) {
         </div>
 
     `;
+
 }
 
 
 /* =========================================================
+
    OPEN WEBSITE FOR REVIEW
+
 ========================================================= */
 
 function openWebsiteForReview(
+
     title,
+
     url,
+
     description
+
 ) {
 
     const existingWebsite =
+
         findExistingWebsite(url);
 
     /*
+
      * Website already exists in database
+
      */
+
     if (existingWebsite) {
 
         window.location.href =
+
             "review.html?websiteId=" +
+
             existingWebsite.id;
 
         return;
+
     }
 
 
     /*
+
      * Website does not exist.
+
      * Automatically save it to database.
+
      */
 
     const website = {
@@ -316,7 +415,9 @@ function openWebsiteForReview(
     };
 
     fetch(
+
         WEBSITE_API,
+
         {
 
             method: "POST",
@@ -324,14 +425,17 @@ function openWebsiteForReview(
             headers: {
 
                 "Content-Type":
+
                     "application/json"
 
             },
 
             body:
+
                 JSON.stringify(website)
 
         }
+
     )
 
         .then(function(response) {
@@ -339,8 +443,11 @@ function openWebsiteForReview(
             if (!response.ok) {
 
                 throw new Error(
+
                     "Website could not be saved"
+
                 );
+
             }
 
             return response.json();
@@ -350,12 +457,17 @@ function openWebsiteForReview(
         .then(function(savedWebsite) {
 
             /*
+
              * Open review page using
+
              * newly generated website ID
+
              */
 
             window.location.href =
+
                 "review.html?websiteId=" +
+
                 savedWebsite.id;
 
         })
@@ -365,15 +477,20 @@ function openWebsiteForReview(
             console.error(error);
 
             alert(
+
                 "Unable to open website review page."
+
             );
 
         });
+
 }
 
 
 /* =========================================================
+
    FIND EXISTING WEBSITE
+
 ========================================================= */
 
 function findExistingWebsite(url) {
@@ -381,20 +498,29 @@ function findExistingWebsite(url) {
     if (!url || allWebsites.length === 0) {
 
         return null;
+
     }
 
     const searchedHost =
+
         normalizeWebsiteUrl(url);
 
     for (
+
         let i = 0;
+
         i < allWebsites.length;
+
         i++
+
     ) {
 
         const savedHost =
+
             normalizeWebsiteUrl(
+
                 allWebsites[i].url
+
             );
 
         if (searchedHost === savedHost) {
@@ -402,14 +528,18 @@ function findExistingWebsite(url) {
             return allWebsites[i];
 
         }
+
     }
 
     return null;
+
 }
 
 
 /* =========================================================
+
    NORMALIZE WEBSITE URL
+
 ========================================================= */
 
 function normalizeWebsiteUrl(url) {
@@ -417,14 +547,17 @@ function normalizeWebsiteUrl(url) {
     try {
 
         const parsedUrl =
+
             new URL(url);
 
         let hostname =
+
             parsedUrl.hostname.toLowerCase();
 
         if (hostname.startsWith("www.")) {
 
             hostname =
+
                 hostname.substring(4);
 
         }
@@ -434,53 +567,78 @@ function normalizeWebsiteUrl(url) {
     } catch (error) {
 
         return url
+
             .toLowerCase()
+
             .replace(/^https?:\/\//, "")
+
             .replace(/^www\./, "")
+
             .replace(/\/$/, "");
+
     }
+
 }
 
 
 /* =========================================================
+
    VIEW SAVED WEBSITE
+
 ========================================================= */
 
 function viewWebsite(websiteId) {
 
     window.location.href =
+
         "review.html?websiteId=" +
+
         websiteId;
+
 }
 
 
 /* =========================================================
+
    SELECT WEBSITE
+
 ========================================================= */
 
 function selectWebsite(
+
     title,
+
     url,
+
     description
+
 ) {
 
     document.getElementById(
+
         "websiteName"
+
     ).value = title;
 
     document.getElementById(
+
         "websiteUrl"
+
     ).value = url;
 
     document.getElementById(
+
         "websiteDescription"
+
     ).value = description || "";
 
 }
 
 
 /* =========================================================
+
    ADD WEBSITE
+
 ========================================================= */
 
 function addWebsite(event) {
@@ -488,23 +646,35 @@ function addWebsite(event) {
     event.preventDefault();
 
     const name =
+
         document.getElementById(
+
             "websiteName"
+
         ).value.trim();
 
     const url =
+
         document.getElementById(
+
             "websiteUrl"
+
         ).value.trim();
 
     const description =
+
         document.getElementById(
+
             "websiteDescription"
+
         ).value.trim();
 
     const message =
+
         document.getElementById(
+
             "websiteMessage"
+
         );
 
     const website = {
@@ -518,7 +688,9 @@ function addWebsite(event) {
     };
 
     fetch(
+
         WEBSITE_API,
+
         {
 
             method: "POST",
@@ -526,14 +698,17 @@ function addWebsite(event) {
             headers: {
 
                 "Content-Type":
+
                     "application/json"
 
             },
 
             body:
+
                 JSON.stringify(website)
 
         }
+
     )
 
         .then(function(response) {
@@ -541,8 +716,11 @@ function addWebsite(event) {
             if (!response.ok) {
 
                 throw new Error(
+
                     "Website could not be added"
+
                 );
+
             }
 
             return response.json();
@@ -562,7 +740,9 @@ function addWebsite(event) {
             `;
 
             document
+
                 .getElementById("websiteForm")
+
                 .reset();
 
             loadWebsites();
@@ -582,12 +762,16 @@ function addWebsite(event) {
                 </span>
 
             `;
+
         });
+
 }
 
 
 /* =========================================================
+
    ESCAPE HTML
+
 ========================================================= */
 
 function escapeHtml(value) {
@@ -609,21 +793,27 @@ function escapeHtml(value) {
         .replace(/"/g, "&quot;")
 
         .replace(/'/g, "&#039;");
+
 }
 
 
 /* =========================================================
+
    ESCAPE ATTRIBUTE
+
 ========================================================= */
 
 function escapeAttribute(value) {
 
     return escapeHtml(value);
+
 }
 
 
 /* =========================================================
+
    ESCAPE JAVASCRIPT
+
 ========================================================= */
 
 function escapeJs(value) {
@@ -645,41 +835,57 @@ function escapeJs(value) {
         .replace(/\n/g, "\\n")
 
         .replace(/\r/g, "\\r");
+
 }
 
 
 /* =========================================================
-   SEARCH BUTTON
+
+   SEARCH BUTTON + WEBSITE BUTTONS
+
 ========================================================= */
 
 document.addEventListener(
+
     "DOMContentLoaded",
+
     function() {
 
         const searchButton =
+
             document.getElementById(
+
                 "searchButton"
+
             );
 
         if (searchButton) {
 
             searchButton.addEventListener(
+
                 "click",
+
                 searchWebsites
+
             );
 
         }
 
 
         const searchInput =
+
             document.getElementById(
+
                 "searchInput"
+
             );
 
         if (searchInput) {
 
             searchInput.addEventListener(
+
                 "keypress",
+
                 function(event) {
 
                     if (event.key === "Enter") {
@@ -689,28 +895,130 @@ document.addEventListener(
                     }
 
                 }
+
             );
 
         }
 
 
         /*
+
          * Add Website form is no longer
+
          * present in the new index.html.
+
          * So we only add the listener
+
          * if it exists.
+
          */
 
         const websiteForm =
+
             document.getElementById(
+
                 "websiteForm"
+
             );
 
         if (websiteForm) {
 
             websiteForm.addEventListener(
+
                 "submit",
+
                 addWebsite
+
+            );
+
+        }
+
+
+        /*
+
+         * View Website & Review buttons
+
+         * are handled using JavaScript.
+
+         * This avoids inline onclick handlers
+
+         * which are blocked by CSP.
+
+         */
+
+        const websiteList =
+
+            document.getElementById(
+
+                "websiteList"
+
+            );
+
+        if (websiteList) {
+
+            websiteList.addEventListener(
+
+                "click",
+
+                function(event) {
+
+                    const button =
+
+                        event.target.closest(
+
+                            ".view-website-button"
+
+                        );
+
+                    if (!button) {
+
+                        return;
+
+                    }
+
+
+                    const websiteId =
+
+                        button.dataset.websiteId;
+
+                    if (websiteId) {
+
+                        viewWebsite(websiteId);
+
+                        return;
+
+                    }
+
+
+                    const title =
+
+                        button.dataset.title;
+
+                    const url =
+
+                        button.dataset.url;
+
+                    const description =
+
+                        button.dataset.description || "";
+
+
+                    if (title && url) {
+
+                        openWebsiteForReview(
+
+                            title,
+
+                            url,
+
+                            description
+
+                        );
+
+                    }
+
+                }
+
             );
 
         }
@@ -719,4 +1027,5 @@ document.addEventListener(
         loadWebsites();
 
     }
+
 );

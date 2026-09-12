@@ -71,7 +71,10 @@ public class UserController {
                             )
                     );
 
-            // Create Security Context
+            // =========================
+            // CREATE SECURITY CONTEXT
+            // =========================
+
             SecurityContext securityContext =
                     SecurityContextHolder.createEmptyContext();
 
@@ -79,7 +82,16 @@ public class UserController {
 
             SecurityContextHolder.setContext(securityContext);
 
-            // Save login in session
+            // =========================
+            // CREATE HTTP SESSION
+            // =========================
+
+            request.getSession(true);
+
+            // =========================
+            // SAVE LOGIN IN SESSION
+            // =========================
+
             HttpSessionSecurityContextRepository
                     securityContextRepository =
                     new HttpSessionSecurityContextRepository();
@@ -90,15 +102,24 @@ public class UserController {
                     response
             );
 
-            // Get logged-in user from database
+            // =========================
+            // GET LOGGED-IN USER
+            // =========================
+
             User loggedInUser =
                     userService.getUserByEmail(user.getEmail());
 
-            // Check admin
+            // =========================
+            // CHECK ADMIN
+            // =========================
+
             boolean admin =
                     userService.isAdmin(loggedInUser.getId());
 
-            // Response
+            // =========================
+            // RESPONSE
+            // =========================
+
             Map<String, Object> result =
                     new HashMap<>();
 
@@ -108,6 +129,8 @@ public class UserController {
             return ResponseEntity.ok(result);
 
         } catch (Exception e) {
+
+            e.printStackTrace();
 
             Map<String, Object> errorResponse =
                     new HashMap<>();

@@ -97,19 +97,14 @@ loginForm.addEventListener("submit", async function(event) {
 
             }, 500);
 
-        } else {
-
-            message.textContent =
-                "Login successful!";
-
-            setTimeout(function() {
-
-                window.location.href =
-                    "index.html";
-
-            }, 500);
-
-        }
+			} else {
+			    message.textContent =
+			        "Login successful!";
+			    setTimeout(function() {
+			        window.location.href =
+			            "index.html";
+			    }, 500);
+			}
 
     } catch (error) {
 

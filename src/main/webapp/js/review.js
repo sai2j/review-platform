@@ -683,9 +683,10 @@ function displayReviews(reviews) {
         `;
 
 
-        loadBusinessResponse(
+       /* loadBusinessResponse(
             review.id
         );
+		*/
 
 
         loadVoteCounts(

@@ -29,6 +29,7 @@ public class BusinessDashboardController {
         this.reviewService = reviewService;
     }
 
+    // Logged-in user can access only their own business
     @GetMapping("/user/{userId}")
     public Business getBusinessForUser(@PathVariable Long userId) {
 
@@ -44,6 +45,7 @@ public class BusinessDashboardController {
         );
     }
 
+    // Logged-in user can access only their own website
     @GetMapping("/user/{userId}/website")
     public Website getWebsiteForUser(@PathVariable Long userId) {
 
@@ -59,6 +61,7 @@ public class BusinessDashboardController {
         );
     }
 
+    // Logged-in user can access only reviews of their business
     @GetMapping("/user/{userId}/reviews")
     public List<Review> getBusinessReviews(@PathVariable Long userId) {
 

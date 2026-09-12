@@ -2,21 +2,25 @@ package com.nit.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 
     @Bean
     public AuthenticationManager authenticationManager(
@@ -26,7 +30,6 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http) throws Exception {
@@ -34,12 +37,37 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
 
+            // =========================
+            // SECURITY HEADERS
+            // =========================
+            .headers(headers -> headers
+                .contentTypeOptions(contentTypeOptions -> {})
+                .frameOptions(frameOptions -> frameOptions.deny())
+                .contentSecurityPolicy(csp -> csp
+                    .policyDirectives(
+                        "default-src 'self'; " +
+                        "script-src 'self'; " +
+                        "style-src 'self' 'unsafe-inline'; " +
+                        "img-src 'self' data: https:; " +
+                        "font-src 'self' data:; " +
+                        "connect-src 'self'; " +
+                        "object-src 'none'; " +
+                        "base-uri 'self'; " +
+                        "form-action 'self'"
+                    )
+                )
+                .referrerPolicy(referrerPolicy -> referrerPolicy
+                    .policy(
+                        org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER
+                    )
+                )
+            )
+
             .authorizeHttpRequests(auth -> auth
 
-                /* =========================
-                   HTML PAGES
-                ========================= */
-
+                // =========================
+                // HTML PAGES
+                // =========================
                 .requestMatchers(
                     "/",
                     "/index.html",
@@ -52,81 +80,57 @@ public class SecurityConfig {
                     "/admin.html"
                 ).permitAll()
 
-
-                /* =========================
-                   CSS + JAVASCRIPT
-                ========================= */
-
+                // =========================
+                // CSS + JAVASCRIPT
+                // =========================
                 .requestMatchers(
                     "/css/**",
                     "/js/**"
                 ).permitAll()
 
-
-                /* =========================
-                   USER LOGIN / REGISTER
-                ========================= */
-
+                // =========================
+                // USER LOGIN / REGISTER
+                // =========================
                 .requestMatchers(
                     "/users/register",
                     "/users/login"
                 ).permitAll()
 
-
-                /* =========================
-                   WEBSITE + REVIEW VIEW
-                ========================= */
-
+                // =========================
+                // WEBSITE + REVIEW VIEW
+                // =========================
                 .requestMatchers(
                     "/websites/**",
                     "/reviews/website/**"
                 ).permitAll()
 
-
-                /* =========================
-                   SEARCH / DISCOVERY
-                ========================= */
-
+                // =========================
+                // SEARCH / DISCOVERY
+                // =========================
                 .requestMatchers(
                     "/discovery/**",
                     "/metadata/**"
                 ).permitAll()
 
-
-                /* =========================
-                   VOTE COUNT
-                ========================= */
-
+                // =========================
+                // VOTE COUNT
+                // =========================
                 .requestMatchers(
                     "/review-votes/*/count"
                 ).permitAll()
 
-
-                /* =========================
-                   BUSINESS RESPONSE
-                ========================= */
-
-                .requestMatchers(
-                    "/business-responses/**"
-                ).permitAll()
-
-
-                /* =========================
-                   ADMIN
-                ========================= */
-
+                // =========================
+                // ADMIN
+                // =========================
                 .requestMatchers("/admins/**")
                 .hasRole("ADMIN")
 
-
-                /* =========================
-                   EVERYTHING ELSE
-                ========================= */
-
+                // =========================
+                // EVERYTHING ELSE
+                // =========================
                 .anyRequest()
                 .authenticated()
             );
-
 
         return http.build();
     }

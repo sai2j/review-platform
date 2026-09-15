@@ -8,4 +8,7 @@ public interface BusinessclaimRepository extends JpaRepository<BusinessClaim, Lo
 
     Optional<BusinessClaim> findByUserIdAndStatus(Long userId, String status);
 
+    // Find approved claim for a specific business
+    Optional<BusinessClaim> findByBusinessIdAndStatus(Long businessId, String status);
+
 }

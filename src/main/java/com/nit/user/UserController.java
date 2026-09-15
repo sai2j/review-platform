@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -148,8 +149,10 @@ public class UserController {
 
     // =========================
     // CREATE USER
+    // ADMIN ONLY
     // =========================
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public User createUser(@RequestBody User user) {
 
@@ -158,8 +161,10 @@ public class UserController {
 
     // =========================
     // GET ALL USERS
+    // ADMIN ONLY
     // =========================
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<User> getAllUsers() {
 
@@ -168,8 +173,10 @@ public class UserController {
 
     // =========================
     // GET USER BY ID
+    // ADMIN ONLY
     // =========================
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Long id) {
 
@@ -178,8 +185,10 @@ public class UserController {
 
     // =========================
     // DELETE USER
+    // ADMIN ONLY
     // =========================
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Long id) {
 

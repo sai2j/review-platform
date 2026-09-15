@@ -32,6 +32,8 @@ public class Review {
 
     private Long websiteId;
 
+    private String status;
+
     public Review() {
     }
 
@@ -40,6 +42,7 @@ public class Review {
         this.comment = comment;
         this.userId = userId;
         this.websiteId = websiteId;
+        this.status = "PENDING";
     }
 
     public Long getId() {
@@ -76,5 +79,13 @@ public class Review {
 
     public void setWebsiteId(Long websiteId) {
         this.websiteId = websiteId;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

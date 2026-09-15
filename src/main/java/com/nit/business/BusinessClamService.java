@@ -18,20 +18,31 @@ public class BusinessClamService {
 
     private final UserRepository userRepository;
 
+    private final BusinessRepository businessRepository;
+
     public BusinessClamService(
             BusinessclaimRepository businessClaimRepository,
-            UserRepository userRepository) {
+            UserRepository userRepository,
+            BusinessRepository businessRepository) {
 
         this.businessClaimRepository = businessClaimRepository;
         this.userRepository = userRepository;
+        this.businessRepository = businessRepository;
     }
 
-    public BusinessClaim saveBusinessClaim(BusinessClaim businessClaim) {
+    // ==============================
+    // CREATE BUSINESS CLAIM
+    // ==============================
+
+    public BusinessClaim saveBusinessClaim(
+            BusinessClaim businessClaim) {
 
         Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
+                SecurityContextHolder.getContext()
+                        .getAuthentication();
 
-        String loggedInEmail = authentication.getName();
+        String loggedInEmail =
+                authentication.getName();
 
         User loggedInUser =
                 userRepository.findByEmail(loggedInEmail);
@@ -43,21 +54,53 @@ public class BusinessClamService {
         // Do not trust userId from frontend
         businessClaim.setUserId(loggedInUser.getId());
 
+        // Check business exists
+        if (businessClaim.getBusinessId() == null
+                || !businessRepository.existsById(
+                        businessClaim.getBusinessId())) {
+
+            throw new RuntimeException(
+                    "Business does not exist");
+        }
+
+        // New claims must always start as PENDING
+        businessClaim.setStatus("PENDING");
+
         return businessClaimRepository.save(businessClaim);
     }
 
+    // ==============================
+    // GET ALL BUSINESS CLAIMS
+    // ==============================
+
     public List<BusinessClaim> getAllBusinessClaims() {
+
         return businessClaimRepository.findAll();
     }
 
+    // ==============================
+    // GET BUSINESS CLAIM BY ID
+    // ==============================
+
     public BusinessClaim getBusinessClaimById(Long id) {
-        return businessClaimRepository.findById(id).orElse(null);
+
+        return businessClaimRepository
+                .findById(id)
+                .orElse(null);
     }
 
-    public BusinessClaim updateClaimStatus(Long id, String status) {
+    // ==============================
+    // UPDATE CLAIM STATUS
+    // ==============================
+
+    public BusinessClaim updateClaimStatus(
+            Long id,
+            String status) {
 
         BusinessClaim claim =
-                businessClaimRepository.findById(id).orElse(null);
+                businessClaimRepository
+                        .findById(id)
+                        .orElse(null);
 
         if (claim == null) {
             return null;
@@ -68,12 +111,19 @@ public class BusinessClamService {
         return businessClaimRepository.save(claim);
     }
 
-    public BusinessClaim getApprovedClaimByUserId(Long userId) {
+    // ==============================
+    // GET APPROVED CLAIM BY USER
+    // ==============================
+
+    public BusinessClaim getApprovedClaimByUserId(
+            Long userId) {
 
         Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
+                SecurityContextHolder.getContext()
+                        .getAuthentication();
 
-        String loggedInEmail = authentication.getName();
+        String loggedInEmail =
+                authentication.getName();
 
         User loggedInUser =
                 userRepository.findByEmail(loggedInEmail);
@@ -84,18 +134,42 @@ public class BusinessClamService {
 
         // User can only access their own approved claim
         if (!loggedInUser.getId().equals(userId)) {
+
             throw new AccessDeniedException(
                     "You can access only your own business claim");
         }
 
         Optional<BusinessClaim> claim =
                 businessClaimRepository
-                        .findByUserIdAndStatus(userId, "APPROVED");
+                        .findByUserIdAndStatus(
+                                userId,
+                                "APPROVED");
 
         return claim.orElse(null);
     }
 
+    // ==============================
+    // GET APPROVED CLAIM BY BUSINESS
+    // ==============================
+
+    public BusinessClaim getApprovedClaimByBusinessId(
+            Long businessId) {
+
+        Optional<BusinessClaim> claim =
+                businessClaimRepository
+                        .findByBusinessIdAndStatus(
+                                businessId,
+                                "APPROVED");
+
+        return claim.orElse(null);
+    }
+
+    // ==============================
+    // DELETE BUSINESS CLAIM
+    // ==============================
+
     public void deleteBusinessClaim(Long id) {
+
         businessClaimRepository.deleteById(id);
     }
 }

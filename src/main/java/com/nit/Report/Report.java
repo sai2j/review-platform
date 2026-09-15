@@ -16,7 +16,6 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @NotNull(message = "User ID is required")
     private Long userId;
 
     @NotNull(message = "Review ID is required")

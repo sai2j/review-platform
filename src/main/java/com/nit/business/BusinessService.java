@@ -96,6 +96,48 @@ public class BusinessService {
         return reviewRepository.findByWebsiteId(website.getId());
     }
 
+    // Website → Business mapping
+    public Business getBusinessForWebsite(Long websiteId) {
+
+        Website website =
+                websiteRepository.findById(websiteId).orElse(null);
+
+        if (website == null) {
+            return null;
+        }
+
+        String canonicalDomain =
+                website.getCanonicalDomain();
+
+        if (canonicalDomain == null
+                || canonicalDomain.isBlank()) {
+            return null;
+        }
+
+        List<Business> businesses =
+                businessRepository.findAll();
+
+        for (Business business : businesses) {
+
+            String officialUrl =
+                    business.getOfficialUrl();
+
+            if (officialUrl == null
+                    || officialUrl.isBlank()) {
+                continue;
+            }
+
+            String businessDomain =
+                    normalizeDomain(officialUrl);
+
+            if (canonicalDomain.equals(businessDomain)) {
+                return business;
+            }
+        }
+
+        return null;
+    }
+
     private String normalizeDomain(String url) {
 
         try {
@@ -113,7 +155,8 @@ public class BusinessService {
             String domain = uri.getHost();
 
             if (domain == null) {
-                throw new RuntimeException("Invalid website URL");
+                throw new RuntimeException(
+                        "Invalid website URL");
             }
 
             domain = domain.toLowerCase();
@@ -126,7 +169,8 @@ public class BusinessService {
 
         } catch (Exception e) {
 
-            throw new RuntimeException("Invalid website URL");
+            throw new RuntimeException(
+                    "Invalid website URL");
         }
     }
 }

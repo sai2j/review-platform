@@ -100,9 +100,11 @@ public class SecurityConfig {
                 // WEBSITE + REVIEW VIEW
                 // =========================
                 .requestMatchers(
-                    "/websites/**",
-                    "/reviews/website/**"
-                ).permitAll()
+                	    "/websites/**",
+                	    "/reviews/website/**",
+                	    "/businesses/website/*",
+                	    "/business-claims/business/*/approved"
+                	).permitAll()
 
                 // =========================
                 // SEARCH / DISCOVERY

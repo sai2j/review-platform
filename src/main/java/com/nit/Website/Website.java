@@ -25,6 +25,13 @@ public class Website {
 
     private String canonicalDomain;
 
+    // SEO fields
+    private String seoTitle;
+
+    private String seoDescription;
+
+    private String canonicalUrl;
+
     public Website() {
     }
 
@@ -68,5 +75,29 @@ public class Website {
 
     public void setCanonicalDomain(String canonicalDomain) {
         this.canonicalDomain = canonicalDomain;
+    }
+
+    public String getSeoTitle() {
+        return seoTitle;
+    }
+
+    public void setSeoTitle(String seoTitle) {
+        this.seoTitle = seoTitle;
+    }
+
+    public String getSeoDescription() {
+        return seoDescription;
+    }
+
+    public void setSeoDescription(String seoDescription) {
+        this.seoDescription = seoDescription;
+    }
+
+    public String getCanonicalUrl() {
+        return canonicalUrl;
+    }
+
+    public void setCanonicalUrl(String canonicalUrl) {
+        this.canonicalUrl = canonicalUrl;
     }
 }

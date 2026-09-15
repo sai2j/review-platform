@@ -2,6 +2,7 @@ package com.nit.review;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -56,7 +58,19 @@ public class ReviewController {
 
     @GetMapping
     public List<Review> getAllReviews() {
+
         return reviewService.getAllReviews();
+    }
+
+    // ==============================
+    // ADMIN PENDING REVIEW QUEUE
+    // ==============================
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/pending")
+    public List<Review> getPendingReviews() {
+
+        return reviewService.getPendingReviews();
     }
 
     @GetMapping("/{id}")
@@ -72,6 +86,19 @@ public class ReviewController {
             @Valid @RequestBody Review review) {
 
         return reviewService.updateReview(id, review);
+    }
+
+    // ==============================
+    // ADMIN APPROVE / REJECT / HIDE / RESTORE REVIEW
+    // ==============================
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/status")
+    public Review updateReviewStatus(
+            @PathVariable Long id,
+            @RequestParam String status) {
+
+        return reviewService.updateReviewStatus(id, status);
     }
 
     @DeleteMapping("/{id}")

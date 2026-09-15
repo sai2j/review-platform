@@ -48,6 +48,15 @@ public class BusinessClaimcontroller {
                 .getApprovedClaimByUserId(userId);
     }
 
+    // Get approved claim for a specific business
+    @GetMapping("/business/{businessId}/approved")
+    public BusinessClaim getApprovedClaimByBusinessId(
+            @PathVariable Long businessId) {
+
+        return businessClaimService
+                .getApprovedClaimByBusinessId(businessId);
+    }
+
     // Only ADMIN can approve/reject a claim
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/status")

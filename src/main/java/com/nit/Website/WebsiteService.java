@@ -5,13 +5,21 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.nit.review.ReviewService;
+
 @Service
 public class WebsiteService {
 
     private final WebsiteRepository websiteRepository;
 
-    public WebsiteService(WebsiteRepository websiteRepository) {
+    private final ReviewService reviewService;
+
+    public WebsiteService(
+            WebsiteRepository websiteRepository,
+            ReviewService reviewService) {
+
         this.websiteRepository = websiteRepository;
+        this.reviewService = reviewService;
     }
 
     public Website saveWebsite(Website website) {
@@ -39,7 +47,33 @@ public class WebsiteService {
         return websiteRepository.findById(id).orElse(null);
     }
 
+    // ADMIN SEO UPDATE
+    public Website updateSeo(
+            Long id,
+            String seoTitle,
+            String seoDescription,
+            String canonicalUrl) {
+
+        Website website =
+                websiteRepository.findById(id).orElse(null);
+
+        if (website == null) {
+            throw new RuntimeException("Website not found");
+        }
+
+        website.setSeoTitle(seoTitle);
+        website.setSeoDescription(seoDescription);
+        website.setCanonicalUrl(canonicalUrl);
+
+        return websiteRepository.save(website);
+    }
+
     public void deleteWebsite(Long id) {
+
+        // Delete all reviews linked to this website first
+        reviewService.deleteReviewsByWebsiteId(id);
+
+        // Then delete the website
         websiteRepository.deleteById(id);
     }
 

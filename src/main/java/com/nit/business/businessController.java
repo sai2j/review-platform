@@ -20,18 +20,30 @@ public class businessController {
 		super();
 		this.businessService = businessService;
 	}
+
 	@PostMapping
 	public Business createBusiness(@RequestBody Business business) {
 		return businessService.saveBusiness(business);
 	}
+
 	@GetMapping
 	public List<Business> getAllBusinesses() {
 		return businessService.getAllBusinesses();
 	}
+
 	@GetMapping("/{id}")
 	public Business getBusinessById(@PathVariable Long id) {
 		return businessService.getBusinessById(id);
 	}
+
+	// New endpoint
+	@GetMapping("/website/{websiteId}")
+	public Business getBusinessForWebsite(
+			@PathVariable Long websiteId) {
+
+		return businessService.getBusinessForWebsite(websiteId);
+	}
+
 	@DeleteMapping("/{id}")
 	public String deleteBusiness(@PathVariable Long id) {
 		businessService.deleteBusiness(id);

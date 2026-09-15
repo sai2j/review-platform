@@ -2,23 +2,211 @@
 <html lang="en">
 
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel-Review Platform</title>
-<link rel="stylesheet" href="css/admin.css">
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Panel - Review Platform</title>
+
+    <link rel="stylesheet" href="css/admin.css">
+
 </head>
+
 <body>
-	<div class="admin-container">
-		<h1>Admin Panel</h1>
-		<p class="admin-subtitle">Reported Reviews</p>
-		<hr>
-		<h2>Business Claims</h2>
-		<div id="claimList">Loading claims...</div>
-		<hr>
-		<div id="reportList">Loading reports...</div>
-		<br> 
-		<a href="index.html"> ← Back to Home </a>
-	</div>
-	<script src="js/admin.js"></script>
+
+<div class="admin-container">
+
+    <h1>Admin Panel</h1>
+
+    <p class="admin-subtitle">
+        Admin Dashboard
+    </p>
+
+    <hr>
+
+    <!-- ============================== -->
+    <!-- DASHBOARD METRICS -->
+    <!-- ============================== -->
+
+    <h2>Dashboard Overview</h2>
+
+    <div class="dashboard-cards">
+
+        <div class="dashboard-card">
+            <h3>Total Users</h3>
+            <p id="totalUsers">Loading...</p>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Total Websites</h3>
+            <p id="totalWebsites">Loading...</p>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Total Reviews</h3>
+            <p id="totalReviews">Loading...</p>
+        </div>
+
+        <div class="dashboard-card">
+            <h3>Pending Reviews</h3>
+            <p id="pendingReviews">Loading...</p>
+        </div>
+
+    </div>
+
+    <hr>
+
+    <!-- ============================== -->
+    <!-- REVIEW MODERATION QUEUE -->
+    <!-- ============================== -->
+
+    <h2>Review Moderation Queue</h2>
+
+    <div id="moderationList">
+        Loading pending reviews...
+    </div>
+
+    <hr>
+
+    <!-- ============================== -->
+    <!-- HIDDEN REVIEWS -->
+    <!-- ============================== -->
+
+    <h2>Hidden Reviews</h2>
+
+    <div id="hiddenReviewList">
+        Loading hidden reviews...
+    </div>
+
+    <hr>
+
+    <!-- ============================== -->
+    <!-- BUSINESS CLAIMS -->
+    <!-- ============================== -->
+
+    <h2>Business Claims</h2>
+
+    <div id="claimList">
+        Loading claims...
+    </div>
+
+    <hr>
+
+    <!-- ============================== -->
+    <!-- MANAGE USERS -->
+    <!-- ============================== -->
+
+    <h2>Manage Users</h2>
+
+    <div id="userList">
+        Loading users...
+    </div>
+
+    <hr>
+
+    <!-- ============================== -->
+    <!-- MANAGE WEBSITES -->
+    <!-- ============================== -->
+
+    <h2>Manage Websites</h2>
+
+    <div id="websiteList">
+        Loading websites...
+    </div>
+
+    <hr>
+
+    <!-- ============================== -->
+    <!-- ADMIN SEO CONTROLS -->
+    <!-- ============================== -->
+
+    <h2>Admin SEO Controls</h2>
+
+    <div class="seo-card">
+
+        <label for="seoWebsite">
+            Select Website
+        </label>
+
+        <select id="seoWebsite">
+            <option value="">
+                Select a website
+            </option>
+        </select>
+
+        <label for="seoTitle">
+            SEO Title
+        </label>
+
+        <input
+            type="text"
+            id="seoTitle"
+            placeholder="Enter SEO title">
+
+        <label for="seoDescription">
+            SEO Description
+        </label>
+
+        <textarea
+            id="seoDescription"
+            placeholder="Enter SEO description"
+            rows="4"></textarea>
+
+        <label for="canonicalUrl">
+            Canonical URL
+        </label>
+
+        <input
+            type="text"
+            id="canonicalUrl"
+            placeholder="Enter canonical URL">
+
+        <button
+            class="seo-save-button"
+            onclick="updateSeo()">
+            Save SEO Settings
+        </button>
+
+        <p id="seoMessage" class="message"></p>
+
+    </div>
+
+    <hr>
+
+    <!-- ============================== -->
+    <!-- REPORTED REVIEWS -->
+    <!-- ============================== -->
+
+    <h2>Reported Reviews</h2>
+
+    <div id="reportList">
+        Loading reports...
+    </div>
+
+    <hr>
+
+    <!-- ============================== -->
+    <!-- AUDIT LOGS -->
+    <!-- ============================== -->
+
+    <h2>Audit Logs</h2>
+
+    <div id="auditLogList">
+        Loading audit logs...
+    </div>
+
+    <br>
+
+    <a href="index.html">
+        ← Back to Home
+    </a>
+
+</div>
+
+<script src="js/admin.js"></script>
+
 </body>
+
 </html>

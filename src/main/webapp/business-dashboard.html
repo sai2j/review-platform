@@ -2,12 +2,17 @@
 <html lang="en">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>Business Dashboard - Review Platform</title>
 
-    <link rel="stylesheet" href="css/business-dashboard.css">
+    <link rel="stylesheet"
+          href="css/business-dashboard.css">
+
 </head>
 
 <body>
@@ -23,6 +28,7 @@
         <hr>
 
         <!-- Business Information -->
+
         <section class="dashboard-section">
 
             <h2>Business Information</h2>
@@ -36,6 +42,7 @@
         <hr>
 
         <!-- Website Information -->
+
         <section class="dashboard-section">
 
             <h2>Website Information</h2>
@@ -49,6 +56,7 @@
         <hr>
 
         <!-- Review Summary -->
+
         <section class="dashboard-section">
 
             <h2>Review Summary</h2>
@@ -56,13 +64,27 @@
             <div class="summary-box">
 
                 <div class="summary-card">
+
                     <h3>Average Rating</h3>
+
                     <p id="averageRating">0.0</p>
+
                 </div>
 
                 <div class="summary-card">
+
                     <h3>Total Reviews</h3>
+
                     <p id="reviewCount">0</p>
+
+                </div>
+
+                <div class="summary-card">
+
+                    <h3>Response Rate</h3>
+
+                    <p id="responseRate">0.0%</p>
+
                 </div>
 
             </div>
@@ -71,20 +93,41 @@
 
         <hr>
 
+        <!-- Rating Trend -->
+
+        <section class="dashboard-section">
+
+            <h2>Rating Trend</h2>
+
+            <div id="ratingTrend">
+
+                Loading rating trend...
+
+            </div>
+
+        </section>
+
+        <hr>
+
         <!-- Customer Reviews -->
+
         <section class="dashboard-section">
 
             <h2>Customer Reviews</h2>
 
             <div id="reviewList">
+
                 Loading reviews...
+
             </div>
 
         </section>
 
         <br>
 
-        <a href="index.html">← Back to Home</a>
+        <a href="index.html">
+            ← Back to Home
+        </a>
 
     </div>
 

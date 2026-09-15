@@ -3,6 +3,8 @@ package com.nit.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import org.springframework.http.HttpMethod;
+
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -102,9 +104,25 @@ public class SecurityConfig {
                 .requestMatchers(
                 	    "/websites/**",
                 	    "/reviews/website/**",
+                	    "/businesses/*",
                 	    "/businesses/website/*",
                 	    "/business-claims/business/*/approved"
                 	).permitAll()
+
+             // =========================
+             // USER LOGIN / REGISTER
+             // =========================
+             .requestMatchers(
+                 "/users/register",
+                 "/users/login"
+             ).permitAll()
+
+             // =========================
+             // BUSINESS EMAIL VERIFICATION
+             // =========================
+             .requestMatchers(
+                 "/businesses/*/verify-email"
+             ).permitAll()
 
                 // =========================
                 // SEARCH / DISCOVERY

@@ -1,10 +1,13 @@
 package com.nit.review;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -32,17 +35,50 @@ public class Review {
 
     private Long websiteId;
 
+    // Moderation status
     private String status;
+
+    // Review verification status
+    @Column(name = "verification_status")
+    private String verificationStatus;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     public Review() {
     }
 
-    public Review(Integer rating, String comment, Long userId, Long websiteId) {
+    public Review(
+            Integer rating,
+            String comment,
+            Long userId,
+            Long websiteId) {
+
         this.rating = rating;
         this.comment = comment;
         this.userId = userId;
         this.websiteId = websiteId;
+
         this.status = "PENDING";
+        this.verificationStatus = "UNVERIFIED";
+    }
+
+    @PrePersist
+    protected void onCreate() {
+
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+
+        if (status == null || status.isBlank()) {
+            status = "PENDING";
+        }
+
+        if (verificationStatus == null
+                || verificationStatus.isBlank()) {
+
+            verificationStatus = "UNVERIFIED";
+        }
     }
 
     public Long getId() {
@@ -87,5 +123,21 @@ public class Review {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getVerificationStatus() {
+        return verificationStatus;
+    }
+
+    public void setVerificationStatus(String verificationStatus) {
+        this.verificationStatus = verificationStatus;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

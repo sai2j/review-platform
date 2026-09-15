@@ -100,6 +100,9 @@ public class ReviewService {
         // New reviews must go through moderation
         review.setStatus("PENDING");
 
+        // New reviews start as unverified
+        review.setVerificationStatus("UNVERIFIED");
+
         return reviewRepository.save(review);
     }
 
@@ -315,6 +318,67 @@ public class ReviewService {
                 "REVIEW",
                 id,
                 details
+        );
+
+        return savedReview;
+    }
+
+    // ==============================
+    // ADMIN REVIEW VERIFICATION STATUS
+    // ==============================
+
+    public Review updateReviewVerificationStatus(
+            Long id,
+            String verificationStatus) {
+
+        Review review =
+                reviewRepository.findById(id).orElse(null);
+
+        if (review == null) {
+            return null;
+        }
+
+        if (verificationStatus == null
+                || verificationStatus.isBlank()) {
+
+            throw new RuntimeException(
+                    "Verification status is required");
+        }
+
+        verificationStatus =
+                verificationStatus.toUpperCase();
+
+        if (!verificationStatus.equals("UNVERIFIED")
+                && !verificationStatus.equals("EMAIL_VERIFIED")
+                && !verificationStatus.equals("EXPERIENCE_VERIFIED")
+                && !verificationStatus.equals("UNDER_REVIEW")
+                && !verificationStatus.equals("REMOVED")) {
+
+            throw new RuntimeException(
+                    "Verification status must be UNVERIFIED, EMAIL_VERIFIED, EXPERIENCE_VERIFIED, UNDER_REVIEW or REMOVED");
+        }
+
+        // Store old verification status
+        String oldVerificationStatus =
+                review.getVerificationStatus();
+
+        // Change verification status
+        review.setVerificationStatus(verificationStatus);
+
+        Review savedReview =
+                reviewRepository.save(review);
+
+        // ==============================
+        // SAVE AUDIT LOG
+        // ==============================
+
+        auditLogService.log(
+                "REVIEW_VERIFICATION_STATUS_CHANGED",
+                "REVIEW",
+                id,
+                oldVerificationStatus
+                        + " -> "
+                        + verificationStatus
         );
 
         return savedReview;

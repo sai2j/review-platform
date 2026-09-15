@@ -204,7 +204,6 @@ function loadWebsiteInfo() {
    LOAD BUSINESS CLAIM STATUS
 
 ========================================================= */
-
 function loadClaimStatus() {
 
     if (!websiteId) {
@@ -225,15 +224,11 @@ function loadClaimStatus() {
     }
 
     fetch(
-
         BUSINESS_API +
-
         "/website/" +
-
         websiteId
 
     )
-
         .then(function(response) {
 
             if (!response.ok) {
@@ -258,64 +253,39 @@ function loadClaimStatus() {
 
             }
 
-            return fetch(
+            /* =========================
+               VERIFIED BUSINESS BADGE
+            ========================= */
 
-                BUSINESS_CLAIM_API +
+            if (
+                String(business.status || "")
+                    .toUpperCase() ===
+                "VERIFIED"
+            ) {
 
-                "/business/" +
+                claimStatus.innerHTML = `
 
-                business.id +
+                    <div class="claimed-badge">
 
-                "/approved"
+                        ✓ Verified Business
 
-            )
+                    </div>
 
-                .then(function(response) {
+                `;
 
-                    if (!response.ok) {
+            } else {
 
-                        throw new Error(
-                            "Claim status API error"
-                        );
+                claimStatus.innerHTML = "";
 
-                    }
-
-                    return response.json();
-
-                })
-
-                .then(function(claim) {
-
-                    if (claim && claim.id) {
-
-                        claimStatus.innerHTML = `
-
-                            <div class="claimed-badge">
-
-                                ✓ Claimed & Verified
-
-                            </div>
-
-                        `;
-
-                    } else {
-
-                        claimStatus.innerHTML = "";
-
-                    }
-
-                });
+            }
 
         })
 
         .catch(function(error) {
 
             console.error(
-
-                "Unable to load business claim status:",
-
+                "Unable to load business verification status:",
                 error
-
             );
 
             claimStatus.innerHTML = "";
@@ -323,8 +293,6 @@ function loadClaimStatus() {
         });
 
 }
-
-
 /* =========================================================
 
    LOAD RATING SUMMARY

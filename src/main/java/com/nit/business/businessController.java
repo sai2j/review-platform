@@ -2,51 +2,123 @@ package com.nit.business;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/businesses")
 public class businessController {
 
-	private final BusinessService businessService;
+    private final BusinessService businessService;
+    private final BusinessEmailVerificationService emailVerificationService;
 
-	public businessController(BusinessService businessService) {
-		super();
-		this.businessService = businessService;
-	}
+    public businessController(
+            BusinessService businessService,
+            BusinessEmailVerificationService emailVerificationService) {
 
-	@PostMapping
-	public Business createBusiness(@RequestBody Business business) {
-		return businessService.saveBusiness(business);
-	}
+        this.businessService = businessService;
+        this.emailVerificationService = emailVerificationService;
+    }
 
-	@GetMapping
-	public List<Business> getAllBusinesses() {
-		return businessService.getAllBusinesses();
-	}
+    @PostMapping
+    public Business createBusiness(
+            @RequestBody Business business) {
 
-	@GetMapping("/{id}")
-	public Business getBusinessById(@PathVariable Long id) {
-		return businessService.getBusinessById(id);
-	}
+        return businessService.saveBusiness(business);
+    }
 
-	// New endpoint
-	@GetMapping("/website/{websiteId}")
-	public Business getBusinessForWebsite(
-			@PathVariable Long websiteId) {
+    @GetMapping
+    public List<Business> getAllBusinesses() {
 
-		return businessService.getBusinessForWebsite(websiteId);
-	}
+        return businessService.getAllBusinesses();
+    }
 
-	@DeleteMapping("/{id}")
-	public String deleteBusiness(@PathVariable Long id) {
-		businessService.deleteBusiness(id);
-		return "Business deleted successfully";
-	}
+    @GetMapping("/{id}")
+    public Business getBusinessById(
+            @PathVariable Long id) {
+
+        return businessService.getBusinessById(id);
+    }
+
+    // Business owner can edit only their approved claimed business
+    @PutMapping("/{id}")
+    public Business updateBusiness(
+            @PathVariable Long id,
+            @RequestBody Business business) {
+
+        return businessService.updateBusiness(id, business);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/verify")
+    public Business verifyBusiness(
+            @PathVariable Long id) {
+
+        return businessService.verifyBusiness(id);
+    }
+
+    @PostMapping("/{id}/verify-email")
+    public String sendBusinessEmailVerification(
+            @PathVariable Long id,
+            @RequestParam String email) {
+
+        Business business =
+                businessService.createEmailVerificationToken(
+                        id, email);
+
+        emailVerificationService
+                .sendVerificationEmail(business);
+
+        return "Verification email sent successfully";
+    }
+
+    @GetMapping("/{id}/verify-email")
+    public String verifyBusinessEmail(
+            @PathVariable Long id,
+            @RequestParam String token) {
+
+        businessService.verifyBusinessEmail(
+                id, token);
+
+        return "Business email verified successfully";
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/generate-meta-token")
+    public String generateMetaVerificationToken(
+            @PathVariable Long id) {
+
+        Business business =
+                businessService
+                        .createMetaVerificationToken(id);
+
+        return "Meta verification token generated: "
+                + business.getMetaVerificationToken();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/verify-meta")
+    public Business verifyBusinessMetaTag(
+            @PathVariable Long id) {
+
+        return businessService
+                .verifyBusinessMetaTag(id);
+    }
+
+    @GetMapping("/website/{websiteId}")
+    public Business getBusinessForWebsite(
+            @PathVariable Long websiteId) {
+
+        return businessService
+                .getBusinessForWebsite(websiteId);
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteBusiness(
+            @PathVariable Long id) {
+
+        businessService.deleteBusiness(id);
+
+        return "Business deleted successfully";
+    }
 }

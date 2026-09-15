@@ -10,7 +10,6 @@ if (!loggedInUser || !loggedInUser.id) {
     alert("Please login first.");
 
     window.location.href = "login.html";
-
 }
 
 
@@ -26,7 +25,8 @@ const USER_ID = loggedInUser.id;
 ========================= */
 
 const BUSINESS_API =
-    "/review-platform/business-dashboard/user/" + USER_ID;
+    "/review-platform/business-dashboard/user/"
+    + USER_ID;
 
 const WEBSITE_API =
     "/review-platform/business-dashboard/user/"
@@ -37,6 +37,11 @@ const REVIEWS_API =
     "/review-platform/business-dashboard/user/"
     + USER_ID
     + "/reviews";
+
+const METRICS_API =
+    "/review-platform/business-dashboard/user/"
+    + USER_ID
+    + "/metrics";
 
 const RESPONSE_API =
     "/review-platform/business-responses";
@@ -53,19 +58,15 @@ function loadBusiness() {
         .then(function(response) {
 
             if (!response.ok) {
-
                 throw new Error("Business API Error");
-
             }
 
             return response.json();
-
         })
 
         .then(function(business) {
 
             displayBusiness(business);
-
         })
 
         .catch(function(error) {
@@ -79,11 +80,8 @@ function loadBusiness() {
 
                 businessInfo.innerHTML =
                     "<p>Unable to load business information.</p>";
-
             }
-
         });
-
 }
 
 
@@ -97,9 +95,7 @@ function displayBusiness(business) {
         document.getElementById("businessInfo");
 
     if (!businessInfo) {
-
         return;
-
     }
 
     if (!business) {
@@ -108,7 +104,6 @@ function displayBusiness(business) {
             "<p>No approved business found.</p>";
 
         return;
-
     }
 
     businessInfo.innerHTML = `
@@ -143,7 +138,6 @@ function displayBusiness(business) {
         </div>
 
     `;
-
 }
 
 
@@ -158,19 +152,15 @@ function loadWebsite() {
         .then(function(response) {
 
             if (!response.ok) {
-
                 throw new Error("Website API Error");
-
             }
 
             return response.json();
-
         })
 
         .then(function(website) {
 
             displayWebsite(website);
-
         })
 
         .catch(function(error) {
@@ -184,11 +174,8 @@ function loadWebsite() {
 
                 websiteInfo.innerHTML =
                     "<p>Unable to load website information.</p>";
-
             }
-
         });
-
 }
 
 
@@ -202,9 +189,7 @@ function displayWebsite(website) {
         document.getElementById("websiteInfo");
 
     if (!websiteInfo) {
-
         return;
-
     }
 
     if (!website) {
@@ -213,7 +198,6 @@ function displayWebsite(website) {
             "<p>No matching website found.</p>";
 
         return;
-
     }
 
     websiteInfo.innerHTML = `
@@ -248,7 +232,6 @@ function displayWebsite(website) {
         </div>
 
     `;
-
 }
 
 
@@ -263,13 +246,10 @@ function loadReviews() {
         .then(function(response) {
 
             if (!response.ok) {
-
                 throw new Error("Reviews API Error");
-
             }
 
             return response.json();
-
         })
 
         .then(function(reviews) {
@@ -277,7 +257,6 @@ function loadReviews() {
             displayReviews(reviews);
 
             calculateSummary(reviews);
-
         })
 
         .catch(function(error) {
@@ -291,11 +270,148 @@ function loadReviews() {
 
                 reviewList.innerHTML =
                     "<p>Unable to load reviews.</p>";
+            }
+        });
+}
 
+
+/* =========================
+   LOAD DASHBOARD METRICS
+========================= */
+
+function loadDashboardMetrics() {
+
+    fetch(METRICS_API)
+
+        .then(function(response) {
+
+            if (!response.ok) {
+                throw new Error("Dashboard Metrics API Error");
             }
 
-        });
+            return response.json();
+        })
 
+        .then(function(metrics) {
+
+            displayDashboardMetrics(metrics);
+        })
+
+        .catch(function(error) {
+
+            console.error(error);
+
+            const responseRate =
+                document.getElementById("responseRate");
+
+            const ratingTrend =
+                document.getElementById("ratingTrend");
+
+            if (responseRate) {
+                responseRate.textContent = "0.0%";
+            }
+
+            if (ratingTrend) {
+                ratingTrend.innerHTML =
+                    "<p>Unable to load rating trend.</p>";
+            }
+        });
+}
+
+
+/* =========================
+   DISPLAY DASHBOARD METRICS
+========================= */
+
+function displayDashboardMetrics(metrics) {
+
+    if (!metrics) {
+        return;
+    }
+
+    const responseRate =
+        document.getElementById("responseRate");
+
+    if (responseRate) {
+
+        responseRate.textContent =
+            Number(metrics.responseRate || 0)
+                .toFixed(1) + "%";
+    }
+
+    const averageRating =
+        document.getElementById("averageRating");
+
+    if (averageRating) {
+
+        averageRating.textContent =
+            Number(metrics.averageRating || 0)
+                .toFixed(1);
+    }
+
+    const reviewCount =
+        document.getElementById("reviewCount");
+
+    if (reviewCount) {
+
+        reviewCount.textContent =
+            metrics.reviewCount || 0;
+    }
+
+    displayRatingTrend(metrics.ratingTrend || []);
+}
+
+
+/* =========================
+   DISPLAY RATING TREND
+========================= */
+
+function displayRatingTrend(trend) {
+
+    const ratingTrend =
+        document.getElementById("ratingTrend");
+
+    if (!ratingTrend) {
+        return;
+    }
+
+    if (!trend || trend.length === 0) {
+
+        ratingTrend.innerHTML =
+            "<p>No rating trend data available yet.</p>";
+
+        return;
+    }
+
+    ratingTrend.innerHTML = "";
+
+    trend.forEach(function(item) {
+
+        ratingTrend.innerHTML += `
+
+            <div class="info-card">
+
+                <p>
+                    <strong>Month:</strong>
+                    ${item.month}
+                </p>
+
+                <p>
+                    <strong>Average Rating:</strong>
+                    ${Number(item.averageRating || 0)
+                        .toFixed(1)}
+                    / 5
+                </p>
+
+                <p>
+                    <strong>Reviews:</strong>
+                    ${item.reviewCount || 0}
+                </p>
+
+            </div>
+
+        `;
+    });
 }
 
 
@@ -314,11 +430,9 @@ function loadResponses() {
                 throw new Error(
                     "Business Response API Error"
                 );
-
             }
 
             return response.json();
-
         })
 
         .catch(function(error) {
@@ -326,9 +440,7 @@ function loadResponses() {
             console.error(error);
 
             return [];
-
         });
-
 }
 
 
@@ -342,13 +454,10 @@ function displayReviews(reviews) {
         document.getElementById("reviewList");
 
     if (!reviewList) {
-
         return;
-
     }
 
     reviewList.innerHTML = "";
-
 
     if (!reviews || reviews.length === 0) {
 
@@ -356,9 +465,7 @@ function displayReviews(reviews) {
             "<p>No customer reviews found.</p>";
 
         return;
-
     }
-
 
     loadResponses()
 
@@ -371,12 +478,9 @@ function displayReviews(reviews) {
 
                         return Number(item.reviewId)
                             === Number(review.id);
-
                     });
 
-
                 let responseHTML = "";
-
 
                 if (response) {
 
@@ -392,7 +496,9 @@ function displayReviews(reviews) {
 
                             <button
                                 onclick="updateResponse(${review.id})">
+
                                 Update Response
+
                             </button>
 
                         </div>
@@ -411,15 +517,15 @@ function displayReviews(reviews) {
 
                             <button
                                 onclick="respondToReview(${review.id})">
+
                                 Respond
+
                             </button>
 
                         </div>
 
                     `;
-
                 }
-
 
                 reviewList.innerHTML += `
 
@@ -448,11 +554,8 @@ function displayReviews(reviews) {
                     </div>
 
                 `;
-
             });
-
         });
-
 }
 
 
@@ -465,21 +568,17 @@ function calculateSummary(reviews) {
     const reviewCount =
         reviews ? reviews.length : 0;
 
-
     const reviewCountElement =
         document.getElementById("reviewCount");
 
     const averageRatingElement =
         document.getElementById("averageRating");
 
-
     if (reviewCountElement) {
 
         reviewCountElement.textContent =
             reviewCount;
-
     }
-
 
     if (reviewCount === 0) {
 
@@ -487,36 +586,27 @@ function calculateSummary(reviews) {
 
             averageRatingElement.textContent =
                 "0.0";
-
         }
 
         return;
-
     }
 
-
     let totalRating = 0;
-
 
     reviews.forEach(function(review) {
 
         totalRating +=
             Number(review.rating) || 0;
-
     });
-
 
     const averageRating =
         totalRating / reviewCount;
-
 
     if (averageRatingElement) {
 
         averageRatingElement.textContent =
             averageRating.toFixed(1);
-
     }
-
 }
 
 
@@ -529,7 +619,6 @@ function respondToReview(reviewId) {
     window.location.href =
         "business-response.html?reviewId="
         + reviewId;
-
 }
 
 
@@ -542,7 +631,6 @@ function updateResponse(reviewId) {
     window.location.href =
         "business-response.html?reviewId="
         + reviewId;
-
 }
 
 
@@ -560,5 +648,6 @@ document.addEventListener(
 
         loadReviews();
 
+        loadDashboardMetrics();
     }
 );

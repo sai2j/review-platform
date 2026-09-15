@@ -1,6 +1,7 @@
 package com.nit.business;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,55 +19,62 @@ public class BusinessDashboardController {
     private final BusinessClamService businessClaimService;
     private final BusinessService businessService;
     private final ReviewService reviewService;
+    private final BusinessDashboardService dashboardService;
 
     public BusinessDashboardController(
             BusinessClamService businessClaimService,
             BusinessService businessService,
-            ReviewService reviewService) {
+            ReviewService reviewService,
+            BusinessDashboardService dashboardService) {
 
         this.businessClaimService = businessClaimService;
         this.businessService = businessService;
         this.reviewService = reviewService;
+        this.dashboardService = dashboardService;
     }
 
     // Logged-in user can access only their own business
     @GetMapping("/user/{userId}")
-    public Business getBusinessForUser(@PathVariable Long userId) {
+    public Business getBusinessForUser(
+            @PathVariable Long userId) {
 
         BusinessClaim claim =
-                businessClaimService.getApprovedClaimByUserId(userId);
+                businessClaimService
+                        .getApprovedClaimByUserId(userId);
 
         if (claim == null) {
             return null;
         }
 
         return businessService.getBusinessById(
-                claim.getBusinessId()
-        );
+                claim.getBusinessId());
     }
 
     // Logged-in user can access only their own website
     @GetMapping("/user/{userId}/website")
-    public Website getWebsiteForUser(@PathVariable Long userId) {
+    public Website getWebsiteForUser(
+            @PathVariable Long userId) {
 
         BusinessClaim claim =
-                businessClaimService.getApprovedClaimByUserId(userId);
+                businessClaimService
+                        .getApprovedClaimByUserId(userId);
 
         if (claim == null) {
             return null;
         }
 
         return businessService.getWebsiteForBusiness(
-                claim.getBusinessId()
-        );
+                claim.getBusinessId());
     }
 
     // Logged-in user can access only reviews of their business
     @GetMapping("/user/{userId}/reviews")
-    public List<Review> getBusinessReviews(@PathVariable Long userId) {
+    public List<Review> getBusinessReviews(
+            @PathVariable Long userId) {
 
         BusinessClaim claim =
-                businessClaimService.getApprovedClaimByUserId(userId);
+                businessClaimService
+                        .getApprovedClaimByUserId(userId);
 
         if (claim == null) {
             return List.of();
@@ -74,15 +82,22 @@ public class BusinessDashboardController {
 
         Website website =
                 businessService.getWebsiteForBusiness(
-                        claim.getBusinessId()
-                );
+                        claim.getBusinessId());
 
         if (website == null) {
             return List.of();
         }
 
         return reviewService.getReviewsByWebsiteId(
-                website.getId()
-        );
+                website.getId());
+    }
+
+    // Business dashboard metrics
+    @GetMapping("/user/{userId}/metrics")
+    public Map<String, Object> getDashboardMetrics(
+            @PathVariable Long userId) {
+
+        return dashboardService
+                .getDashboardMetrics(userId);
     }
 }

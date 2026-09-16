@@ -6,12 +6,14 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/business-claims")
+@RequestMapping({"/business-claims", "/api/v1/business/claims"})
 public class BusinessClaimcontroller {
 
     private final BusinessClamService businessClaimService;
 
-    public BusinessClaimcontroller(BusinessClamService businessClaimService) {
+    public BusinessClaimcontroller(
+            BusinessClamService businessClaimService) {
+
         this.businessClaimService = businessClaimService;
     }
 
@@ -20,13 +22,15 @@ public class BusinessClaimcontroller {
     public BusinessClaim createBusinessClaim(
             @RequestBody BusinessClaim businessClaim) {
 
-        return businessClaimService.saveBusinessClaim(businessClaim);
+        return businessClaimService.saveBusinessClaim(
+                businessClaim);
     }
 
     // Only ADMIN can view all claims
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<BusinessClaim> getAllBusinessClaims() {
+
         return businessClaimService.getAllBusinessClaims();
     }
 
@@ -36,7 +40,8 @@ public class BusinessClaimcontroller {
     public BusinessClaim getBusinessClaimById(
             @PathVariable Long id) {
 
-        return businessClaimService.getBusinessClaimById(id);
+        return businessClaimService
+                .getBusinessClaimById(id);
     }
 
     // User can view only their own approved claim
@@ -74,7 +79,8 @@ public class BusinessClaimcontroller {
     public String deleteBusinessClaim(
             @PathVariable Long id) {
 
-        businessClaimService.deleteBusinessClaim(id);
+        businessClaimService
+                .deleteBusinessClaim(id);
 
         return "Business claim deleted successfully";
     }

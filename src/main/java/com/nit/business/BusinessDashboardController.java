@@ -3,6 +3,8 @@ package com.nit.business;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,26 +13,53 @@ import org.springframework.web.bind.annotation.RestController;
 import com.nit.Website.Website;
 import com.nit.review.Review;
 import com.nit.review.ReviewService;
+import com.nit.user.User;
+import com.nit.user.UserRepository;
 
 @RestController
-@RequestMapping("/business-dashboard")
+@RequestMapping({"/business-dashboard", "/api/v1/business"})
 public class BusinessDashboardController {
 
     private final BusinessClamService businessClaimService;
     private final BusinessService businessService;
     private final ReviewService reviewService;
     private final BusinessDashboardService dashboardService;
+    private final UserRepository userRepository;
 
     public BusinessDashboardController(
             BusinessClamService businessClaimService,
             BusinessService businessService,
             ReviewService reviewService,
-            BusinessDashboardService dashboardService) {
+            BusinessDashboardService dashboardService,
+            UserRepository userRepository) {
 
         this.businessClaimService = businessClaimService;
         this.businessService = businessService;
         this.reviewService = reviewService;
         this.dashboardService = dashboardService;
+        this.userRepository = userRepository;
+    }
+
+    // PDF API: GET /api/v1/business/dashboard
+    @GetMapping("/dashboard")
+    public Map<String, Object> getBusinessDashboard() {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext()
+                        .getAuthentication();
+
+        String loggedInEmail =
+                authentication.getName();
+
+        User loggedInUser =
+                userRepository.findByEmail(loggedInEmail);
+
+        if (loggedInUser == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        return dashboardService
+                .getDashboardMetrics(loggedInUser.getId());
     }
 
     // Logged-in user can access only their own business
@@ -92,7 +121,7 @@ public class BusinessDashboardController {
                 website.getId());
     }
 
-    // Business dashboard metrics
+    // Existing dashboard metrics endpoint
     @GetMapping("/user/{userId}/metrics")
     public Map<String, Object> getDashboardMetrics(
             @PathVariable Long userId) {

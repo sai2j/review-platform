@@ -14,126 +14,156 @@ import com.nit.user.UserRepository;
 @Service
 public class BusinessResponseService {
 
-	private final BusinessResponseRepository businessResponseRepository;
+    private final BusinessResponseRepository businessResponseRepository;
+    private final BusinessRepository businessRepository;
+    private final ReviewRepository reviewRepository;
+    private final BusinessClamService businessClaimService;
+    private final UserRepository userRepository;
 
-	private final BusinessRepository businessRepository;
+    public BusinessResponseService(
+            BusinessResponseRepository businessResponseRepository,
+            BusinessRepository businessRepository,
+            ReviewRepository reviewRepository,
+            BusinessClamService businessClaimService,
+            UserRepository userRepository) {
 
-	private final ReviewRepository reviewRepository;
+        this.businessResponseRepository = businessResponseRepository;
+        this.businessRepository = businessRepository;
+        this.reviewRepository = reviewRepository;
+        this.businessClaimService = businessClaimService;
+        this.userRepository = userRepository;
+    }
 
-	private final BusinessClamService businessClaimService;
+    public BusinessResponse saveBusinessResponse(
+            BusinessResponse businessResponse) {
 
-	private final UserRepository userRepository;
+        if (!canAccessBusiness(businessResponse.getBusinessId())) {
+            throw new AccessDeniedException(
+                    "You can respond only for your approved business");
+        }
 
-	public BusinessResponseService(BusinessResponseRepository businessResponseRepository,
-			BusinessRepository businessRepository, ReviewRepository reviewRepository,
-			BusinessClamService businessClaimService, UserRepository userRepository) {
+        if (businessResponse.getBusinessId() == null
+                || !businessRepository.existsById(
+                        businessResponse.getBusinessId())) {
 
-		this.businessResponseRepository = businessResponseRepository;
-		this.businessRepository = businessRepository;
-		this.reviewRepository = reviewRepository;
-		this.businessClaimService = businessClaimService;
-		this.userRepository = userRepository;
-	}
+            throw new RuntimeException("Business does not exist");
+        }
 
-	public BusinessResponse saveBusinessResponse(BusinessResponse businessResponse) {
+        if (businessResponse.getReviewId() == null
+                || !reviewRepository.existsById(
+                        businessResponse.getReviewId())) {
 
-		if (!canAccessBusiness(businessResponse.getBusinessId())) {
-			throw new AccessDeniedException("You can respond only for your approved business");
-		}
+            throw new RuntimeException("Review does not exist");
+        }
 
-		if (!businessRepository.existsById(businessResponse.getBusinessId())) {
+        BusinessResponse existingResponse =
+                businessResponseRepository
+                        .findByBusinessIdAndReviewId(
+                                businessResponse.getBusinessId(),
+                                businessResponse.getReviewId())
+                        .orElse(null);
 
-			throw new RuntimeException("Business does not exist");
-		}
+        if (existingResponse != null) {
 
-		if (!reviewRepository.existsById(businessResponse.getReviewId())) {
+            existingResponse.setResponse(
+                    businessResponse.getResponse());
 
-			throw new RuntimeException("Review does not exist");
-		}
+            return businessResponseRepository.save(
+                    existingResponse);
+        }
 
-		BusinessResponse existingResponse = businessResponseRepository
-				.findByBusinessIdAndReviewId(businessResponse.getBusinessId(), businessResponse.getReviewId())
-				.orElse(null);
+        return businessResponseRepository.save(
+                businessResponse);
+    }
 
-		if (existingResponse != null) {
+    public List<BusinessResponse> getAllBusinessResponses() {
+        return businessResponseRepository.findAll();
+    }
 
-			existingResponse.setResponse(businessResponse.getResponse());
+    public BusinessResponse getBusinessResponseById(Long id) {
+        return businessResponseRepository
+                .findById(id)
+                .orElse(null);
+    }
 
-			return businessResponseRepository.save(existingResponse);
-		}
+    public BusinessResponse updateBusinessResponse(
+            Long id,
+            BusinessResponse businessResponse) {
 
-		return businessResponseRepository.save(businessResponse);
-	}
+        if (!canAccessResponse(id)) {
+            throw new AccessDeniedException(
+                    "You can update only your business response");
+        }
 
-	public List<BusinessResponse> getAllBusinessResponses() {
+        BusinessResponse existingResponse =
+                businessResponseRepository
+                        .findById(id)
+                        .orElse(null);
 
-		return businessResponseRepository.findAll();
-	}
+        if (existingResponse == null) {
+            return null;
+        }
 
-	public BusinessResponse getBusinessResponseById(Long id) {
+        existingResponse.setResponse(
+                businessResponse.getResponse());
 
-		return businessResponseRepository.findById(id).orElse(null);
-	}
+        return businessResponseRepository.save(
+                existingResponse);
+    }
 
-	public BusinessResponse updateBusinessResponse(Long id, BusinessResponse businessResponse) {
+    public void deleteBusinessResponse(Long id) {
 
-		if (!canAccessResponse(id)) {
-			throw new AccessDeniedException("You can update only your business response");
-		}
+        if (!canAccessResponse(id)) {
+            throw new AccessDeniedException(
+                    "You can delete only your business response");
+        }
 
-		BusinessResponse existingResponse = businessResponseRepository.findById(id).orElse(null);
+        businessResponseRepository.deleteById(id);
+    }
 
-		if (existingResponse == null) {
-			return null;
-		}
+    public boolean canAccessBusiness(Long businessId) {
 
-		existingResponse.setResponse(businessResponse.getResponse());
+        Authentication authentication =
+                SecurityContextHolder.getContext()
+                        .getAuthentication();
 
-		return businessResponseRepository.save(existingResponse);
-	}
+        if (authentication == null
+                || !authentication.isAuthenticated()) {
+            return false;
+        }
 
-	public void deleteBusinessResponse(Long id) {
+        User loggedInUser =
+                userRepository.findByEmail(
+                        authentication.getName());
 
-		if (!canAccessResponse(id)) {
-			throw new AccessDeniedException("You can delete only your business response");
-		}
+        if (loggedInUser == null) {
+            return false;
+        }
 
-		businessResponseRepository.deleteById(id);
-	}
+        BusinessClaim claim =
+                businessClaimService
+                        .getApprovedClaimByUserId(
+                                loggedInUser.getId());
 
-	// Check whether logged-in user owns an approved claim
-	public boolean canAccessBusiness(Long businessId) {
+        if (claim == null) {
+            return false;
+        }
 
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return claim.getBusinessId().equals(businessId);
+    }
 
-		if (authentication == null || !authentication.isAuthenticated()) {
-			return false;
-		}
+    public boolean canAccessResponse(Long responseId) {
 
-		User loggedInUser = userRepository.findByEmail(authentication.getName());
+        BusinessResponse response =
+                businessResponseRepository
+                        .findById(responseId)
+                        .orElse(null);
 
-		if (loggedInUser == null) {
-			return false;
-		}
+        if (response == null) {
+            return false;
+        }
 
-		BusinessClaim claim = businessClaimService.getApprovedClaimByUserId(loggedInUser.getId());
-
-		if (claim == null) {
-			return false;
-		}
-
-		return claim.getBusinessId().equals(businessId);
-	}
-
-	// Check whether logged-in user owns the response
-	public boolean canAccessResponse(Long responseId) {
-
-		BusinessResponse response = businessResponseRepository.findById(responseId).orElse(null);
-
-		if (response == null) {
-			return false;
-		}
-
-		return canAccessBusiness(response.getBusinessId());
-	}
+        return canAccessBusiness(
+                response.getBusinessId());
+    }
 }

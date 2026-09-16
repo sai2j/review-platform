@@ -25,6 +25,8 @@ public class User {
 
     private String role = "USER";
 
+    private String status = "ACTIVE";
+
     public User() {
     }
 
@@ -33,6 +35,7 @@ public class User {
         this.email = email;
         this.password = password;
         this.role = "USER";
+        this.status = "ACTIVE";
     }
 
     public Long getId() {
@@ -75,6 +78,14 @@ public class User {
         this.role = role;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -82,6 +93,7 @@ public class User {
                 ", name='" + name + '\'' +
                 ", email='" + email + '\'' +
                 ", role='" + role + '\'' +
+                ", status='" + status + '\'' +
                 '}';
     }
 }

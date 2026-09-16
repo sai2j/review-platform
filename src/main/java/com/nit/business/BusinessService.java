@@ -5,8 +5,16 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.UUID;
+
+import javax.naming.Context;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -74,6 +82,7 @@ public class BusinessService {
 
         if (authentication == null
                 || !authentication.isAuthenticated()) {
+
             throw new AccessDeniedException(
                     "You must be logged in to edit business profile");
         }
@@ -84,6 +93,7 @@ public class BusinessService {
                 userRepository.findByEmail(loggedInEmail);
 
         if (loggedInUser == null) {
+
             throw new AccessDeniedException(
                     "User not found");
         }
@@ -135,6 +145,10 @@ public class BusinessService {
         return businessRepository.save(business);
     }
 
+    // =========================================================
+    // BUSINESS EMAIL VERIFICATION
+    // =========================================================
+
     public Business createEmailVerificationToken(
             Long businessId,
             String email) {
@@ -159,10 +173,12 @@ public class BusinessService {
         }
 
         String emailDomain = getEmailDomain(email);
+
         String websiteDomain =
                 normalizeDomain(business.getOfficialUrl());
 
         if (!emailDomain.equals(websiteDomain)) {
+
             throw new RuntimeException(
                     "Business email domain must match official website domain");
         }
@@ -212,6 +228,10 @@ public class BusinessService {
 
         return businessRepository.save(business);
     }
+
+    // =========================================================
+    // META TAG VERIFICATION
+    // =========================================================
 
     public Business createMetaVerificationToken(
             Long businessId) {
@@ -329,6 +349,142 @@ public class BusinessService {
                     "Unable to verify website meta tag");
         }
     }
+
+    // =========================================================
+    // DNS VERIFICATION
+    // =========================================================
+
+    public Business createDnsVerificationToken(
+            Long businessId) {
+
+        Business business =
+                businessRepository.findById(businessId).orElse(null);
+
+        if (business == null) {
+            throw new RuntimeException("Business not found");
+        }
+
+        if (business.getOfficialUrl() == null
+                || business.getOfficialUrl().isBlank()) {
+
+            throw new RuntimeException(
+                    "Official website URL is required");
+        }
+
+        String token = UUID.randomUUID().toString();
+
+        business.setDnsVerificationToken(token);
+        business.setDnsVerified(false);
+
+        return businessRepository.save(business);
+    }
+
+    public Business verifyBusinessDns(Long businessId) {
+
+        Business business =
+                businessRepository.findById(businessId).orElse(null);
+
+        if (business == null) {
+            throw new RuntimeException("Business not found");
+        }
+
+        String token =
+                business.getDnsVerificationToken();
+
+        if (token == null || token.isBlank()) {
+
+            throw new RuntimeException(
+                    "DNS verification token has not been generated");
+        }
+
+        String domain =
+                normalizeDomain(business.getOfficialUrl());
+
+        if (!isDnsTokenPresent(domain, token)) {
+
+            throw new RuntimeException(
+                    "DNS verification TXT record not found");
+        }
+
+        business.setDnsVerified(true);
+        business.setDnsVerificationToken(null);
+        business.setStatus("VERIFIED");
+
+        return businessRepository.save(business);
+    }
+
+    private boolean isDnsTokenPresent(
+            String domain,
+            String expectedToken) {
+
+        DirContext context = null;
+
+        try {
+
+            Hashtable<String, String> environment =
+                    new Hashtable<>();
+
+            environment.put(
+                    Context.INITIAL_CONTEXT_FACTORY,
+                    "com.sun.jndi.dns.DnsContextFactory");
+
+            context =
+                    new InitialDirContext(environment);
+
+            Attributes attributes =
+                    context.getAttributes(
+                            domain,
+                            new String[]{"TXT"});
+
+            Attribute txtAttribute =
+                    attributes.get("TXT");
+
+            if (txtAttribute == null) {
+                return false;
+            }
+
+            for (int i = 0;
+                    i < txtAttribute.size();
+                    i++) {
+
+                Object value =
+                        txtAttribute.get(i);
+
+                if (value != null) {
+
+                    String txtValue =
+                            value.toString()
+                                    .replace("\"", "")
+                                    .trim();
+
+                    if (txtValue.equals(expectedToken)) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+
+        } catch (NamingException e) {
+
+            throw new RuntimeException(
+                    "Unable to check DNS TXT record");
+
+        } finally {
+
+            if (context != null) {
+
+                try {
+                    context.close();
+                } catch (NamingException ignored) {
+                }
+            }
+        }
+    }
+
+    // =========================================================
+    // OTHER BUSINESS METHODS
+    // =========================================================
 
     public void deleteBusiness(Long id) {
         businessRepository.deleteById(id);
@@ -465,6 +621,7 @@ public class BusinessService {
                     uri.getHost();
 
             if (domain == null) {
+
                 throw new RuntimeException(
                         "Invalid website URL");
             }
@@ -473,6 +630,7 @@ public class BusinessService {
                     domain.toLowerCase();
 
             if (domain.startsWith("www.")) {
+
                 domain =
                         domain.substring(4);
             }

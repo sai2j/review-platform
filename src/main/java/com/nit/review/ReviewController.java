@@ -6,6 +6,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -14,10 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nit.dto.ReviewRequestDTO;
+import com.nit.dto.ReviewResponseDTO;
+
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/reviews")
+@RequestMapping({"/reviews", "/api/v1/reviews"})
 @Validated
 public class ReviewController {
 
@@ -27,12 +31,22 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
+    // ==============================
+    // GET REVIEWS BY WEBSITE
+    // ==============================
+
     @GetMapping("/website/{websiteId}")
-    public List<Review> getReviewsByWebsiteId(
+    public List<ReviewResponseDTO> getReviewsByWebsiteId(
             @PathVariable Long websiteId) {
 
-        return reviewService.getReviewsByWebsiteId(websiteId);
+        return reviewService.convertToResponseDTOList(
+                reviewService.getReviewsByWebsiteId(websiteId)
+        );
     }
+
+    // ==============================
+    // RATING SUMMARY
+    // ==============================
 
     @GetMapping("/website/{websiteId}/summary")
     public RatingSummary getRatingSummary(
@@ -49,17 +63,41 @@ public class ReviewController {
         );
     }
 
-    @PostMapping
-    public Review createReview(
-            @Valid @RequestBody Review review) {
+    // ==============================
+    // CREATE REVIEW
+    // ==============================
 
-        return reviewService.saveReview(review);
+    @PostMapping
+    public ReviewResponseDTO createReview(
+            @Valid @RequestBody ReviewRequestDTO request) {
+
+        return reviewService.saveReview(request);
     }
 
-    @GetMapping
-    public List<Review> getAllReviews() {
+    // ==============================
+    // CREATE REVIEW FOR WEBSITE
+    // ==============================
 
-        return reviewService.getAllReviews();
+    @PostMapping("/website/{websiteId}")
+    public ReviewResponseDTO createReviewForWebsite(
+            @PathVariable Long websiteId,
+            @Valid @RequestBody ReviewRequestDTO request) {
+
+        request.setWebsiteId(websiteId);
+
+        return reviewService.saveReview(request);
+    }
+
+    // ==============================
+    // GET ALL REVIEWS
+    // ==============================
+
+    @GetMapping
+    public List<ReviewResponseDTO> getAllReviews() {
+
+        return reviewService.convertToResponseDTOList(
+                reviewService.getAllReviews()
+        );
     }
 
     // ==============================
@@ -68,24 +106,36 @@ public class ReviewController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/pending")
-    public List<Review> getPendingReviews() {
+    public List<ReviewResponseDTO> getPendingReviews() {
 
-        return reviewService.getPendingReviews();
+        return reviewService.convertToResponseDTOList(
+                reviewService.getPendingReviews()
+        );
     }
+
+    // ==============================
+    // GET REVIEW BY ID
+    // ==============================
 
     @GetMapping("/{id}")
-    public Review getReviewById(
+    public ReviewResponseDTO getReviewById(
             @PathVariable Long id) {
 
-        return reviewService.getReviewById(id);
+        return reviewService.convertToResponseDTO(
+                reviewService.getReviewById(id)
+        );
     }
 
-    @PutMapping("/{id}")
-    public Review updateReview(
-            @PathVariable Long id,
-            @Valid @RequestBody Review review) {
+    // ==============================
+    // UPDATE REVIEW
+    // ==============================
 
-        return reviewService.updateReview(id, review);
+    @PatchMapping("/{id}")
+    public ReviewResponseDTO updateReview(
+            @PathVariable Long id,
+            @Valid @RequestBody ReviewRequestDTO request) {
+
+        return reviewService.updateReview(id, request);
     }
 
     // ==============================
@@ -94,7 +144,21 @@ public class ReviewController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/status")
-    public Review updateReviewStatus(
+    public ReviewResponseDTO updateReviewStatus(
+            @PathVariable Long id,
+            @RequestParam String status) {
+
+        return reviewService.updateReviewStatus(id, status);
+    }
+
+    // ==============================
+    // PDF ADMIN REVIEW MODERATION API
+    // PATCH /api/v1/admin/reviews/{id}
+    // ==============================
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/api/v1/admin/reviews/{id}")
+    public ReviewResponseDTO adminUpdateReview(
             @PathVariable Long id,
             @RequestParam String status) {
 
@@ -107,14 +171,19 @@ public class ReviewController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/verification-status")
-    public Review updateReviewVerificationStatus(
+    public ReviewResponseDTO updateReviewVerificationStatus(
             @PathVariable Long id,
             @RequestParam String verificationStatus) {
 
         return reviewService.updateReviewVerificationStatus(
                 id,
-                verificationStatus);
+                verificationStatus
+        );
     }
+
+    // ==============================
+    // DELETE REVIEW
+    // ==============================
 
     @DeleteMapping("/{id}")
     public String deleteReview(

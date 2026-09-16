@@ -72,4 +72,35 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+
+    // =========================
+    // ACCOUNT RESTRICTION
+    // =========================
+
+    public User updateUserStatus(Long id, String status) {
+
+        User user = userRepository.findById(id).orElse(null);
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        if (status == null || status.isBlank()) {
+            throw new RuntimeException("Status is required");
+        }
+
+        status = status.toUpperCase();
+
+        if (!status.equals("ACTIVE")
+                && !status.equals("RESTRICTED")) {
+
+            throw new RuntimeException(
+                    "Status must be ACTIVE or RESTRICTED"
+            );
+        }
+
+        user.setStatus(status);
+
+        return userRepository.save(user);
+    }
 }

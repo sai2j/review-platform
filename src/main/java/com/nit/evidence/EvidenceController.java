@@ -1,3 +1,4 @@
+
 package com.nit.evidence;
 
 import java.nio.file.Files;
@@ -9,7 +10,6 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,7 +23,6 @@ public class EvidenceController {
         this.evidenceService = evidenceService;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping(
             value = "/review/{reviewId}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -34,7 +33,6 @@ public class EvidenceController {
         return evidenceService.uploadEvidence(reviewId, file);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/review/{reviewId}")
     public List<Evidence> getEvidenceByReviewId(
             @PathVariable Long reviewId) {
@@ -42,7 +40,6 @@ public class EvidenceController {
         return evidenceService.getEvidenceByReviewId(reviewId);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public Evidence getEvidenceById(
             @PathVariable Long id) {
@@ -50,7 +47,6 @@ public class EvidenceController {
         return evidenceService.getEvidenceById(id);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}/file")
     public ResponseEntity<Resource> downloadEvidence(
             @PathVariable Long id) {
@@ -94,3 +90,4 @@ public class EvidenceController {
         }
     }
 }
+

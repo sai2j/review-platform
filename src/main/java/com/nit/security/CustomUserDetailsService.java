@@ -1,4 +1,3 @@
-
 package com.nit.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -35,6 +34,14 @@ public class CustomUserDetailsService
             );
         }
 
+        // Block restricted accounts
+        if ("RESTRICTED".equalsIgnoreCase(user.getStatus())) {
+
+            throw new UsernameNotFoundException(
+                    "User account is restricted"
+            );
+        }
+
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getEmail())
                 .password(user.getPassword())
@@ -42,4 +49,3 @@ public class CustomUserDetailsService
                 .build();
     }
 }
-

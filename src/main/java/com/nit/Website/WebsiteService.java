@@ -1,3 +1,4 @@
+
 package com.nit.Website;
 
 import java.net.URI;
@@ -5,6 +6,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.nit.dto.WebsiteResponseDTO;
+import com.nit.review.Review;
 import com.nit.review.ReviewService;
 
 @Service
@@ -39,12 +42,80 @@ public class WebsiteService {
         return websiteRepository.save(website);
     }
 
-    public List<Website> getAllWebsites() {
-        return websiteRepository.findAll();
+    public List<WebsiteResponseDTO> getAllWebsites() {
+
+        return websiteRepository.findAll()
+                .stream()
+                .map(this::convertToResponseDTO)
+                .toList();
     }
 
-    public Website getWebsiteById(Long id) {
-        return websiteRepository.findById(id).orElse(null);
+    public WebsiteResponseDTO getWebsiteById(Long id) {
+
+        Website website =
+                websiteRepository.findById(id).orElse(null);
+
+        if (website == null) {
+            return null;
+        }
+
+        return convertToResponseDTO(website);
+    }
+
+    // WEBSITE PROFILE BY DOMAIN
+    public WebsiteResponseDTO getWebsiteByDomain(String domain) {
+
+        String canonicalDomain =
+                normalizeDomain(domain);
+
+        Website website =
+                websiteRepository
+                        .findByCanonicalDomain(canonicalDomain)
+                        .orElse(null);
+
+        if (website == null) {
+            return null;
+        }
+
+        return convertToResponseDTO(website);
+    }
+
+    // WEBSITE REVIEWS
+    public List<com.nit.dto.ReviewResponseDTO> getWebsiteReviews(
+            Long websiteId) {
+
+        List<Review> reviews =
+                reviewService.getReviewsByWebsiteId(websiteId);
+
+        return reviewService.convertToResponseDTOList(
+                reviews);
+    }
+
+    // WEBSITE SEARCH
+    public List<WebsiteResponseDTO> searchWebsites(String query) {
+
+        List<Website> websites;
+
+        if (query == null || query.trim().isEmpty()) {
+
+            websites = websiteRepository.findAll();
+
+        } else {
+
+            String searchQuery = query.trim();
+
+            websites =
+                    websiteRepository
+                            .findByNameContainingIgnoreCaseOrCanonicalDomainContainingIgnoreCase(
+                                    searchQuery,
+                                    searchQuery
+                            );
+        }
+
+        return websites
+                .stream()
+                .map(this::convertToResponseDTO)
+                .toList();
     }
 
     // ADMIN SEO UPDATE
@@ -75,6 +146,21 @@ public class WebsiteService {
 
         // Then delete the website
         websiteRepository.deleteById(id);
+    }
+
+    // ENTITY TO DTO CONVERSION
+    private WebsiteResponseDTO convertToResponseDTO(Website website) {
+
+        return new WebsiteResponseDTO(
+                website.getId(),
+                website.getName(),
+                website.getUrl(),
+                website.getDescription(),
+                website.getCanonicalDomain(),
+                website.getSeoTitle(),
+                website.getSeoDescription(),
+                website.getCanonicalUrl()
+        );
     }
 
     private String normalizeDomain(String url) {
@@ -111,3 +197,4 @@ public class WebsiteService {
         }
     }
 }
+

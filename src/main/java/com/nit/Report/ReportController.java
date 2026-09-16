@@ -30,6 +30,17 @@ public class ReportController {
         return reportService.saveReport(report);
     }
 
+    // CREATE REPORT FOR REVIEW - PDF API
+    @PostMapping("/review/{reviewId}")
+    public Report createReportForReview(
+            @PathVariable Long reviewId,
+            @Valid @RequestBody Report report) {
+
+        report.setReviewId(reviewId);
+
+        return reportService.saveReport(report);
+    }
+
     // Only ADMIN can view all reports
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping

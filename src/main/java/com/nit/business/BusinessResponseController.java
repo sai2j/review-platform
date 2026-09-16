@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/business-responses")
+@RequestMapping({"/business-responses", "/api/v1/business"})
 public class BusinessResponseController {
 
     private final BusinessResponseService businessResponseService;
@@ -30,6 +30,19 @@ public class BusinessResponseController {
     @PostMapping
     public BusinessResponse createBusinessResponse(
             @Valid @RequestBody BusinessResponse businessResponse) {
+
+        return businessResponseService
+                .saveBusinessResponse(businessResponse);
+    }
+
+    // PDF API: POST /api/v1/business/reviews/{id}/responses
+    @PreAuthorize("@businessResponseService.canAccessBusiness(#businessResponse.businessId)")
+    @PostMapping("/reviews/{id}/responses")
+    public BusinessResponse createBusinessResponseForReview(
+            @PathVariable Long id,
+            @Valid @RequestBody BusinessResponse businessResponse) {
+
+        businessResponse.setReviewId(id);
 
         return businessResponseService
                 .saveBusinessResponse(businessResponse);

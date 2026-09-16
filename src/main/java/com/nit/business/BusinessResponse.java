@@ -19,7 +19,6 @@ public class BusinessResponse {
     @NotNull(message = "Business ID is required")
     private Long businessId;
 
-    @NotNull(message = "Review ID is required")
     private Long reviewId;
 
     @NotBlank(message = "Response is required")

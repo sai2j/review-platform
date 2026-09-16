@@ -62,6 +62,9 @@ public class EvidenceService {
 
         User loggedInUser = getLoggedInUser();
 
+        // Only the review owner or ADMIN can upload evidence
+        checkReviewAccess(review, loggedInUser);
+
         try {
 
             Files.createDirectories(evidenceStorage);
@@ -124,48 +127,93 @@ public class EvidenceService {
 
         } catch (IOException e) {
 
-        	 e.printStackTrace();
+            e.printStackTrace();
 
-        	    throw new RuntimeException(
-        	            "Unable to store evidence file: " + e.getMessage());
+            throw new RuntimeException(
+                    "Unable to store evidence file: " + e.getMessage());
         }
     }
 
     public List<Evidence> getEvidenceByReviewId(Long reviewId) {
 
-        if (!reviewRepository.existsById(reviewId)) {
+        Review review =
+                reviewRepository.findById(reviewId).orElse(null);
+
+        if (review == null) {
             throw new RuntimeException("Review not found");
         }
 
-        getLoggedInUser();
+        User loggedInUser = getLoggedInUser();
+
+        // Only review owner or ADMIN can access evidence list
+        checkReviewAccess(review, loggedInUser);
 
         return evidenceRepository.findByReviewId(reviewId);
     }
 
     public Evidence getEvidenceById(Long id) {
 
-        getLoggedInUser();
-
-        return evidenceRepository
-                .findById(id)
-                .orElse(null);
-    }
-
-    public Path getEvidenceFile(Long id) {
-
         Evidence evidence =
-                evidenceRepository.findById(id).orElse(null);
+                evidenceRepository
+                        .findById(id)
+                        .orElse(null);
 
         if (evidence == null) {
             throw new RuntimeException("Evidence not found");
         }
 
-        getLoggedInUser();
+        User loggedInUser = getLoggedInUser();
+
+        Review review =
+                reviewRepository
+                        .findById(evidence.getReviewId())
+                        .orElse(null);
+
+        if (review == null) {
+            throw new RuntimeException("Review not found");
+        }
+
+        // Only review owner or ADMIN can access evidence
+        checkReviewAccess(review, loggedInUser);
+
+        return evidence;
+    }
+
+    public Path getEvidenceFile(Long id) {
+
+        Evidence evidence =
+                evidenceRepository
+                        .findById(id)
+                        .orElse(null);
+
+        if (evidence == null) {
+            throw new RuntimeException("Evidence not found");
+        }
+
+        User loggedInUser = getLoggedInUser();
+
+        Review review =
+                reviewRepository
+                        .findById(evidence.getReviewId())
+                        .orElse(null);
+
+        if (review == null) {
+            throw new RuntimeException("Review not found");
+        }
+
+        // Only review owner or ADMIN can download/view evidence
+        checkReviewAccess(review, loggedInUser);
 
         Path path =
                 Paths.get(evidence.getStoragePath())
                         .toAbsolutePath()
                         .normalize();
+
+        // Make sure file is still inside private evidence storage
+        if (!path.startsWith(evidenceStorage)) {
+            throw new AccessDeniedException(
+                    "Invalid evidence storage path");
+        }
 
         if (!Files.exists(path)) {
             throw new RuntimeException(
@@ -173,6 +221,30 @@ public class EvidenceService {
         }
 
         return path;
+    }
+
+    private void checkReviewAccess(
+            Review review,
+            User loggedInUser) {
+
+        if (loggedInUser == null) {
+            throw new AccessDeniedException(
+                    "You must be logged in");
+        }
+
+        // ADMIN has access
+        if ("ADMIN".equalsIgnoreCase(loggedInUser.getRole())) {
+            return;
+        }
+
+        // Review owner has access
+        if (review.getUserId() != null
+                && review.getUserId().equals(loggedInUser.getId())) {
+            return;
+        }
+
+        throw new AccessDeniedException(
+                "You are not authorized to access this evidence");
     }
 
     private User getLoggedInUser() {

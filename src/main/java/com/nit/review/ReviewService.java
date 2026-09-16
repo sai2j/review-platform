@@ -1,6 +1,7 @@
 package com.nit.review;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
@@ -12,6 +13,8 @@ import com.nit.Website.WebsiteRepository;
 import com.nit.admin.AdminRepository;
 import com.nit.audit.AuditLogService;
 import com.nit.business.BusinessResponseRepository;
+import com.nit.dto.ReviewRequestDTO;
+import com.nit.dto.ReviewResponseDTO;
 import com.nit.user.User;
 import com.nit.user.UserRepository;
 
@@ -21,51 +24,30 @@ public class ReviewService {
     public final ReviewRepository reviewRepository;
 
     private final UserRepository userRepository;
-
     private final WebsiteRepository websiteRepository;
-
     private final AdminRepository adminRepository;
-
     private final ReviewVoteRepository reviewVoteRepository;
-
     private final ReportRepository reportRepository;
-
     private final BusinessResponseRepository businessResponseRepository;
-
     private final AuditLogService auditLogService;
 
     public ReviewService(
-
             ReviewRepository reviewRepository,
-
             UserRepository userRepository,
-
             WebsiteRepository websiteRepository,
-
             AdminRepository adminRepository,
-
             ReviewVoteRepository reviewVoteRepository,
-
             ReportRepository reportRepository,
-
             BusinessResponseRepository businessResponseRepository,
-
             AuditLogService auditLogService) {
 
         this.reviewRepository = reviewRepository;
-
         this.userRepository = userRepository;
-
         this.websiteRepository = websiteRepository;
-
         this.adminRepository = adminRepository;
-
         this.reviewVoteRepository = reviewVoteRepository;
-
         this.reportRepository = reportRepository;
-
         this.businessResponseRepository = businessResponseRepository;
-
         this.auditLogService = auditLogService;
     }
 
@@ -73,7 +55,7 @@ public class ReviewService {
     // CREATE REVIEW
     // ==============================
 
-    public Review saveReview(Review review) {
+    public ReviewResponseDTO saveReview(ReviewRequestDTO request) {
 
         Authentication authentication =
                 SecurityContextHolder.getContext().getAuthentication();
@@ -87,15 +69,21 @@ public class ReviewService {
             throw new RuntimeException("User not found");
         }
 
-        // Do not trust userId from frontend
-        review.setUserId(loggedInUser.getId());
-
-        // Check website exists
-        if (review.getWebsiteId() == null
-                || !websiteRepository.existsById(review.getWebsiteId())) {
+        if (request.getWebsiteId() == null
+                || !websiteRepository.existsById(request.getWebsiteId())) {
 
             throw new RuntimeException("Website does not exist");
         }
+
+        Review review = new Review();
+
+        review.setRating(request.getRating());
+        review.setComment(request.getComment());
+
+        // Do not trust userId from frontend
+        review.setUserId(loggedInUser.getId());
+
+        review.setWebsiteId(request.getWebsiteId());
 
         // New reviews must go through moderation
         review.setStatus("PENDING");
@@ -103,7 +91,10 @@ public class ReviewService {
         // New reviews start as unverified
         review.setVerificationStatus("UNVERIFIED");
 
-        return reviewRepository.save(review);
+        Review savedReview =
+                reviewRepository.save(review);
+
+        return convertToResponseDTO(savedReview);
     }
 
     // ==============================
@@ -146,7 +137,9 @@ public class ReviewService {
     // UPDATE REVIEW
     // ==============================
 
-    public Review updateReview(Long id, Review review) {
+    public ReviewResponseDTO updateReview(
+            Long id,
+            ReviewRequestDTO request) {
 
         Review existingReview =
                 reviewRepository.findById(id).orElse(null);
@@ -175,11 +168,13 @@ public class ReviewService {
         }
 
         // Update only rating and comment
-        existingReview.setRating(review.getRating());
+        existingReview.setRating(request.getRating());
+        existingReview.setComment(request.getComment());
 
-        existingReview.setComment(review.getComment());
+        Review savedReview =
+                reviewRepository.save(existingReview);
 
-        return reviewRepository.save(existingReview);
+        return convertToResponseDTO(savedReview);
     }
 
     // ==============================
@@ -222,9 +217,7 @@ public class ReviewService {
                     "You can delete only your own review");
         }
 
-        // ==============================
-        // DELETE DEPENDENT DATA FIRST
-        // ==============================
+        // Delete dependent data first
 
         // 1. Delete business response
         businessResponseRepository.deleteByReviewId(id);
@@ -273,7 +266,9 @@ public class ReviewService {
     // ADMIN APPROVE / REJECT / HIDE / RESTORE REVIEW
     // ==============================
 
-    public Review updateReviewStatus(Long id, String status) {
+    public ReviewResponseDTO updateReviewStatus(
+            Long id,
+            String status) {
 
         Review review =
                 reviewRepository.findById(id).orElse(null);
@@ -283,6 +278,7 @@ public class ReviewService {
         }
 
         if (status == null || status.isBlank()) {
+
             throw new RuntimeException("Status is required");
         }
 
@@ -297,18 +293,12 @@ public class ReviewService {
                     "Status must be PENDING, APPROVED, REJECTED or HIDDEN");
         }
 
-        // Store old status before changing it
         String oldStatus = review.getStatus();
 
-        // Change review status
         review.setStatus(status);
 
         Review savedReview =
                 reviewRepository.save(review);
-
-        // ==============================
-        // SAVE AUDIT LOG
-        // ==============================
 
         String details =
                 oldStatus + " -> " + status;
@@ -320,14 +310,14 @@ public class ReviewService {
                 details
         );
 
-        return savedReview;
+        return convertToResponseDTO(savedReview);
     }
 
     // ==============================
     // ADMIN REVIEW VERIFICATION STATUS
     // ==============================
 
-    public Review updateReviewVerificationStatus(
+    public ReviewResponseDTO updateReviewVerificationStatus(
             Long id,
             String verificationStatus) {
 
@@ -358,19 +348,13 @@ public class ReviewService {
                     "Verification status must be UNVERIFIED, EMAIL_VERIFIED, EXPERIENCE_VERIFIED, UNDER_REVIEW or REMOVED");
         }
 
-        // Store old verification status
         String oldVerificationStatus =
                 review.getVerificationStatus();
 
-        // Change verification status
         review.setVerificationStatus(verificationStatus);
 
         Review savedReview =
                 reviewRepository.save(review);
-
-        // ==============================
-        // SAVE AUDIT LOG
-        // ==============================
 
         auditLogService.log(
                 "REVIEW_VERIFICATION_STATUS_CHANGED",
@@ -381,7 +365,7 @@ public class ReviewService {
                         + verificationStatus
         );
 
-        return savedReview;
+        return convertToResponseDTO(savedReview);
     }
 
     // ==============================
@@ -394,7 +378,6 @@ public class ReviewService {
                 reviewRepository.findByWebsiteId(websiteId);
 
         double totalRating = 0;
-
         int approvedCount = 0;
 
         for (Review review : reviews) {
@@ -402,7 +385,6 @@ public class ReviewService {
             if ("APPROVED".equalsIgnoreCase(review.getStatus())) {
 
                 totalRating += review.getRating();
-
                 approvedCount++;
             }
         }
@@ -430,7 +412,6 @@ public class ReviewService {
         for (Review review : reviews) {
 
             if ("APPROVED".equalsIgnoreCase(review.getStatus())) {
-
                 count++;
             }
         }
@@ -505,5 +486,39 @@ public class ReviewService {
         }
 
         return count;
+    }
+
+    // ==============================
+    // ENTITY -> RESPONSE DTO
+    // ==============================
+
+    public ReviewResponseDTO convertToResponseDTO(Review review) {
+
+        if (review == null) {
+            return null;
+        }
+
+        return new ReviewResponseDTO(
+                review.getId(),
+                review.getRating(),
+                review.getComment(),
+                review.getUserId(),
+                review.getWebsiteId(),
+                review.getStatus(),
+                review.getVerificationStatus(),
+                review.getCreatedAt()
+        );
+    }
+
+    // ==============================
+    // ENTITY LIST -> RESPONSE DTO LIST
+    // ==============================
+
+    public List<ReviewResponseDTO> convertToResponseDTOList(
+            List<Review> reviews) {
+
+        return reviews.stream()
+                .map(this::convertToResponseDTO)
+                .collect(Collectors.toList());
     }
 }

@@ -13,34 +13,90 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.nit.dto.ReviewRequestDTO;
+import com.nit.dto.ReviewResponseDTO;
+import com.nit.dto.WebsiteResponseDTO;
+import com.nit.review.ReviewService;
+
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/websites")
+@RequestMapping({"/websites", "/api/v1/websites"})
 public class WebsiteController {
 
     private final WebsiteService websiteService;
+    private final ReviewService reviewService;
 
-    public WebsiteController(WebsiteService websiteService) {
+    public WebsiteController(
+            WebsiteService websiteService,
+            ReviewService reviewService) {
+
         this.websiteService = websiteService;
+        this.reviewService = reviewService;
     }
 
     @PostMapping
     public Website createWebsite(@Valid @RequestBody Website website) {
+
         return websiteService.saveWebsite(website);
     }
 
     @GetMapping
-    public List<Website> getAllWebsites() {
+    public List<WebsiteResponseDTO> getAllWebsites() {
+
         return websiteService.getAllWebsites();
     }
 
+    // WEBSITE SEARCH
+
+    @GetMapping("/search")
+    public List<WebsiteResponseDTO> searchWebsites(
+            @RequestParam String q) {
+
+        return websiteService.searchWebsites(q);
+    }
+
+    // WEBSITE PROFILE BY DOMAIN
+
+    @GetMapping("/domain/{domain}")
+    public WebsiteResponseDTO getWebsiteByDomain(
+            @PathVariable String domain) {
+
+        return websiteService.getWebsiteByDomain(domain);
+    }
+
+    // WEBSITE PROFILE BY ID
+
     @GetMapping("/{id}")
-    public Website getwebsiteById(@PathVariable Long id) {
+    public WebsiteResponseDTO getwebsiteById(
+            @PathVariable Long id) {
+
         return websiteService.getWebsiteById(id);
     }
 
+    // WEBSITE REVIEWS
+
+    @GetMapping("/{id}/reviews")
+    public List<ReviewResponseDTO> getWebsiteReviews(
+            @PathVariable Long id) {
+
+        return websiteService.getWebsiteReviews(id);
+    }
+
+    // CREATE REVIEW FOR WEBSITE
+
+    @PostMapping("/{id}/reviews")
+    public ReviewResponseDTO createReviewForWebsite(
+            @PathVariable Long id,
+            @Valid @RequestBody ReviewRequestDTO request) {
+
+        request.setWebsiteId(id);
+
+        return reviewService.saveReview(request);
+    }
+
     // ADMIN SEO CONTROLS
+
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/seo")
     public Website updateSeo(
@@ -60,7 +116,9 @@ public class WebsiteController {
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public String deleteWebsite(@PathVariable Long id) {
+
         websiteService.deleteWebsite(id);
+
         return " website delete sucessfully";
     }
 }

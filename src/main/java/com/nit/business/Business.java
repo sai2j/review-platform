@@ -55,6 +55,18 @@ public class Business {
     @Column(name = "meta_verified")
     private boolean metaVerified = false;
 
+    // ==============================
+    // DNS VERIFICATION
+    // ==============================
+
+    @JsonIgnore
+    @Column(name = "dns_verification_token")
+    private String dnsVerificationToken;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Column(name = "dns_verified")
+    private boolean dnsVerified = false;
+
     public Business() {
     }
 
@@ -163,5 +175,28 @@ public class Business {
 
     public void setMetaVerified(boolean metaVerified) {
         this.metaVerified = metaVerified;
+    }
+
+    // ==============================
+    // DNS GETTERS/SETTERS
+    // ==============================
+
+    public String getDnsVerificationToken() {
+        return dnsVerificationToken;
+    }
+
+    public void setDnsVerificationToken(
+            String dnsVerificationToken) {
+
+        this.dnsVerificationToken =
+                dnsVerificationToken;
+    }
+
+    public boolean isDnsVerified() {
+        return dnsVerified;
+    }
+
+    public void setDnsVerified(boolean dnsVerified) {
+        this.dnsVerified = dnsVerified;
     }
 }

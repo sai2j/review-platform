@@ -57,6 +57,10 @@ public class businessController {
         return businessService.verifyBusiness(id);
     }
 
+    // =========================================================
+    // BUSINESS EMAIL VERIFICATION
+    // =========================================================
+
     @PostMapping("/{id}/verify-email")
     public String sendBusinessEmailVerification(
             @PathVariable Long id,
@@ -83,6 +87,10 @@ public class businessController {
         return "Business email verified successfully";
     }
 
+    // =========================================================
+    // META TAG VERIFICATION
+    // =========================================================
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{id}/generate-meta-token")
     public String generateMetaVerificationToken(
@@ -104,6 +112,36 @@ public class businessController {
         return businessService
                 .verifyBusinessMetaTag(id);
     }
+
+    // =========================================================
+    // DNS VERIFICATION
+    // =========================================================
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/generate-dns-token")
+    public String generateDnsVerificationToken(
+            @PathVariable Long id) {
+
+        Business business =
+                businessService
+                        .createDnsVerificationToken(id);
+
+        return "DNS verification token generated: "
+                + business.getDnsVerificationToken();
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/verify-dns")
+    public Business verifyBusinessDns(
+            @PathVariable Long id) {
+
+        return businessService
+                .verifyBusinessDns(id);
+    }
+
+    // =========================================================
+    // OTHER BUSINESS METHODS
+    // =========================================================
 
     @GetMapping("/website/{websiteId}")
     public Business getBusinessForWebsite(

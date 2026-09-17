@@ -24,101 +24,106 @@ import jakarta.validation.Valid;
 @RequestMapping({"/websites", "/api/v1/websites"})
 public class WebsiteController {
 
-    private final WebsiteService websiteService;
-    private final ReviewService reviewService;
 
-    public WebsiteController(
-            WebsiteService websiteService,
-            ReviewService reviewService) {
+private final WebsiteService websiteService;
+private final ReviewService reviewService;
 
-        this.websiteService = websiteService;
-        this.reviewService = reviewService;
-    }
+public WebsiteController(
+        WebsiteService websiteService,
+        ReviewService reviewService) {
 
-    @PostMapping
-    public Website createWebsite(@Valid @RequestBody Website website) {
+    this.websiteService = websiteService;
+    this.reviewService = reviewService;
+}
 
-        return websiteService.saveWebsite(website);
-    }
+@PostMapping
+public Website createWebsite(@Valid @RequestBody Website website) {
 
-    @GetMapping
-    public List<WebsiteResponseDTO> getAllWebsites() {
+    return websiteService.saveWebsite(website);
+}
 
-        return websiteService.getAllWebsites();
-    }
+@GetMapping
+public List<WebsiteResponseDTO> getAllWebsites() {
 
-    // WEBSITE SEARCH
+    return websiteService.getAllWebsites();
+}
 
-    @GetMapping("/search")
-    public List<WebsiteResponseDTO> searchWebsites(
-            @RequestParam String q) {
+// WEBSITE SEARCH
+@GetMapping("/search")
+public List<WebsiteResponseDTO> searchWebsites(
+        @RequestParam String q) {
 
-        return websiteService.searchWebsites(q);
-    }
+    return websiteService.searchWebsites(q);
+}
 
-    // WEBSITE PROFILE BY DOMAIN
+// WEBSITE PROFILE BY DOMAIN
+@GetMapping("/domain/{domain}")
+public WebsiteResponseDTO getWebsiteByDomain(
+        @PathVariable String domain) {
 
-    @GetMapping("/domain/{domain}")
-    public WebsiteResponseDTO getWebsiteByDomain(
-            @PathVariable String domain) {
+    return websiteService.getWebsiteByDomain(domain);
+}
 
-        return websiteService.getWebsiteByDomain(domain);
-    }
+// WEBSITE PROFILE BY ID
+@GetMapping("/{id}")
+public WebsiteResponseDTO getwebsiteById(
+        @PathVariable Long id) {
 
-    // WEBSITE PROFILE BY ID
+    return websiteService.getWebsiteById(id);
+}
 
-    @GetMapping("/{id}")
-    public WebsiteResponseDTO getwebsiteById(
-            @PathVariable Long id) {
+// RELATED WEBSITES
+@GetMapping("/{id}/related")
+public List<WebsiteResponseDTO> getRelatedWebsites(
+        @PathVariable Long id) {
 
-        return websiteService.getWebsiteById(id);
-    }
+    return websiteService.getRelatedWebsites(id);
+}
 
-    // WEBSITE REVIEWS
+// WEBSITE REVIEWS
+@GetMapping("/{id}/reviews")
+public List<ReviewResponseDTO> getWebsiteReviews(
+        @PathVariable Long id) {
 
-    @GetMapping("/{id}/reviews")
-    public List<ReviewResponseDTO> getWebsiteReviews(
-            @PathVariable Long id) {
+    return websiteService.getWebsiteReviews(id);
+}
 
-        return websiteService.getWebsiteReviews(id);
-    }
+// CREATE REVIEW FOR WEBSITE
+@PostMapping("/{id}/reviews")
+public ReviewResponseDTO createReviewForWebsite(
+        @PathVariable Long id,
+        @Valid @RequestBody ReviewRequestDTO request) {
 
-    // CREATE REVIEW FOR WEBSITE
+    request.setWebsiteId(id);
 
-    @PostMapping("/{id}/reviews")
-    public ReviewResponseDTO createReviewForWebsite(
-            @PathVariable Long id,
-            @Valid @RequestBody ReviewRequestDTO request) {
+    return reviewService.saveReview(request);
+}
 
-        request.setWebsiteId(id);
+// ADMIN SEO CONTROLS
+@PreAuthorize("hasRole('ADMIN')")
+@PutMapping("/{id}/seo")
+public Website updateSeo(
+        @PathVariable Long id,
+        @RequestParam(required = false) String seoTitle,
+        @RequestParam(required = false) String seoDescription,
+        @RequestParam(required = false) String canonicalUrl) {
 
-        return reviewService.saveReview(request);
-    }
+    return websiteService.updateSeo(
+            id,
+            seoTitle,
+            seoDescription,
+            canonicalUrl
+    );
+}
 
-    // ADMIN SEO CONTROLS
+@PreAuthorize("hasRole('ADMIN')")
+@DeleteMapping("/{id}")
+public String deleteWebsite(@PathVariable Long id) {
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}/seo")
-    public Website updateSeo(
-            @PathVariable Long id,
-            @RequestParam(required = false) String seoTitle,
-            @RequestParam(required = false) String seoDescription,
-            @RequestParam(required = false) String canonicalUrl) {
+    websiteService.deleteWebsite(id);
 
-        return websiteService.updateSeo(
-                id,
-                seoTitle,
-                seoDescription,
-                canonicalUrl
-        );
-    }
+    return " website delete sucessfully";
+}
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id}")
-    public String deleteWebsite(@PathVariable Long id) {
 
-        websiteService.deleteWebsite(id);
-
-        return " website delete sucessfully";
-    }
 }

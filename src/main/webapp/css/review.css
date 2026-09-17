@@ -431,6 +431,50 @@ body {
     color: #666;
 }
 
+/* ================================
+FAQ SECTION
+================================ */
+
+.faq-section {
+background: white;
+margin-top: 25px;
+padding: 30px;
+border: 1px solid #e1e4e8;
+border-radius: 14px;
+}
+
+.faq-heading h2 {
+margin-top: 0;
+font-size: 27px;
+color: #111;
+}
+
+.faq-heading p {
+margin-bottom: 25px;
+color: #666;
+}
+
+.faq-item {
+padding: 18px 0;
+border-bottom: 1px solid #e1e4e8;
+}
+
+.faq-item:last-child {
+border-bottom: none;
+}
+
+.faq-item h3 {
+margin: 0 0 8px;
+font-size: 18px;
+color: #222;
+}
+
+.faq-item p {
+margin: 0;
+color: #555;
+line-height: 1.6;
+}
+
 
 /* ================================
    REVIEW CARD

@@ -11,18 +11,37 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/discovery")
 public class DiscoveryController {
 
-    private final DiscoveryService discoveryService;
 
-    public DiscoveryController(
-            DiscoveryService discoveryService) {
+private final DiscoveryService discoveryService;
 
-        this.discoveryService = discoveryService;
-    }
+public DiscoveryController(
+        DiscoveryService discoveryService) {
 
-    @GetMapping("/search")
-    public List<WebsiteSearchResult> searchWebsite(
-            @RequestParam String keyword) {
+    this.discoveryService = discoveryService;
+}
 
-        return discoveryService.searchWebsites(keyword);
-    }
+@GetMapping("/search")
+public List<WebsiteSearchResult> searchWebsite(
+        @RequestParam String keyword) {
+
+    return discoveryService.searchWebsites(keyword);
+}
+
+// SIMILAR WEBSITES
+@GetMapping("/similar")
+public List<WebsiteSearchResult> findSimilarWebsites(
+        @RequestParam String keyword) {
+
+    return discoveryService.findSimilarWebsites(keyword);
+}
+
+// ALTERNATIVE WEBSITES
+@GetMapping("/alternatives")
+public List<WebsiteSearchResult> findAlternativeWebsites(
+        @RequestParam String keyword) {
+
+    return discoveryService.findAlternativeWebsites(keyword);
+}
+
+
 }

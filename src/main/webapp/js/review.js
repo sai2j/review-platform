@@ -13,48 +13,41 @@ const BUSINESS_API = "/review-platform/businesses";
 const BUSINESS_CLAIM_API =
     "/review-platform/business-claims";
 
-
 const urlParams =
     new URLSearchParams(window.location.search);
 
 const websiteId =
     urlParams.get("websiteId");
 
-
 /* =========================================================
-
-   GET LOGGED-IN USER
-
+GET LOGGED-IN USER
 ========================================================= */
 
 function getLoggedInUser() {
 
+
     try {
 
         return JSON.parse(
-
             localStorage.getItem("loggedInUser")
-
         );
 
     } catch (error) {
 
         console.error(
-
             "Unable to read logged-in user:",
-
             error
-
         );
 
         return null;
 
     }
 
+
 }
 
-
 function getUserId() {
+
 
     const user =
         getLoggedInUser();
@@ -67,16 +60,143 @@ function getUserId() {
 
     return Number(user.id);
 
+
 }
 
+/* =========================================================
+UPDATE WEBSITE SEO
+========================================================= */
+
+function updateWebsiteSEO(website) {
+
+
+    if (!website) {
+
+        return;
+
+    }
+
+
+    const websiteName =
+        website.name || "Website";
+
+
+    const seoTitle =
+        website.seoTitle ||
+        websiteName + " Reviews | Review Platform";
+
+
+    const seoDescription =
+        website.seoDescription ||
+        "Read reviews, ratings and user experiences for " +
+        websiteName +
+        " on Review Platform.";
+
+
+    document.title =
+        seoTitle;
+
+
+    let descriptionMeta =
+        document.querySelector(
+            'meta[name="description"]'
+        );
+
+
+    if (!descriptionMeta) {
+
+        descriptionMeta =
+            document.createElement("meta");
+
+        descriptionMeta.setAttribute(
+            "name",
+            "description"
+        );
+
+        document.head.appendChild(
+            descriptionMeta
+        );
+
+    }
+
+
+    descriptionMeta.setAttribute(
+        "content",
+        seoDescription
+    );
+
+
+    let robotsMeta =
+        document.querySelector(
+            'meta[name="robots"]'
+        );
+
+
+    if (!robotsMeta) {
+
+        robotsMeta =
+            document.createElement("meta");
+
+        robotsMeta.setAttribute(
+            "name",
+            "robots"
+        );
+
+        document.head.appendChild(
+            robotsMeta
+        );
+
+    }
+
+
+    robotsMeta.setAttribute(
+        "content",
+        "index, follow"
+    );
+
+
+    const canonicalUrl =
+        website.canonicalUrl ||
+        window.location.href;
+
+
+    let canonicalLink =
+        document.querySelector(
+            'link[rel="canonical"]'
+        );
+
+
+    if (!canonicalLink) {
+
+        canonicalLink =
+            document.createElement("link");
+
+        canonicalLink.setAttribute(
+            "rel",
+            "canonical"
+        );
+
+        document.head.appendChild(
+            canonicalLink
+        );
+
+    }
+
+
+    canonicalLink.setAttribute(
+        "href",
+        canonicalUrl
+    );
+
+
+}
 
 /* =========================================================
-
-   LOAD WEBSITE INFORMATION
-
+LOAD WEBSITE INFORMATION
 ========================================================= */
 
 function loadWebsiteInfo() {
+
 
     if (!websiteId) {
 
@@ -84,10 +204,9 @@ function loadWebsiteInfo() {
 
     }
 
+
     fetch(
-
         WEBSITE_API + "/" + websiteId
-
     )
 
         .then(function(response) {
@@ -95,9 +214,7 @@ function loadWebsiteInfo() {
             if (!response.ok) {
 
                 throw new Error(
-
                     "Website not found"
-
                 );
 
             }
@@ -108,10 +225,20 @@ function loadWebsiteInfo() {
 
         .then(function(website) {
 
+            /* =========================
+               UPDATE SEO
+            ========================= */
+
+            updateWebsiteSEO(
+                website
+            );
+
+
             const websiteInfo =
                 document.getElementById(
                     "websiteInfo"
                 );
+
 
             if (!websiteInfo) {
 
@@ -119,53 +246,52 @@ function loadWebsiteInfo() {
 
             }
 
+
             websiteInfo.innerHTML = `
 
-                <h2>
+            <h2>
+
+                ${escapeHtml(
+                website.name || "Website"
+            )}
+
+            </h2>
+
+            <p>
+
+                ${escapeHtml(
+                website.description || ""
+            )}
+
+            </p>
+
+            <p>
+
+                <strong>Website:</strong>
+
+                <a
+                    href="${escapeAttribute(
+                website.url
+            )}"
+                    target="_blank"
+                    rel="noopener noreferrer">
 
                     ${escapeHtml(
-                        website.name || "Website"
-                    )}
+                website.url
+            )}
 
-                </h2>
+                </a>
 
-                <p>
+            </p>
 
-                    ${escapeHtml(
-                        website.description || ""
-                    )}
+            <div id="claimStatus">
 
-                </p>
+                Checking business verification...
 
-                <p>
+            </div>
 
-                    <strong>Website:</strong>
+        `;
 
-                    <a
-
-                        href="${escapeAttribute(
-                            website.url
-                        )}"
-
-                        target="_blank"
-
-                        rel="noopener noreferrer">
-
-                        ${escapeHtml(
-                            website.url
-                        )}
-
-                    </a>
-
-                </p>
-
-                <div id="claimStatus">
-
-                    Checking business verification...
-
-                </div>
-
-            `;
 
             loadClaimStatus();
 
@@ -175,36 +301,38 @@ function loadWebsiteInfo() {
 
             console.error(error);
 
+
             const websiteInfo =
                 document.getElementById(
                     "websiteInfo"
                 );
 
+
             if (websiteInfo) {
 
                 websiteInfo.innerHTML = `
 
-                    <p class="error-message">
+                <p class="error-message">
 
-                        Unable to load website information.
+                    Unable to load website information.
 
-                    </p>
+                </p>
 
-                `;
+            `;
 
             }
 
         });
 
+
 }
 
-
 /* =========================================================
-
-   LOAD BUSINESS CLAIM STATUS
-
+LOAD BUSINESS CLAIM STATUS
 ========================================================= */
+
 function loadClaimStatus() {
+
 
     if (!websiteId) {
 
@@ -212,10 +340,12 @@ function loadClaimStatus() {
 
     }
 
+
     const claimStatus =
         document.getElementById(
             "claimStatus"
         );
+
 
     if (!claimStatus) {
 
@@ -223,12 +353,13 @@ function loadClaimStatus() {
 
     }
 
+
     fetch(
         BUSINESS_API +
         "/website/" +
         websiteId
-
     )
+
         .then(function(response) {
 
             if (!response.ok) {
@@ -253,6 +384,7 @@ function loadClaimStatus() {
 
             }
 
+
             /* =========================
                VERIFIED BUSINESS BADGE
             ========================= */
@@ -265,13 +397,13 @@ function loadClaimStatus() {
 
                 claimStatus.innerHTML = `
 
-                    <div class="claimed-badge">
+                <div class="claimed-badge">
 
-                        ✓ Verified Business
+                    ✓ Verified Business
 
-                    </div>
+                </div>
 
-                `;
+            `;
 
             } else {
 
@@ -292,14 +424,15 @@ function loadClaimStatus() {
 
         });
 
+
 }
+
 /* =========================================================
-
-   LOAD RATING SUMMARY
-
+LOAD RATING SUMMARY
 ========================================================= */
 
 function loadRatingSummary() {
+
 
     if (!websiteId) {
 
@@ -307,16 +440,12 @@ function loadRatingSummary() {
 
     }
 
+
     fetch(
-
         REVIEW_API +
-
         "/website/" +
-
         websiteId +
-
         "/summary"
-
     )
 
         .then(function(response) {
@@ -324,9 +453,7 @@ function loadRatingSummary() {
             if (!response.ok) {
 
                 throw new Error(
-
                     "Rating Summary API Error"
-
                 );
 
             }
@@ -342,30 +469,36 @@ function loadRatingSummary() {
                     summary.averageRating || 0
                 );
 
+
             const totalReview =
                 Number(
                     summary.totalReview || 0
                 );
+
 
             const fiveStar =
                 Number(
                     summary.fivestar || 0
                 );
 
+
             const fourStar =
                 Number(
                     summary.fourStar || 0
                 );
+
 
             const threeStar =
                 Number(
                     summary.threeStar || 0
                 );
 
+
             const twoStar =
                 Number(
                     summary.twoStar || 0
                 );
+
 
             const oneStar =
                 Number(
@@ -378,17 +511,18 @@ function loadRatingSummary() {
                     "averageRating"
                 );
 
+
             if (averageElement) {
 
                 averageElement.innerHTML = `
 
-                    <h3>
+                <h3>
 
-                        ⭐ ${averageRating.toFixed(1)}/5
+                    ⭐ ${averageRating.toFixed(1)}/5
 
-                    </h3>
+                </h3>
 
-                `;
+            `;
 
             }
 
@@ -398,23 +532,24 @@ function loadRatingSummary() {
                     "totalReviews"
                 );
 
+
             if (totalElement) {
 
                 totalElement.innerHTML = `
 
-                    <p>
+                <p>
 
-                        Total Reviews:
+                    Total Reviews:
 
-                        <strong>
+                    <strong>
 
-                            ${totalReview}
+                        ${totalReview}
 
-                        </strong>
+                    </strong>
 
-                    </p>
+                </p>
 
-                `;
+            `;
 
             }
 
@@ -423,6 +558,7 @@ function loadRatingSummary() {
                 document.getElementById(
                     "fiveStarCount"
                 );
+
 
             if (fiveElement) {
 
@@ -437,6 +573,7 @@ function loadRatingSummary() {
                     "fourStarCount"
                 );
 
+
             if (fourElement) {
 
                 fourElement.textContent =
@@ -449,6 +586,7 @@ function loadRatingSummary() {
                 document.getElementById(
                     "threeStarCount"
                 );
+
 
             if (threeElement) {
 
@@ -463,6 +601,7 @@ function loadRatingSummary() {
                     "twoStarCount"
                 );
 
+
             if (twoElement) {
 
                 twoElement.textContent =
@@ -476,6 +615,7 @@ function loadRatingSummary() {
                     "oneStarCount"
                 );
 
+
             if (oneElement) {
 
                 oneElement.textContent =
@@ -488,6 +628,7 @@ function loadRatingSummary() {
                 document.getElementById(
                     "fiveStarBar"
                 );
+
 
             if (fiveBar) {
 
@@ -505,6 +646,7 @@ function loadRatingSummary() {
                     "fourStarBar"
                 );
 
+
             if (fourBar) {
 
                 fourBar.style.width =
@@ -520,6 +662,7 @@ function loadRatingSummary() {
                 document.getElementById(
                     "threeStarBar"
                 );
+
 
             if (threeBar) {
 
@@ -537,6 +680,7 @@ function loadRatingSummary() {
                     "twoStarBar"
                 );
 
+
             if (twoBar) {
 
                 twoBar.style.width =
@@ -552,6 +696,7 @@ function loadRatingSummary() {
                 document.getElementById(
                     "oneStarBar"
                 );
+
 
             if (oneBar) {
 
@@ -569,22 +714,24 @@ function loadRatingSummary() {
 
             console.error(error);
 
+
             const averageElement =
                 document.getElementById(
                     "averageRating"
                 );
 
+
             if (averageElement) {
 
                 averageElement.innerHTML = `
 
-                    <p class="error-message">
+                <p class="error-message">
 
-                        Unable to load rating.
+                    Unable to load rating.
 
-                    </p>
+                </p>
 
-                `;
+            `;
 
             }
 
@@ -594,6 +741,7 @@ function loadRatingSummary() {
                     "totalReviews"
                 );
 
+
             if (totalElement) {
 
                 totalElement.innerHTML = "";
@@ -602,22 +750,18 @@ function loadRatingSummary() {
 
         });
 
+
 }
 
-
 /* =========================================================
-
-   CALCULATE PERCENTAGE
-
+CALCULATE PERCENTAGE
 ========================================================= */
 
 function calculatePercentage(
-
     count,
-
     total
-
 ) {
+
 
     if (!total || total === 0) {
 
@@ -625,19 +769,16 @@ function calculatePercentage(
 
     }
 
+
     return Math.round(
-
         (count / total) * 100
-
     );
+
 
 }
 
-
 /* =========================================================
-
-   LOAD REVIEWS
-
+LOAD REVIEWS
 ========================================================= */
 
 function loadReviews() {
@@ -649,17 +790,18 @@ function loadReviews() {
                 "reviewList"
             );
 
+
         if (reviewList) {
 
             reviewList.innerHTML = `
 
-                <p class="error-message">
+            <p class="error-message">
 
-                    Website ID not found.
+                Website ID not found.
 
-                </p>
+            </p>
 
-            `;
+        `;
 
         }
 
@@ -669,13 +811,9 @@ function loadReviews() {
 
 
     fetch(
-
         REVIEW_API +
-
         "/website/" +
-
         websiteId
-
     )
 
         .then(function(response) {
@@ -683,9 +821,7 @@ function loadReviews() {
             if (!response.ok) {
 
                 throw new Error(
-
                     "Review API error"
-
                 );
 
             }
@@ -694,52 +830,54 @@ function loadReviews() {
 
         })
 
-        .then(function(reviews) {
-
-            displayReviews(reviews);
-
-        })
+		.then(function(data) {
+		    displayReviews(
+		        data.content || []
+		    );
+		})
 
         .catch(function(error) {
 
             console.error(error);
+
 
             const reviewList =
                 document.getElementById(
                     "reviewList"
                 );
 
+
             if (reviewList) {
 
                 reviewList.innerHTML = `
 
-                    <p class="error-message">
+                <p class="error-message">
 
-                        Unable to load reviews.
+                    Unable to load reviews.
 
-                    </p>
+                </p>
 
-                `;
+            `;
 
             }
 
         });
 
+
 }
 
-
 /* =========================================================
-
-   DISPLAY REVIEWS
-
+DISPLAY REVIEWS
 ========================================================= */
 
 function displayReviews(reviews) {
+
 
     const reviewList =
         document.getElementById(
             "reviewList"
         );
+
 
     if (!reviewList) {
 
@@ -755,13 +893,13 @@ function displayReviews(reviews) {
 
         reviewList.innerHTML = `
 
-            <p class="no-review">
+        <p class="no-review">
 
-                No reviews available yet.
+            No reviews available yet.
 
-            </p>
+        </p>
 
-        `;
+    `;
 
         return;
 
@@ -774,13 +912,9 @@ function displayReviews(reviews) {
 
 
         for (
-
             let i = 1;
-
             i <= 5;
-
             i++
-
         ) {
 
             if (i <= review.rating) {
@@ -794,273 +928,214 @@ function displayReviews(reviews) {
 
         reviewList.innerHTML += `
 
-            <div
+        <div
+            class="review-card"
+            data-review-id="${review.id}">
 
-                class="review-card"
+            <div class="rating">
 
-                data-review-id="${review.id}">
+                ${stars}
 
-                <!-- Rating -->
+                <strong>
 
-                <div class="rating">
+                    ${review.rating}/5
 
-                    ${stars}
-
-                    <strong>
-
-                        ${review.rating}/5
-
-                    </strong>
-
-                </div>
-
-
-                <!-- Comment -->
-
-                <div class="comment">
-
-                    ${escapeHtml(
-                        review.comment || ""
-                    )}
-
-                </div>
-
-
-                <!-- Helpful -->
-
-                <button
-
-                    type="button"
-
-                    class="helpful-button"
-
-                    data-action="helpful"
-
-                    data-review-id="${review.id}">
-
-                    👍 Helpful
-
-                </button>
-
-
-                <!-- Not Helpful -->
-
-                <button
-
-                    type="button"
-
-                    class="not-helpful-button"
-
-                    data-action="not-helpful"
-
-                    data-review-id="${review.id}">
-
-                    👎 Not Helpful
-
-                </button>
-
-
-                <!-- Vote Count -->
-
-                <span class="vote-count">
-
-                    👍
-
-                    <span
-
-                        id="helpful-${review.id}">
-
-                        0
-
-                    </span>
-
-                    &nbsp;&nbsp;
-
-                    👎
-
-                    <span
-
-                        id="not-helpful-${review.id}">
-
-                        0
-
-                    </span>
-
-                </span>
-
-
-                <br>
-
-                <br>
-
-
-                <!-- Edit -->
-
-                <button
-
-                    type="button"
-
-                    class="edit-button"
-
-                    data-action="edit"
-
-                    data-review-id="${review.id}">
-
-                    Edit Review
-
-                </button>
-
-
-                <!-- Delete -->
-
-                <button
-
-                    type="button"
-
-                    class="delete-button"
-
-                    data-action="delete"
-
-                    data-review-id="${review.id}">
-
-                    Delete Review
-
-                </button>
-
-
-                <!-- Report -->
-
-                <button
-
-                    type="button"
-
-                    class="report-button"
-
-                    data-action="show-report"
-
-                    data-review-id="${review.id}">
-
-                    Report Review
-
-                </button>
-
-
-                <!-- Report Form -->
-
-                <div
-
-                    id="reportForm-${review.id}"
-
-                    class="report-form"
-
-                    style="display: none;">
-
-                    <label>
-
-                        Report Reason
-
-                    </label>
-
-
-                    <select
-
-                        id="reportReason-${review.id}">
-
-                        <option value="">
-
-                            Select reason
-
-                        </option>
-
-                        <option value="Spam">
-
-                            Spam
-
-                        </option>
-
-                        <option value="Fake Review">
-
-                            Fake Review
-
-                        </option>
-
-                        <option value="Offensive Content">
-
-                            Offensive Content
-
-                        </option>
-
-                        <option value="Other">
-
-                            Other
-
-                        </option>
-
-                    </select>
-
-
-                    <button
-
-                        type="button"
-
-                        class="submit-report-button"
-
-                        data-action="submit-report"
-
-                        data-review-id="${review.id}">
-
-                        Submit Report
-
-                    </button>
-
-
-                    <p
-
-                        id="reportMessage-${review.id}"
-
-                        class="report-message">
-
-                    </p>
-
-                </div>
-
+                </strong>
 
             </div>
 
-        `;
+
+            <div class="comment">
+
+                ${escapeHtml(
+            review.comment || ""
+        )}
+
+            </div>
+
+
+            <button
+                type="button"
+                class="helpful-button"
+                data-action="helpful"
+                data-review-id="${review.id}">
+
+                👍 Helpful
+
+            </button>
+
+
+            <button
+                type="button"
+                class="not-helpful-button"
+                data-action="not-helpful"
+                data-review-id="${review.id}">
+
+                👎 Not Helpful
+
+            </button>
+
+
+            <span class="vote-count">
+
+                👍
+
+                <span
+                    id="helpful-${review.id}">
+
+                    0
+
+                </span>
+
+                &nbsp;&nbsp;
+
+                👎
+
+                <span
+                    id="not-helpful-${review.id}">
+
+                    0
+
+                </span>
+
+            </span>
+
+
+            <br>
+            <br>
+
+
+            <button
+                type="button"
+                class="edit-button"
+                data-action="edit"
+                data-review-id="${review.id}">
+
+                Edit Review
+
+            </button>
+
+
+            <button
+                type="button"
+                class="delete-button"
+                data-action="delete"
+                data-review-id="${review.id}">
+
+                Delete Review
+
+            </button>
+
+
+            <button
+                type="button"
+                class="report-button"
+                data-action="show-report"
+                data-review-id="${review.id}">
+
+                Report Review
+
+            </button>
+
+
+            <div
+                id="reportForm-${review.id}"
+                class="report-form"
+                style="display: none;">
+
+                <label>
+
+                    Report Reason
+
+                </label>
+
+
+                <select
+                    id="reportReason-${review.id}">
+
+                    <option value="">
+
+                        Select reason
+
+                    </option>
+
+                    <option value="Spam">
+
+                        Spam
+
+                    </option>
+
+                    <option value="Fake Review">
+
+                        Fake Review
+
+                    </option>
+
+                    <option value="Offensive Content">
+
+                        Offensive Content
+
+                    </option>
+
+                    <option value="Other">
+
+                        Other
+
+                    </option>
+
+                </select>
+
+
+                <button
+                    type="button"
+                    class="submit-report-button"
+                    data-action="submit-report"
+                    data-review-id="${review.id}">
+
+                    Submit Report
+
+                </button>
+
+
+                <p
+                    id="reportMessage-${review.id}"
+                    class="report-message">
+
+                </p>
+
+            </div>
+
+        </div>
+
+    `;
 
 
         /*
-
          * Business response loading is intentionally
-
          * not called here.
-
          */
 
         loadVoteCounts(
-
             review.id
-
         );
 
     });
 
+
 }
 
-
 /* =========================================================
-
-   LOAD BUSINESS RESPONSE
-
+LOAD BUSINESS RESPONSE
 ========================================================= */
 
 function loadBusinessResponse(reviewId) {
+
 
     const responseElement =
         document.getElementById(
             "response-" + reviewId
         );
+
 
     if (!responseElement) {
 
@@ -1076,9 +1151,7 @@ function loadBusinessResponse(reviewId) {
             if (!response.ok) {
 
                 throw new Error(
-
                     "Business response API error"
-
                 );
 
             }
@@ -1102,35 +1175,33 @@ function loadBusinessResponse(reviewId) {
 
                 responseElement.innerHTML = `
 
-                    <strong>
+                <strong>
 
-                        Business Response:
+                    Business Response:
 
-                    </strong>
+                </strong>
 
-                    <p>
+                <p>
 
-                        ${escapeHtml(
+                    ${escapeHtml(
+                    businessResponse.response || ""
+                )}
 
-                            businessResponse.response || ""
+                </p>
 
-                        )}
-
-                    </p>
-
-                `;
+            `;
 
             } else {
 
                 responseElement.innerHTML = `
 
-                    <p>
+                <p>
 
-                        No business response yet.
+                    No business response yet.
 
-                    </p>
+                </p>
 
-                `;
+            `;
 
             }
 
@@ -1142,157 +1213,134 @@ function loadBusinessResponse(reviewId) {
 
             responseElement.innerHTML = `
 
-                <p>
+            <p>
 
-                    No business response available.
+                No business response available.
 
-                </p>
+            </p>
 
-            `;
+        `;
 
         });
 
+
 }
 
-
 /* =========================================================
-
-   OPEN BUSINESS RESPONSE PAGE
-
+OPEN BUSINESS RESPONSE PAGE
 ========================================================= */
 
 function openBusinessResponse(
-
     reviewId,
-
     businessId
-
 ) {
 
+
     window.location.href =
-
         "business-response.html" +
-
         "?reviewId=" +
-
         reviewId +
-
         "&businessId=" +
-
         businessId;
 
 }
 
-
 /* =========================================================
-
-   MARK REVIEW HELPFUL
-
+MARK REVIEW HELPFUL
 ========================================================= */
 
 function markHelpful(reviewId) {
 
-    const userId =
-        getUserId();
+    
+const userId =
+    getUserId();
 
 
-    if (!userId) {
+if (!userId) {
 
-        alert(
+    alert(
+        "Please login before voting."
+    );
 
-            "Please login before voting."
-
-        );
-
-        return;
-
-    }
-
-
-    const vote = {
-
-        reviewId:
-            Number(reviewId),
-
-        userId:
-            Number(userId),
-
-        voteType:
-            "HELPFUL"
-
-    };
-
-
-    fetch(
-
-        VOTE_API,
-
-        {
-
-            method: "POST",
-
-            headers: {
-
-                "Content-Type":
-                    "application/json"
-
-            },
-
-            body:
-                JSON.stringify(vote)
-
-        }
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Helpful vote failed"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function() {
-
-            loadVoteCounts(
-
-                reviewId
-
-            );
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            alert(
-
-                "Unable to submit vote."
-
-            );
-
-        });
+    return;
 
 }
 
 
+const vote = {
+
+    reviewId:
+        Number(reviewId),
+
+    userId:
+        Number(userId),
+
+    voteType:
+        "HELPFUL"
+
+};
+
+
+fetch(
+    VOTE_API,
+    {
+
+        method: "POST",
+
+        headers: {
+
+            "Content-Type":
+                "application/json"
+
+        },
+
+        body:
+            JSON.stringify(vote)
+
+    }
+
+)
+
+    .then(function(response) {
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Helpful vote failed"
+            );
+
+        }
+
+        return response.json();
+
+    })
+
+    .then(function() {
+
+        loadVoteCounts(
+            reviewId
+        );
+
+    })
+
+    .catch(function(error) {
+
+        console.error(error);
+
+        alert(
+            "Unable to submit vote."
+        );
+
+    });
+
+}
+
 /* =========================================================
-
-   MARK REVIEW NOT HELPFUL
-
+MARK REVIEW NOT HELPFUL
 ========================================================= */
 
 function markNotHelpful(reviewId) {
+
 
     const userId =
         getUserId();
@@ -1301,9 +1349,7 @@ function markNotHelpful(reviewId) {
     if (!userId) {
 
         alert(
-
             "Please login before voting."
-
         );
 
         return;
@@ -1326,9 +1372,7 @@ function markNotHelpful(reviewId) {
 
 
     fetch(
-
         VOTE_API,
-
         {
 
             method: "POST",
@@ -1352,9 +1396,7 @@ function markNotHelpful(reviewId) {
             if (!response.ok) {
 
                 throw new Error(
-
                     "Not helpful vote failed"
-
                 );
 
             }
@@ -1366,9 +1408,7 @@ function markNotHelpful(reviewId) {
         .then(function() {
 
             loadVoteCounts(
-
                 reviewId
-
             );
 
         })
@@ -1378,34 +1418,26 @@ function markNotHelpful(reviewId) {
             console.error(error);
 
             alert(
-
                 "Unable to submit vote."
-
             );
 
         });
 
+
 }
 
-
 /* =========================================================
-
-   LOAD VOTE COUNTS
-
+LOAD VOTE COUNTS
 ========================================================= */
 
 function loadVoteCounts(reviewId) {
 
+
     fetch(
-
         VOTE_API +
-
         "/" +
-
         reviewId +
-
         "/count"
-
     )
 
         .then(function(response) {
@@ -1413,9 +1445,7 @@ function loadVoteCounts(reviewId) {
             if (!response.ok) {
 
                 throw new Error(
-
                     "Vote count API error"
-
                 );
 
             }
@@ -1430,6 +1460,7 @@ function loadVoteCounts(reviewId) {
                 document.getElementById(
                     "helpful-" + reviewId
                 );
+
 
             const notHelpfulElement =
                 document.getElementById(
@@ -1457,25 +1488,21 @@ function loadVoteCounts(reviewId) {
         .catch(function(error) {
 
             console.error(
-
                 "Unable to load vote counts:",
-
                 error
-
             );
 
         });
 
+
 }
 
-
 /* =========================================================
-
-   EDIT REVIEW
-
+EDIT REVIEW
 ========================================================= */
 
 function editReview(reviewId) {
+
 
     const userId =
         getUserId();
@@ -1484,9 +1511,7 @@ function editReview(reviewId) {
     if (!userId) {
 
         alert(
-
             "Please login before editing a review."
-
         );
 
         return;
@@ -1496,9 +1521,7 @@ function editReview(reviewId) {
 
     const newRating =
         prompt(
-
             "Enter new rating (1-5):"
-
         );
 
 
@@ -1514,19 +1537,13 @@ function editReview(reviewId) {
 
 
     if (
-
         !rating ||
-
         rating < 1 ||
-
         rating > 5
-
     ) {
 
         alert(
-
             "Please enter a valid rating between 1 and 5."
-
         );
 
         return;
@@ -1536,11 +1553,8 @@ function editReview(reviewId) {
 
     const newComment =
         prompt(
-
             "Enter new review:",
-
             ""
-
         );
 
 
@@ -1558,9 +1572,7 @@ function editReview(reviewId) {
     if (!comment) {
 
         alert(
-
             "Review cannot be empty."
-
         );
 
         return;
@@ -1586,13 +1598,9 @@ function editReview(reviewId) {
 
 
     fetch(
-
         REVIEW_API +
-
         "/" +
-
         reviewId,
-
         {
 
             method: "PUT",
@@ -1620,17 +1628,12 @@ function editReview(reviewId) {
                     .then(function(errorText) {
 
                         console.error(
-
                             "Edit review API error:",
-
                             errorText
-
                         );
 
                         throw new Error(
-
                             "Review could not be updated"
-
                         );
 
                     });
@@ -1644,9 +1647,7 @@ function editReview(reviewId) {
         .then(function() {
 
             alert(
-
                 "Review updated successfully!"
-
             );
 
             loadReviews();
@@ -1660,23 +1661,20 @@ function editReview(reviewId) {
             console.error(error);
 
             alert(
-
                 "Review could not be updated."
-
             );
 
         });
 
+
 }
 
-
 /* =========================================================
-
-   DELETE REVIEW
-
+DELETE REVIEW
 ========================================================= */
 
 function deleteReview(reviewId) {
+
 
     const userId =
         getUserId();
@@ -1685,9 +1683,7 @@ function deleteReview(reviewId) {
     if (!userId) {
 
         alert(
-
             "Please login before deleting a review."
-
         );
 
         return;
@@ -1697,9 +1693,7 @@ function deleteReview(reviewId) {
 
     const confirmDelete =
         confirm(
-
             "Are you sure you want to delete this review?"
-
         );
 
 
@@ -1711,13 +1705,9 @@ function deleteReview(reviewId) {
 
 
     fetch(
-
         REVIEW_API +
-
         "/" +
-
         reviewId,
-
         {
 
             method: "DELETE"
@@ -1731,9 +1721,7 @@ function deleteReview(reviewId) {
             if (!response.ok) {
 
                 throw new Error(
-
                     "Delete review failed"
-
                 );
 
             }
@@ -1745,9 +1733,7 @@ function deleteReview(reviewId) {
         .then(function() {
 
             alert(
-
                 "Review deleted successfully!"
-
             );
 
             loadReviews();
@@ -1761,29 +1747,24 @@ function deleteReview(reviewId) {
             console.error(error);
 
             alert(
-
                 "Review could not be deleted."
-
             );
 
         });
 
+
 }
 
-
 /* =========================================================
-
-   SHOW / HIDE REPORT FORM
-
+SHOW / HIDE REPORT FORM
 ========================================================= */
 
 function showReportForm(reviewId) {
 
+
     const reportForm =
         document.getElementById(
-
             "reportForm-" + reviewId
-
         );
 
 
@@ -1795,11 +1776,8 @@ function showReportForm(reviewId) {
 
 
     if (
-
         reportForm.style.display === "none" ||
-
         reportForm.style.display === ""
-
     ) {
 
         reportForm.style.display =
@@ -1812,30 +1790,25 @@ function showReportForm(reviewId) {
 
     }
 
+
 }
 
-
 /* =========================================================
-
-   SUBMIT REPORT
-
+SUBMIT REPORT
 ========================================================= */
 
 function submitReport(reviewId) {
 
+
     const reasonElement =
         document.getElementById(
-
             "reportReason-" + reviewId
-
         );
 
 
     const message =
         document.getElementById(
-
             "reportMessage-" + reviewId
-
         );
 
 
@@ -1854,13 +1827,13 @@ function submitReport(reviewId) {
 
         message.innerHTML = `
 
-            <span class="error-message">
+        <span class="error-message">
 
-                Please select a reason.
+            Please select a reason.
 
-            </span>
+        </span>
 
-        `;
+    `;
 
         return;
 
@@ -1875,13 +1848,13 @@ function submitReport(reviewId) {
 
         message.innerHTML = `
 
-            <span class="error-message">
+        <span class="error-message">
 
-                Please login before reporting a review.
+            Please login before reporting a review.
 
-            </span>
+        </span>
 
-        `;
+    `;
 
         return;
 
@@ -1903,9 +1876,7 @@ function submitReport(reviewId) {
 
 
     fetch(
-
         REPORT_API,
-
         {
 
             method: "POST",
@@ -1933,17 +1904,12 @@ function submitReport(reviewId) {
                     .then(function(errorText) {
 
                         console.error(
-
                             "Report API error:",
-
                             errorText
-
                         );
 
                         throw new Error(
-
                             "Report could not be submitted"
-
                         );
 
                     });
@@ -1958,13 +1924,13 @@ function submitReport(reviewId) {
 
             message.innerHTML = `
 
-                <span class="success-message">
+            <span class="success-message">
 
-                    Review reported successfully!
+                Review reported successfully!
 
-                </span>
+            </span>
 
-            `;
+        `;
 
 
             reasonElement.value = "";
@@ -1977,29 +1943,30 @@ function submitReport(reviewId) {
 
             message.innerHTML = `
 
-                <span class="error-message">
+            <span class="error-message">
 
-                    Report could not be submitted.
+                Report could not be submitted.
 
-                </span>
+            </span>
 
-            `;
+        `;
 
         });
 
+
 }
 
-
 /* =========================================================
-
-   ADD REVIEW
-
+ADD REVIEW
 ========================================================= */
 
 function setupReviewForm() {
 
+
     const reviewForm =
-        document.getElementById("reviewForm");
+        document.getElementById(
+            "reviewForm"
+        );
 
 
     if (!reviewForm) {
@@ -2010,40 +1977,38 @@ function setupReviewForm() {
 
 
     reviewForm.addEventListener(
-
         "submit",
-
         function(event) {
 
             event.preventDefault();
 
 
             const ratingElement =
-                document.getElementById("rating");
+                document.getElementById(
+                    "rating"
+                );
 
 
             const commentElement =
-                document.getElementById("comment");
+                document.getElementById(
+                    "comment"
+                );
 
 
             const message =
-                document.getElementById("message");
+                document.getElementById(
+                    "message"
+                );
 
 
             if (
-
                 !ratingElement ||
-
                 !commentElement ||
-
                 !message
-
             ) {
 
                 console.error(
-
                     "Review form elements not found."
-
                 );
 
                 return;
@@ -2052,7 +2017,9 @@ function setupReviewForm() {
 
 
             const rating =
-                Number(ratingElement.value);
+                Number(
+                    ratingElement.value
+                );
 
 
             const comment =
@@ -2060,22 +2027,20 @@ function setupReviewForm() {
 
 
             /* =========================
-
                WEBSITE CHECK
-
             ========================= */
 
             if (!websiteId) {
 
                 message.innerHTML = `
 
-                    <span class="error-message">
+                <span class="error-message">
 
-                        Website ID not found.
+                    Website ID not found.
 
-                    </span>
+                </span>
 
-                `;
+            `;
 
                 return;
 
@@ -2083,9 +2048,7 @@ function setupReviewForm() {
 
 
             /* =========================
-
                LOGIN CHECK
-
             ========================= */
 
             const user =
@@ -2096,13 +2059,13 @@ function setupReviewForm() {
 
                 message.innerHTML = `
 
-                    <span class="error-message">
+                <span class="error-message">
 
-                        Please login before submitting a review.
+                    Please login before submitting a review.
 
-                    </span>
+                </span>
 
-                `;
+            `;
 
                 return;
 
@@ -2110,30 +2073,24 @@ function setupReviewForm() {
 
 
             /* =========================
-
                RATING CHECK
-
             ========================= */
 
             if (
-
                 !rating ||
-
                 rating < 1 ||
-
                 rating > 5
-
             ) {
 
                 message.innerHTML = `
 
-                    <span class="error-message">
+                <span class="error-message">
 
-                        Please select a valid rating.
+                    Please select a valid rating.
 
-                    </span>
+                </span>
 
-                `;
+            `;
 
                 return;
 
@@ -2141,22 +2098,20 @@ function setupReviewForm() {
 
 
             /* =========================
-
                COMMENT CHECK
-
             ========================= */
 
             if (!comment) {
 
                 message.innerHTML = `
 
-                    <span class="error-message">
+                <span class="error-message">
 
-                        Please enter your review.
+                    Please enter your review.
 
-                    </span>
+                </span>
 
-                `;
+            `;
 
                 return;
 
@@ -2164,9 +2119,7 @@ function setupReviewForm() {
 
 
             /* =========================
-
                REVIEW OBJECT
-
             ========================= */
 
             const review = {
@@ -2187,24 +2140,17 @@ function setupReviewForm() {
 
 
             console.log(
-
                 "Sending review:",
-
                 review
-
             );
 
 
             /* =========================
-
                SEND REVIEW
-
             ========================= */
 
             fetch(
-
                 REVIEW_API,
-
                 {
 
                     method: "POST",
@@ -2228,11 +2174,8 @@ function setupReviewForm() {
                 .then(function(response) {
 
                     console.log(
-
                         "Review response status:",
-
                         response.status
-
                     );
 
 
@@ -2243,19 +2186,13 @@ function setupReviewForm() {
                             .then(function(errorText) {
 
                                 console.error(
-
                                     "Review API error:",
-
                                     errorText
-
                                 );
 
                                 throw new Error(
-
                                     errorText ||
-
                                     "Review could not be added"
-
                                 );
 
                             });
@@ -2270,23 +2207,20 @@ function setupReviewForm() {
                 .then(function(data) {
 
                     console.log(
-
                         "Review saved:",
-
                         data
-
                     );
 
 
                     message.innerHTML = `
 
-                        <span class="success-message">
+                    <span class="success-message">
 
-                            Review added successfully!
+                        Review added successfully!
 
-                        </span>
+                    </span>
 
-                    `;
+                `;
 
 
                     reviewForm.reset();
@@ -2301,23 +2235,20 @@ function setupReviewForm() {
                 .catch(function(error) {
 
                     console.error(
-
                         "Review submit error:",
-
                         error
-
                     );
 
 
                     message.innerHTML = `
 
-                        <span class="error-message">
+                    <span class="error-message">
 
-                            Review could not be added.
+                        Review could not be added.
 
-                        </span>
+                    </span>
 
-                    `;
+                `;
 
                 });
 
@@ -2325,21 +2256,21 @@ function setupReviewForm() {
 
     );
 
+
 }
 
-
 /* =========================================================
-
-   REVIEW BUTTON EVENT HANDLERS
-
-   No inline onclick handlers
-
+REVIEW BUTTON EVENT HANDLERS
+No inline onclick handlers
 ========================================================= */
 
 function setupReviewButtonHandlers() {
 
+
     const reviewList =
-        document.getElementById("reviewList");
+        document.getElementById(
+            "reviewList"
+        );
 
 
     if (!reviewList) {
@@ -2350,9 +2281,7 @@ function setupReviewButtonHandlers() {
 
 
     reviewList.addEventListener(
-
         "click",
-
         function(event) {
 
             const button =
@@ -2440,22 +2369,19 @@ function setupReviewButtonHandlers() {
 
     );
 
+
 }
 
-
 /* =========================================================
-
-   WRITE REVIEW BUTTON
-
+WRITE REVIEW BUTTON
 ========================================================= */
 
 function setupWriteReviewButton() {
 
+
     const writeReviewButton =
         document.getElementById(
-
             "writeReviewButton"
-
         );
 
 
@@ -2467,16 +2393,12 @@ function setupWriteReviewButton() {
 
 
     writeReviewButton.addEventListener(
-
         "click",
-
         function() {
 
             const reviewForm =
                 document.getElementById(
-
                     "reviewForm"
-
                 );
 
 
@@ -2494,23 +2416,19 @@ function setupWriteReviewButton() {
 
     );
 
+
 }
 
-
 /* =========================================================
-
-   ESCAPE HTML
-
+ESCAPE HTML
 ========================================================= */
 
 function escapeHtml(value) {
 
+
     if (
-
         value === null ||
-
         value === undefined
-
     ) {
 
         return "";
@@ -2530,36 +2448,31 @@ function escapeHtml(value) {
 
         .replace(/'/g, "&#039;");
 
+
 }
 
-
 /* =========================================================
-
-   ESCAPE ATTRIBUTE
-
+ESCAPE ATTRIBUTE
 ========================================================= */
 
 function escapeAttribute(value) {
 
+
     return escapeHtml(value);
+
 
 }
 
-
 /* =========================================================
-
-   ESCAPE JAVASCRIPT
-
+ESCAPE JAVASCRIPT
 ========================================================= */
 
 function escapeJs(value) {
 
+
     if (
-
         value === null ||
-
         value === undefined
-
     ) {
 
         return "";
@@ -2579,21 +2492,16 @@ function escapeJs(value) {
 
         .replace(/\r/g, "\\r");
 
+
 }
 
-
 /* =========================================================
-
-   PAGE LOAD
-
+PAGE LOAD
 ========================================================= */
 
 document.addEventListener(
-
     "DOMContentLoaded",
-
     function() {
-
         loadWebsiteInfo();
 
         loadRatingSummary();
@@ -2607,5 +2515,6 @@ document.addEventListener(
         setupWriteReviewButton();
 
     }
+
 
 );

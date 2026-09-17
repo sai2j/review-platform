@@ -1,8 +1,12 @@
 package com.nit.review;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -80,15 +84,16 @@ public class ReviewService {
         review.setRating(request.getRating());
         review.setComment(request.getComment());
 
-        // Do not trust userId from frontend
         review.setUserId(loggedInUser.getId());
-
         review.setWebsiteId(request.getWebsiteId());
 
-        // New reviews must go through moderation
-        review.setStatus("PENDING");
+        review.setDeliveryRating(request.getDeliveryRating());
+        review.setSupportRating(request.getSupportRating());
+        review.setRefundRating(request.getRefundRating());
+        review.setProductRating(request.getProductRating());
+        review.setPricingRating(request.getPricingRating());
 
-        // New reviews start as unverified
+        review.setStatus("PENDING");
         review.setVerificationStatus("UNVERIFIED");
 
         Review savedReview =
@@ -102,8 +107,212 @@ public class ReviewService {
     // ==============================
 
     public List<Review> getReviewsByWebsiteId(Long websiteId) {
-
         return reviewRepository.findByWebsiteId(websiteId);
+    }
+
+    // ==============================
+    // PAGINATED REVIEWS BY WEBSITE
+    // ==============================
+
+    public Page<ReviewResponseDTO> getReviewsByWebsiteId(
+            Long websiteId,
+            Pageable pageable) {
+
+        return reviewRepository
+                .findByWebsiteId(websiteId, pageable)
+                .map(this::convertToResponseDTO);
+    }
+
+    // ==============================
+    // RATING FILTER + PAGINATION
+    // ==============================
+
+    public Page<ReviewResponseDTO> getReviewsByWebsiteIdAndRating(
+            Long websiteId,
+            Integer rating,
+            Pageable pageable) {
+
+        return reviewRepository
+                .findByWebsiteIdAndRating(
+                        websiteId,
+                        rating,
+                        pageable)
+                .map(this::convertToResponseDTO);
+    }
+
+    // ==============================
+    // VERIFICATION FILTER + PAGINATION
+    // ==============================
+
+    public Page<ReviewResponseDTO>
+    getReviewsByWebsiteIdAndVerificationStatus(
+            Long websiteId,
+            String verificationStatus,
+            Pageable pageable) {
+
+        return reviewRepository
+                .findByWebsiteIdAndVerificationStatus(
+                        websiteId,
+                        verificationStatus,
+                        pageable)
+                .map(this::convertToResponseDTO);
+    }
+
+    // ==============================
+    // EXPERIENCE TYPE FILTER
+    // ==============================
+
+    public Page<ReviewResponseDTO>
+    getReviewsByWebsiteIdAndExperienceType(
+            Long websiteId,
+            String experienceType,
+            Integer experienceRating,
+            Pageable pageable) {
+
+        if (experienceType == null
+                || experienceType.isBlank()) {
+
+            throw new RuntimeException(
+                    "Experience type is required");
+        }
+
+        if (experienceRating == null
+                || experienceRating < 1
+                || experienceRating > 5) {
+
+            throw new RuntimeException(
+                    "Experience rating must be between 1 and 5");
+        }
+
+        String type =
+                experienceType.trim().toLowerCase();
+
+        Page<Review> reviews;
+
+        switch (type) {
+
+            case "delivery":
+
+                reviews = reviewRepository
+                        .findByWebsiteIdAndDeliveryRating(
+                                websiteId,
+                                experienceRating,
+                                pageable);
+                break;
+
+            case "support":
+
+                reviews = reviewRepository
+                        .findByWebsiteIdAndSupportRating(
+                                websiteId,
+                                experienceRating,
+                                pageable);
+                break;
+
+            case "refund":
+
+                reviews = reviewRepository
+                        .findByWebsiteIdAndRefundRating(
+                                websiteId,
+                                experienceRating,
+                                pageable);
+                break;
+
+            case "product":
+
+                reviews = reviewRepository
+                        .findByWebsiteIdAndProductRating(
+                                websiteId,
+                                experienceRating,
+                                pageable);
+                break;
+
+            case "pricing":
+
+                reviews = reviewRepository
+                        .findByWebsiteIdAndPricingRating(
+                                websiteId,
+                                experienceRating,
+                                pageable);
+                break;
+
+            default:
+
+                throw new RuntimeException(
+                        "Experience type must be delivery, support, refund, product or pricing");
+        }
+
+        return reviews.map(this::convertToResponseDTO);
+    }
+
+    // ==============================
+    // DATE FILTER + PAGINATION
+    // ==============================
+
+    public Page<ReviewResponseDTO>
+    getReviewsByWebsiteIdAndDate(
+            Long websiteId,
+            LocalDate startDate,
+            LocalDate endDate,
+            Pageable pageable) {
+
+        if (startDate == null && endDate == null) {
+
+            throw new RuntimeException(
+                    "At least one date is required");
+        }
+
+        if (startDate != null
+                && endDate != null
+                && startDate.isAfter(endDate)) {
+
+            throw new RuntimeException(
+                    "Start date cannot be after end date");
+        }
+
+        LocalDateTime startDateTime;
+
+        LocalDateTime endDateTime;
+
+        if (startDate != null) {
+
+            startDateTime =
+                    startDate.atStartOfDay();
+
+        } else {
+
+            startDateTime =
+                    LocalDate.of(1900, 1, 1)
+                            .atStartOfDay();
+        }
+
+        if (endDate != null) {
+
+            endDateTime =
+                    endDate.atTime(
+                            23,
+                            59,
+                            59,
+                            999999999);
+
+        } else {
+
+            endDateTime =
+                    LocalDate.of(9999, 12, 31)
+                            .atTime(
+                                    23,
+                                    59,
+                                    59,
+                                    999999999);
+        }
+
+        return reviewRepository
+                .findByWebsiteIdAndCreatedAtBetween(
+                        websiteId,
+                        startDateTime,
+                        endDateTime,
+                        pageable)
+                .map(this::convertToResponseDTO);
     }
 
     // ==============================
@@ -111,8 +320,19 @@ public class ReviewService {
     // ==============================
 
     public List<Review> getAllReviews() {
-
         return reviewRepository.findAll();
+    }
+
+    // ==============================
+    // PAGINATED ALL REVIEWS
+    // ==============================
+
+    public Page<ReviewResponseDTO> getAllReviews(
+            Pageable pageable) {
+
+        return reviewRepository
+                .findAll(pageable)
+                .map(this::convertToResponseDTO);
     }
 
     // ==============================
@@ -120,7 +340,6 @@ public class ReviewService {
     // ==============================
 
     public List<Review> getPendingReviews() {
-
         return reviewRepository.findByStatus("PENDING");
     }
 
@@ -130,7 +349,9 @@ public class ReviewService {
 
     public Review getReviewById(Long id) {
 
-        return reviewRepository.findById(id).orElse(null);
+        return reviewRepository
+                .findById(id)
+                .orElse(null);
     }
 
     // ==============================
@@ -142,16 +363,21 @@ public class ReviewService {
             ReviewRequestDTO request) {
 
         Review existingReview =
-                reviewRepository.findById(id).orElse(null);
+                reviewRepository
+                        .findById(id)
+                        .orElse(null);
 
         if (existingReview == null) {
             return null;
         }
 
         Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
 
-        String loggedInEmail = authentication.getName();
+        String loggedInEmail =
+                authentication.getName();
 
         User loggedInUser =
                 userRepository.findByEmail(loggedInEmail);
@@ -160,16 +386,33 @@ public class ReviewService {
             throw new RuntimeException("User not found");
         }
 
-        // Only owner can edit review
-        if (!existingReview.getUserId().equals(loggedInUser.getId())) {
+        if (!existingReview.getUserId()
+                .equals(loggedInUser.getId())) {
 
             throw new AccessDeniedException(
                     "You can edit only your own review");
         }
 
-        // Update only rating and comment
-        existingReview.setRating(request.getRating());
-        existingReview.setComment(request.getComment());
+        existingReview.setRating(
+                request.getRating());
+
+        existingReview.setComment(
+                request.getComment());
+
+        existingReview.setDeliveryRating(
+                request.getDeliveryRating());
+
+        existingReview.setSupportRating(
+                request.getSupportRating());
+
+        existingReview.setRefundRating(
+                request.getRefundRating());
+
+        existingReview.setProductRating(
+                request.getProductRating());
+
+        existingReview.setPricingRating(
+                request.getPricingRating());
 
         Review savedReview =
                 reviewRepository.save(existingReview);
@@ -184,16 +427,21 @@ public class ReviewService {
     public void deleteReview(Long id) {
 
         Review existingReview =
-                reviewRepository.findById(id).orElse(null);
+                reviewRepository
+                        .findById(id)
+                        .orElse(null);
 
         if (existingReview == null) {
             throw new RuntimeException("Review not found");
         }
 
         Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
 
-        String loggedInEmail = authentication.getName();
+        String loggedInEmail =
+                authentication.getName();
 
         User loggedInUser =
                 userRepository.findByEmail(loggedInEmail);
@@ -202,33 +450,29 @@ public class ReviewService {
             throw new RuntimeException("User not found");
         }
 
-        // Check admin
         boolean isAdmin =
-                adminRepository.existsByUserId(loggedInUser.getId());
+                adminRepository.existsByUserId(
+                        loggedInUser.getId());
 
-        // Check owner
         boolean isOwner =
-                existingReview.getUserId().equals(loggedInUser.getId());
+                existingReview.getUserId()
+                        .equals(loggedInUser.getId());
 
-        // Only owner OR admin can delete
         if (!isOwner && !isAdmin) {
 
             throw new AccessDeniedException(
                     "You can delete only your own review");
         }
 
-        // Delete dependent data first
+        businessResponseRepository
+                .deleteByReviewId(id);
 
-        // 1. Delete business response
-        businessResponseRepository.deleteByReviewId(id);
+        reviewVoteRepository
+                .deleteByReviewId(id);
 
-        // 2. Delete helpful / not helpful votes
-        reviewVoteRepository.deleteByReviewId(id);
+        reportRepository
+                .deleteByReviewId(id);
 
-        // 3. Delete reports
-        reportRepository.deleteByReviewId(id);
-
-        // 4. Finally delete review
         reviewRepository.deleteById(id);
     }
 
@@ -239,31 +483,30 @@ public class ReviewService {
     public void deleteReviewsByWebsiteId(Long websiteId) {
 
         List<Review> reviews =
-                reviewRepository.findByWebsiteId(websiteId);
+                reviewRepository
+                        .findByWebsiteId(websiteId);
 
         for (Review review : reviews) {
 
-            Long reviewId = review.getId();
+            Long reviewId =
+                    review.getId();
 
-            // Delete business response
             businessResponseRepository
                     .deleteByReviewId(reviewId);
 
-            // Delete votes
             reviewVoteRepository
                     .deleteByReviewId(reviewId);
 
-            // Delete reports
             reportRepository
                     .deleteByReviewId(reviewId);
 
-            // Delete review
-            reviewRepository.deleteById(reviewId);
+            reviewRepository
+                    .deleteById(reviewId);
         }
     }
 
     // ==============================
-    // ADMIN APPROVE / REJECT / HIDE / RESTORE REVIEW
+    // ADMIN APPROVE / REJECT / HIDE / RESTORE
     // ==============================
 
     public ReviewResponseDTO updateReviewStatus(
@@ -271,18 +514,23 @@ public class ReviewService {
             String status) {
 
         Review review =
-                reviewRepository.findById(id).orElse(null);
+                reviewRepository
+                        .findById(id)
+                        .orElse(null);
 
         if (review == null) {
             return null;
         }
 
-        if (status == null || status.isBlank()) {
+        if (status == null
+                || status.isBlank()) {
 
-            throw new RuntimeException("Status is required");
+            throw new RuntimeException(
+                    "Status is required");
         }
 
-        status = status.toUpperCase();
+        status =
+                status.toUpperCase();
 
         if (!status.equals("PENDING")
                 && !status.equals("APPROVED")
@@ -293,21 +541,19 @@ public class ReviewService {
                     "Status must be PENDING, APPROVED, REJECTED or HIDDEN");
         }
 
-        String oldStatus = review.getStatus();
+        String oldStatus =
+                review.getStatus();
 
         review.setStatus(status);
 
         Review savedReview =
                 reviewRepository.save(review);
 
-        String details =
-                oldStatus + " -> " + status;
-
         auditLogService.log(
                 "REVIEW_STATUS_CHANGED",
                 "REVIEW",
                 id,
-                details
+                oldStatus + " -> " + status
         );
 
         return convertToResponseDTO(savedReview);
@@ -322,7 +568,9 @@ public class ReviewService {
             String verificationStatus) {
 
         Review review =
-                reviewRepository.findById(id).orElse(null);
+                reviewRepository
+                        .findById(id)
+                        .orElse(null);
 
         if (review == null) {
             return null;
@@ -351,7 +599,8 @@ public class ReviewService {
         String oldVerificationStatus =
                 review.getVerificationStatus();
 
-        review.setVerificationStatus(verificationStatus);
+        review.setVerificationStatus(
+                verificationStatus);
 
         Review savedReview =
                 reviewRepository.save(review);
@@ -374,27 +623,16 @@ public class ReviewService {
 
     public double getAverageRating(Long websiteId) {
 
-        List<Review> reviews =
-                reviewRepository.findByWebsiteId(websiteId);
+        Double average =
+                reviewRepository
+                        .findAverageApprovedRating(websiteId);
 
-        double totalRating = 0;
-        int approvedCount = 0;
-
-        for (Review review : reviews) {
-
-            if ("APPROVED".equalsIgnoreCase(review.getStatus())) {
-
-                totalRating += review.getRating();
-                approvedCount++;
-            }
-        }
-
-        if (approvedCount == 0) {
+        if (average == null) {
             return 0.0;
         }
 
         return Math.round(
-                (totalRating / approvedCount) * 10.0
+                average * 10.0
         ) / 10.0;
     }
 
@@ -404,95 +642,60 @@ public class ReviewService {
 
     public int getReviewCount(Long websiteId) {
 
-        List<Review> reviews =
-                reviewRepository.findByWebsiteId(websiteId);
+        Long count =
+                reviewRepository
+                        .countApprovedReviews(websiteId);
 
-        int count = 0;
-
-        for (Review review : reviews) {
-
-            if ("APPROVED".equalsIgnoreCase(review.getStatus())) {
-                count++;
-            }
-        }
-
-        return count;
+        return count == null
+                ? 0
+                : count.intValue();
     }
 
     // ==============================
-    // FIVE STAR COUNT
+    // STAR COUNTS
     // ==============================
 
     public int getFiveStarCount(Long websiteId) {
-
         return getStarCount(websiteId, 5);
     }
 
-    // ==============================
-    // FOUR STAR COUNT
-    // ==============================
-
     public int getFourStarCount(Long websiteId) {
-
         return getStarCount(websiteId, 4);
     }
 
-    // ==============================
-    // THREE STAR COUNT
-    // ==============================
-
     public int getThreeStarCount(Long websiteId) {
-
         return getStarCount(websiteId, 3);
     }
 
-    // ==============================
-    // TWO STAR COUNT
-    // ==============================
-
     public int getTwoStarCount(Long websiteId) {
-
         return getStarCount(websiteId, 2);
     }
 
-    // ==============================
-    // ONE STAR COUNT
-    // ==============================
-
     public int getOneStarCount(Long websiteId) {
-
         return getStarCount(websiteId, 1);
     }
 
-    // ==============================
-    // STAR COUNT
-    // ==============================
+    private int getStarCount(
+            Long websiteId,
+            int star) {
 
-    private int getStarCount(Long websiteId, int star) {
+        Long count =
+                reviewRepository
+                        .countApprovedReviewsByRating(
+                                websiteId,
+                                star);
 
-        List<Review> reviews =
-                reviewRepository.findByWebsiteId(websiteId);
-
-        int count = 0;
-
-        for (Review review : reviews) {
-
-            if ("APPROVED".equalsIgnoreCase(review.getStatus())
-                    && review.getRating() != null
-                    && review.getRating() == star) {
-
-                count++;
-            }
-        }
-
-        return count;
+        return count == null
+                ? 0
+                : count.intValue();
     }
 
     // ==============================
     // ENTITY -> RESPONSE DTO
     // ==============================
 
-    public ReviewResponseDTO convertToResponseDTO(Review review) {
+    public ReviewResponseDTO convertToResponseDTO(
+            Review review) {
 
         if (review == null) {
             return null;
@@ -506,6 +709,11 @@ public class ReviewService {
                 review.getWebsiteId(),
                 review.getStatus(),
                 review.getVerificationStatus(),
+                review.getDeliveryRating(),
+                review.getSupportRating(),
+                review.getRefundRating(),
+                review.getProductRating(),
+                review.getPricingRating(),
                 review.getCreatedAt()
         );
     }

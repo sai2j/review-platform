@@ -17,458 +17,412 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Service
 public class DiscoveryService {
 
-    private final RestTemplate restTemplate;
+	private final RestTemplate restTemplate;
 
-    @Value("${tinyfish.api-key:TEST_KEY}")
-    private String apiKey;
+	@Value("${tinyfish.api-key:TEST_KEY}")
+	private String apiKey;
 
-    public DiscoveryService() {
+	public DiscoveryService() {
+		this.restTemplate = new RestTemplate();
+	}
 
-        this.restTemplate = new RestTemplate();
-    }
+// =========================================================
+// SEARCH WEBSITE
+// =========================================================
 
+	public List<WebsiteSearchResult> searchWebsites(String keyword) {
 
-    // =========================================================
-    // SEARCH WEBSITE
-    // =========================================================
+		List<WebsiteSearchResult> results = new ArrayList<>();
 
-    public List<WebsiteSearchResult> searchWebsites(
-            String keyword) {
+		if (keyword == null || keyword.trim().isEmpty()) {
+			return results;
+		}
 
-        List<WebsiteSearchResult> results =
-                new ArrayList<>();
+		String url = UriComponentsBuilder.fromUriString("https://api.search.tinyfish.ai").queryParam("query", keyword)
+				.toUriString();
 
-        if (keyword == null ||
-            keyword.trim().isEmpty()) {
+		HttpHeaders headers = new HttpHeaders();
+		headers.set("Accept", "application/json");
+		headers.set("X-API-Key", apiKey);
 
-            return results;
-        }
+		HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        String url = UriComponentsBuilder
-                .fromUriString(
-                        "https://api.search.tinyfish.ai"
-                )
-                .queryParam(
-                        "query",
-                        keyword
-                )
-                .toUriString();
+		ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
 
+		Map body = response.getBody();
 
-        // =====================================================
-        // HEADERS
-        // =====================================================
+		if (body == null) {
+			return results;
+		}
 
-        HttpHeaders headers =
-                new HttpHeaders();
+		List<Map<String, Object>> searchResults = (List<Map<String, Object>>) body.get("results");
 
-        headers.set(
-                "Accept",
-                "application/json"
-        );
+		if (searchResults == null || searchResults.isEmpty()) {
+			return results;
+		}
 
-        headers.set(
-                "X-API-Key",
-                apiKey
-        );
+		String searchKeyword = keyword.toLowerCase().trim().replaceAll("\\s+", "");
 
+		WebsiteSearchResult bestResult = null;
+		int bestScore = 0;
 
-        HttpEntity<String> entity =
-                new HttpEntity<>(headers);
+		for (Map<String, Object> item : searchResults) {
 
+			String title = item.get("title") != null ? item.get("title").toString() : "";
 
-        // =====================================================
-        // CALL TINYFISH
-        // =====================================================
+			String resultUrl = item.get("url") != null ? item.get("url").toString() : "";
 
-        ResponseEntity<Map> response =
-                restTemplate.exchange(
-                        url,
-                        HttpMethod.GET,
-                        entity,
-                        Map.class
-                );
+			String description = item.get("snippet") != null ? item.get("snippet").toString() : "";
 
+			if (resultUrl.isBlank()) {
+				continue;
+			}
 
-        Map body =
-                response.getBody();
+			if (!isActualWebsite(resultUrl)) {
+				continue;
+			}
 
+			String domain = getDomain(resultUrl);
 
-        if (body == null) {
+			if (domain == null) {
+				continue;
+			}
 
-            return results;
-        }
+			String cleanDomain = domain.replace(".", "").replace("-", "").toLowerCase();
 
+			String cleanTitle = title.toLowerCase().replaceAll("\\s+", "");
 
-        List<Map<String, Object>> searchResults =
-                (List<Map<String, Object>>)
-                        body.get("results");
+			int score = 0;
 
+			if (cleanDomain.equals(searchKeyword)) {
+				score += 100;
+			} else if (cleanDomain.contains(searchKeyword)) {
+				score += 50;
+			}
 
-        if (searchResults == null ||
-            searchResults.isEmpty()) {
+			if (cleanTitle.equals(searchKeyword)) {
+				score += 40;
+			} else if (cleanTitle.contains(searchKeyword)) {
+				score += 20;
+			}
 
-            return results;
-        }
+			if (resultUrl.toLowerCase().contains(keyword.toLowerCase())) {
+				score += 10;
+			}
 
+			if (score == 0) {
+				continue;
+			}
 
-        String searchKeyword =
-                keyword
-                        .toLowerCase()
-                        .trim()
-                        .replaceAll("\\s+", "");
+			if (bestResult == null || score > bestScore) {
 
+				bestScore = score;
 
-        WebsiteSearchResult bestResult =
-                null;
+				bestResult = new WebsiteSearchResult(title, resultUrl, description);
+			}
+		}
 
-        int bestScore = 0;
+		if (bestResult != null) {
+			results.add(bestResult);
+		}
 
+		return results;
+	}
 
-        // =====================================================
-        // CHECK ALL SEARCH RESULTS
-        // =====================================================
+// =========================================================
+// SIMILAR WEBSITES
+// =========================================================
 
-        for (Map<String, Object> item :
-                searchResults) {
+	public List<WebsiteSearchResult> findSimilarWebsites(String keyword) {
 
-            String title =
-                    item.get("title") != null
-                    ? item.get("title").toString()
-                    : "";
+		List<WebsiteSearchResult> results = new ArrayList<>();
 
-            String resultUrl =
-                    item.get("url") != null
-                    ? item.get("url").toString()
-                    : "";
+		if (keyword == null || keyword.trim().isEmpty()) {
 
-            String description =
-                    item.get("snippet") != null
-                    ? item.get("snippet").toString()
-                    : "";
+			return results;
+		}
 
+		String searchQuery = "websites similar to " + keyword.trim();
 
-            if (resultUrl.isBlank()) {
+		String url = UriComponentsBuilder.fromUriString("https://api.search.tinyfish.ai")
+				.queryParam("query", searchQuery).toUriString();
 
-                continue;
-            }
+		HttpHeaders headers = new HttpHeaders();
 
+		headers.set("Accept", "application/json");
 
-            // =================================================
-            // ONLY REAL WEBSITE
-            // =================================================
+		headers.set("X-API-Key", apiKey);
 
-            if (!isActualWebsite(resultUrl)) {
+		HttpEntity<String> entity = new HttpEntity<>(headers);
 
-                continue;
-            }
+		ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
 
+		Map body = response.getBody();
 
-            String domain =
-                    getDomain(resultUrl);
+		if (body == null) {
+			return results;
+		}
 
+		List<Map<String, Object>> searchResults = (List<Map<String, Object>>) body.get("results");
 
-            if (domain == null) {
+		if (searchResults == null || searchResults.isEmpty()) {
 
-                continue;
-            }
+			return results;
+		}
 
+		String keywordLower = keyword.trim().toLowerCase();
 
-            String cleanDomain =
-                    domain
-                            .replace(".", "")
-                            .replace("-", "")
-                            .toLowerCase();
+		for (Map<String, Object> item : searchResults) {
 
+			String title = item.get("title") != null ? item.get("title").toString() : "";
 
-            String cleanTitle =
-                    title
-                            .toLowerCase()
-                            .replaceAll("\\s+", "");
+			String resultUrl = item.get("url") != null ? item.get("url").toString() : "";
 
+			String description = item.get("snippet") != null ? item.get("snippet").toString() : "";
 
-            // =================================================
-            // CALCULATE SIMPLE SCORE
-            // =================================================
+			if (resultUrl.isBlank()) {
+				continue;
+			}
 
-            int score = 0;
+			if (!isActualWebsite(resultUrl)) {
+				continue;
+			}
 
+			String domain = getDomain(resultUrl);
 
-            // Exact domain match
-            if (cleanDomain.equals(searchKeyword)) {
+			if (domain == null) {
+				continue;
+			}
 
-                score += 100;
-            }
+			if (domain.equals(keywordLower) || domain.contains(keywordLower.replace(" ", ""))) {
 
+				continue;
+			}
 
-            // Domain contains keyword
-            else if (cleanDomain.contains(searchKeyword)) {
+			boolean duplicate = results.stream().anyMatch(result -> getDomain(result.getUrl()) != null
+					&& getDomain(result.getUrl()).equalsIgnoreCase(domain));
 
-                score += 50;
-            }
+			if (duplicate) {
+				continue;
+			}
 
+			results.add(new WebsiteSearchResult(title, resultUrl, description));
 
-            // Exact title match
-            if (cleanTitle.equals(searchKeyword)) {
+			if (results.size() >= 5) {
+				break;
+			}
+		}
 
-                score += 40;
-            }
+		return results;
+	}
 
+// =========================================================
+// ALTERNATIVE WEBSITES
+// =========================================================
 
-            // Title contains keyword
-            else if (cleanTitle.contains(searchKeyword)) {
+	public List<WebsiteSearchResult> findAlternativeWebsites(String keyword) {
 
-                score += 20;
-            }
+		List<WebsiteSearchResult> results = new ArrayList<>();
 
+		if (keyword == null || keyword.trim().isEmpty()) {
 
-            // URL contains keyword
-            if (resultUrl
-                    .toLowerCase()
-                    .contains(
-                            keyword.toLowerCase()
-                    )) {
+			return results;
+		}
 
-                score += 10;
-            }
+		String searchQuery = "best alternatives to " + keyword.trim() + " official websites";
 
+		String url = UriComponentsBuilder.fromUriString("https://api.search.tinyfish.ai")
+				.queryParam("query", searchQuery).toUriString();
 
-            /*
-             * Agar keyword ka relation hi nahi hai
-             * to result ignore karo.
-             */
+		HttpHeaders headers = new HttpHeaders();
 
-            if (score == 0) {
+		headers.set("Accept", "application/json");
 
-                continue;
-            }
+		headers.set("X-API-Key", apiKey);
 
+		HttpEntity<String> entity = new HttpEntity<>(headers);
 
-            // =================================================
-            // BEST RESULT SAVE KARO
-            // =================================================
+		ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, entity, Map.class);
 
-            if (bestResult == null ||
-                score > bestScore) {
+		Map body = response.getBody();
 
-                bestScore = score;
+		if (body == null) {
+			return results;
+		}
 
-                bestResult =
-                        new WebsiteSearchResult(
-                                title,
-                                resultUrl,
-                                description
-                        );
-            }
-        }
+		List<Map<String, Object>> searchResults = (List<Map<String, Object>>) body.get("results");
 
+		if (searchResults == null || searchResults.isEmpty()) {
 
-        // =====================================================
-        // ONLY ONE RESULT RETURN
-        // =====================================================
+			return results;
+		}
 
-        if (bestResult != null) {
+		String keywordLower = keyword.trim().toLowerCase();
 
-            results.add(bestResult);
-        }
+		String cleanKeyword = keywordLower.replaceAll("[^a-z0-9]", "");
 
+		for (Map<String, Object> item : searchResults) {
 
-        return results;
-    }
+			String title = item.get("title") != null ? item.get("title").toString() : "";
 
+			String resultUrl = item.get("url") != null ? item.get("url").toString() : "";
 
-    // =========================================================
-    // CHECK ACTUAL WEBSITE
-    // =========================================================
+			String description = item.get("snippet") != null ? item.get("snippet").toString() : "";
 
-    private boolean isActualWebsite(
-            String url) {
+			if (resultUrl.isBlank()) {
+				continue;
+			}
 
-        try {
+			if (!isActualWebsite(resultUrl)) {
+				continue;
+			}
 
-            URI uri =
-                    URI.create(url);
+			String domain = getDomain(resultUrl);
 
+			if (domain == null) {
+				continue;
+			}
 
-            String host =
-                    uri.getHost();
+			String cleanDomain = domain.replace(".", "").replace("-", "").toLowerCase();
 
+			// Original website ko exclude karo
+			if (cleanDomain.equals(cleanKeyword) || cleanDomain.contains(cleanKeyword)) {
 
-            if (host == null) {
+				continue;
+			}
 
-                return false;
-            }
+			// Duplicate domain ko exclude karo
+			boolean duplicate = results.stream().anyMatch(result -> getDomain(result.getUrl()) != null
+					&& getDomain(result.getUrl()).equalsIgnoreCase(domain));
 
+			if (duplicate) {
+				continue;
+			}
 
-            String lowerHost =
-                    host.toLowerCase();
+			// Article/list pages ko avoid karne ke liye
+			// title/description mein alternative context check karo
+			String combinedText = (title + " " + description).toLowerCase();
 
+			if (!combinedText.contains("alternative") && !combinedText.contains("music")
+					&& !combinedText.contains("streaming") && !combinedText.contains("service")) {
 
-            String lowerUrl =
-                    url.toLowerCase();
+				continue;
+			}
 
+			results.add(new WebsiteSearchResult(title, resultUrl, description));
 
-            // =================================================
-            // UNWANTED DOMAINS
-            // =================================================
+			if (results.size() >= 5) {
+				break;
+			}
+		}
 
-            String[] unwantedDomains = {
+		return results;
+	}
 
-                    "wikipedia.org",
+// =========================================================
+// CHECK ACTUAL WEBSITE
+// =========================================================
 
-                    "youtube.com",
+	private boolean isActualWebsite(String url) {
 
-                    "facebook.com",
+		try {
 
-                    "instagram.com",
+			URI uri = URI.create(url);
 
-                    "linkedin.com",
+			String host = uri.getHost();
 
-                    "reddit.com",
+			if (host == null) {
+				return false;
+			}
 
-                    "quora.com",
+			String lowerHost = host.toLowerCase();
 
-                    "twitter.com",
+			String lowerUrl = url.toLowerCase();
 
-                    "x.com",
+			String[] unwantedDomains = {
 
-                    "pinterest.com",
+					"wikipedia.org", "youtube.com", "facebook.com", "instagram.com", "linkedin.com", "reddit.com",
+					"quora.com", "twitter.com", "x.com", "pinterest.com", "apps.apple.com", "play.google.com",
+					"apps.microsoft.com", "microsoft.com/store"
 
-                    "apps.apple.com",
+			};
 
-                    "play.google.com",
+			for (String unwanted : unwantedDomains) {
 
-                    "apps.microsoft.com",
+				if (lowerHost.equals(unwanted) || lowerHost.endsWith("." + unwanted) || lowerUrl.contains(unwanted)) {
 
-                    "microsoft.com/store"
+					return false;
+				}
+			}
 
-            };
+			String path = uri.getPath();
 
+			if (path != null && !path.equals("/") && !path.isEmpty()) {
 
-            for (String unwanted :
-                    unwantedDomains) {
+				String lowerPath = path.toLowerCase();
 
-                if (lowerHost.equals(unwanted) ||
-                    lowerHost.endsWith("." + unwanted) ||
-                    lowerUrl.contains(unwanted)) {
+				String[] unwantedPaths = {
 
-                    return false;
-                }
-            }
+						"/wiki/", "/article/", "/articles/", "/news/", "/blog/", "/blogs/", "/search", "/tag/",
+						"/category/", "/topics/", "/stories/", "/post/"
 
+				};
 
-            // =================================================
-            // UNWANTED PAGE TYPES
-            // =================================================
+				for (String unwantedPath : unwantedPaths) {
 
-            String path =
-                    uri.getPath();
+					if (lowerPath.contains(unwantedPath)) {
 
+						return false;
+					}
+				}
+			}
 
-            if (path != null &&
-                !path.equals("/") &&
-                !path.isEmpty()) {
+			if (lowerHost.contains("apps.apple.com")) {
 
-                String lowerPath =
-                        path.toLowerCase();
+				return false;
+			}
 
+			if (lowerHost.contains("play.google.com")) {
 
-                String[] unwantedPaths = {
+				return false;
+			}
 
-                        "/wiki/",
-                        "/article/",
-                        "/articles/",
-                        "/news/",
-                        "/blog/",
-                        "/blogs/",
-                        "/search",
-                        "/tag/",
-                        "/category/",
-                        "/topics/",
-                        "/stories/",
-                        "/post/"
+			return true;
 
-                };
+		} catch (Exception e) {
 
+			return false;
+		}
+	}
 
-                for (String unwantedPath :
-                        unwantedPaths) {
+// =========================================================
+// GET DOMAIN
+// =========================================================
 
-                    if (lowerPath.contains(
-                            unwantedPath)) {
+	private String getDomain(String url) {
 
-                        return false;
-                    }
-                }
-            }
+		try {
 
+			URI uri = URI.create(url);
 
-            /*
-             * App Store / Play Store ko extra check
-             */
+			String host = uri.getHost();
 
-            if (lowerHost.contains(
-                    "apps.apple.com")) {
+			if (host == null) {
+				return null;
+			}
 
-                return false;
-            }
+			host = host.toLowerCase();
 
+			if (host.startsWith("www.")) {
+				host = host.substring(4);
+			}
 
-            if (lowerHost.contains(
-                    "play.google.com")) {
+			return host;
 
-                return false;
-            }
+		} catch (Exception e) {
 
+			return null;
+		}
+	}
 
-            return true;
-
-        } catch (Exception e) {
-
-            return false;
-        }
-    }
-
-
-    // =========================================================
-    // GET DOMAIN
-    // =========================================================
-
-    private String getDomain(
-            String url) {
-
-        try {
-
-            URI uri =
-                    URI.create(url);
-
-
-            String host =
-                    uri.getHost();
-
-
-            if (host == null) {
-
-                return null;
-            }
-
-
-            host =
-                    host.toLowerCase();
-
-
-            if (host.startsWith("www.")) {
-
-                host =
-                        host.substring(4);
-            }
-
-
-            return host;
-
-        } catch (Exception e) {
-
-            return null;
-        }
-    }
 }

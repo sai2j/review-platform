@@ -1,3 +1,4 @@
+
 package com.nit.review;
 
 import java.time.LocalDateTime;
@@ -41,6 +42,22 @@ public class Review {
     // Review verification status
     @Column(name = "verification_status")
     private String verificationStatus;
+
+    // Experience ratings
+    @Column(name = "delivery_rating")
+    private Integer deliveryRating;
+
+    @Column(name = "support_rating")
+    private Integer supportRating;
+
+    @Column(name = "refund_rating")
+    private Integer refundRating;
+
+    @Column(name = "product_rating")
+    private Integer productRating;
+
+    @Column(name = "pricing_rating")
+    private Integer pricingRating;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -133,6 +150,46 @@ public class Review {
         this.verificationStatus = verificationStatus;
     }
 
+    public Integer getDeliveryRating() {
+        return deliveryRating;
+    }
+
+    public void setDeliveryRating(Integer deliveryRating) {
+        this.deliveryRating = deliveryRating;
+    }
+
+    public Integer getSupportRating() {
+        return supportRating;
+    }
+
+    public void setSupportRating(Integer supportRating) {
+        this.supportRating = supportRating;
+    }
+
+    public Integer getRefundRating() {
+        return refundRating;
+    }
+
+    public void setRefundRating(Integer refundRating) {
+        this.refundRating = refundRating;
+    }
+
+    public Integer getProductRating() {
+        return productRating;
+    }
+
+    public void setProductRating(Integer productRating) {
+        this.productRating = productRating;
+    }
+
+    public Integer getPricingRating() {
+        return pricingRating;
+    }
+
+    public void setPricingRating(Integer pricingRating) {
+        this.pricingRating = pricingRating;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -141,3 +198,4 @@ public class Review {
         this.createdAt = createdAt;
     }
 }
+

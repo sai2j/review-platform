@@ -5,7 +5,15 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "businesses")
@@ -15,20 +23,23 @@ public class Business {
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    @NotBlank(message = "Business name is required")
+    @Size(max = 200, message = "Business name must not exceed 200 characters")
     private String name;
 
+    @Size(max = 2000, message = "Description must not exceed 2000 characters")
     private String description;
 
     @Column(name = "official_url")
+    @NotBlank(message = "Official URL is required")
+    @Size(max = 500, message = "Official URL must not exceed 500 characters")
     private String officialUrl;
 
     private String status;
 
-    // ==============================
-    // BUSINESS EMAIL VERIFICATION
-    // ==============================
-
     @Column(name = "business_email")
+    @Email(message = "Invalid business email")
+    @Size(max = 255, message = "Business email must not exceed 255 characters")
     private String businessEmail;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -43,10 +54,6 @@ public class Business {
     @Column(name = "email_verification_expiry")
     private LocalDateTime emailVerificationExpiry;
 
-    // ==============================
-    // META TAG VERIFICATION
-    // ==============================
-
     @JsonIgnore
     @Column(name = "meta_verification_token")
     private String metaVerificationToken;
@@ -54,10 +61,6 @@ public class Business {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(name = "meta_verified")
     private boolean metaVerified = false;
-
-    // ==============================
-    // DNS VERIFICATION
-    // ==============================
 
     @JsonIgnore
     @Column(name = "dns_verification_token")
@@ -115,10 +118,6 @@ public class Business {
         this.status = status;
     }
 
-    // ==============================
-    // BUSINESS EMAIL GETTERS/SETTERS
-    // ==============================
-
     public String getBusinessEmail() {
         return businessEmail;
     }
@@ -147,26 +146,16 @@ public class Business {
         return emailVerificationExpiry;
     }
 
-    public void setEmailVerificationExpiry(
-            LocalDateTime emailVerificationExpiry) {
-
-        this.emailVerificationExpiry =
-                emailVerificationExpiry;
+    public void setEmailVerificationExpiry(LocalDateTime emailVerificationExpiry) {
+        this.emailVerificationExpiry = emailVerificationExpiry;
     }
-
-    // ==============================
-    // META TAG GETTERS/SETTERS
-    // ==============================
 
     public String getMetaVerificationToken() {
         return metaVerificationToken;
     }
 
-    public void setMetaVerificationToken(
-            String metaVerificationToken) {
-
-        this.metaVerificationToken =
-                metaVerificationToken;
+    public void setMetaVerificationToken(String metaVerificationToken) {
+        this.metaVerificationToken = metaVerificationToken;
     }
 
     public boolean isMetaVerified() {
@@ -177,19 +166,12 @@ public class Business {
         this.metaVerified = metaVerified;
     }
 
-    // ==============================
-    // DNS GETTERS/SETTERS
-    // ==============================
-
     public String getDnsVerificationToken() {
         return dnsVerificationToken;
     }
 
-    public void setDnsVerificationToken(
-            String dnsVerificationToken) {
-
-        this.dnsVerificationToken =
-                dnsVerificationToken;
+    public void setDnsVerificationToken(String dnsVerificationToken) {
+        this.dnsVerificationToken = dnsVerificationToken;
     }
 
     public boolean isDnsVerified() {

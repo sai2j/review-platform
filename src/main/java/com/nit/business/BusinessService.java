@@ -67,6 +67,45 @@ public class BusinessService {
         return businessRepository.findById(id).orElse(null);
     }
 
+    // =========================================================
+    // BUSINESS API AUTHORIZATION
+    // =========================================================
+
+    public boolean canAccessBusiness(Long businessId) {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext()
+                        .getAuthentication();
+
+        if (authentication == null
+                || !authentication.isAuthenticated()) {
+
+            return false;
+        }
+
+        User loggedInUser =
+                userRepository.findByEmail(
+                        authentication.getName());
+
+        if (loggedInUser == null) {
+            return false;
+        }
+
+        BusinessClaim approvedClaim =
+                businessClaimRepository
+                        .findByBusinessIdAndStatus(
+                                businessId,
+                                "APPROVED")
+                        .orElse(null);
+
+        if (approvedClaim == null) {
+            return false;
+        }
+
+        return loggedInUser.getId()
+                .equals(approvedClaim.getUserId());
+    }
+
     // Business owner can edit only their approved claimed business
     public Business updateBusiness(Long id, Business business) {
 
@@ -100,7 +139,9 @@ public class BusinessService {
 
         BusinessClaim approvedClaim =
                 businessClaimRepository
-                        .findByBusinessIdAndStatus(id, "APPROVED")
+                        .findByBusinessIdAndStatus(
+                                id,
+                                "APPROVED")
                         .orElse(null);
 
         if (approvedClaim == null

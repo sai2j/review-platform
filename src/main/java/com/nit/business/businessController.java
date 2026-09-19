@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/businesses")
 public class businessController {
@@ -20,19 +22,23 @@ public class businessController {
         this.emailVerificationService = emailVerificationService;
     }
 
+    // Only authenticated users can create a business
+    @PreAuthorize("isAuthenticated()")
     @PostMapping
     public Business createBusiness(
-            @RequestBody Business business) {
+            @Valid @RequestBody Business business) {
 
         return businessService.saveBusiness(business);
     }
 
+    // Public business listing
     @GetMapping
     public List<Business> getAllBusinesses() {
 
         return businessService.getAllBusinesses();
     }
 
+    // Public business details
     @GetMapping("/{id}")
     public Business getBusinessById(
             @PathVariable Long id) {
@@ -41,14 +47,16 @@ public class businessController {
     }
 
     // Business owner can edit only their approved claimed business
+    @PreAuthorize("@businessService.canAccessBusiness(#id)")
     @PutMapping("/{id}")
     public Business updateBusiness(
             @PathVariable Long id,
-            @RequestBody Business business) {
+            @Valid @RequestBody Business business) {
 
         return businessService.updateBusiness(id, business);
     }
 
+    // Only ADMIN can verify business
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/verify")
     public Business verifyBusiness(
@@ -61,6 +69,8 @@ public class businessController {
     // BUSINESS EMAIL VERIFICATION
     // =========================================================
 
+    // Only approved business owner can request email verification
+    @PreAuthorize("@businessService.canAccessBusiness(#id)")
     @PostMapping("/{id}/verify-email")
     public String sendBusinessEmailVerification(
             @PathVariable Long id,
@@ -76,6 +86,7 @@ public class businessController {
         return "Verification email sent successfully";
     }
 
+    // Verification token endpoint remains accessible for email-link verification
     @GetMapping("/{id}/verify-email")
     public String verifyBusinessEmail(
             @PathVariable Long id,
@@ -97,8 +108,7 @@ public class businessController {
             @PathVariable Long id) {
 
         Business business =
-                businessService
-                        .createMetaVerificationToken(id);
+                businessService.createMetaVerificationToken(id);
 
         return "Meta verification token generated: "
                 + business.getMetaVerificationToken();
@@ -109,8 +119,7 @@ public class businessController {
     public Business verifyBusinessMetaTag(
             @PathVariable Long id) {
 
-        return businessService
-                .verifyBusinessMetaTag(id);
+        return businessService.verifyBusinessMetaTag(id);
     }
 
     // =========================================================
@@ -123,8 +132,7 @@ public class businessController {
             @PathVariable Long id) {
 
         Business business =
-                businessService
-                        .createDnsVerificationToken(id);
+                businessService.createDnsVerificationToken(id);
 
         return "DNS verification token generated: "
                 + business.getDnsVerificationToken();
@@ -135,8 +143,7 @@ public class businessController {
     public Business verifyBusinessDns(
             @PathVariable Long id) {
 
-        return businessService
-                .verifyBusinessDns(id);
+        return businessService.verifyBusinessDns(id);
     }
 
     // =========================================================
@@ -151,6 +158,8 @@ public class businessController {
                 .getBusinessForWebsite(websiteId);
     }
 
+    // Only ADMIN can delete a business
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public String deleteBusiness(
             @PathVariable Long id) {

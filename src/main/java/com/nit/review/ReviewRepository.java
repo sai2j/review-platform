@@ -63,6 +63,23 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findByStatus(String status);
 
     // ==============================
+    // DUPLICATE REVIEW DETECTION
+    // ==============================
+
+    boolean existsByUserIdAndWebsiteIdAndComment(
+            Long userId,
+            Long websiteId,
+            String comment);
+
+    // ==============================
+    // REVIEW VELOCITY DETECTION
+    // ==============================
+
+    long countByUserIdAndCreatedAtAfter(
+            Long userId,
+            LocalDateTime createdAt);
+
+    // ==============================
     // PERFORMANCE - RATING SUMMARY
     // ==============================
 

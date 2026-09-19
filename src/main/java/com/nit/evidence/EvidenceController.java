@@ -1,4 +1,3 @@
-
 package com.nit.evidence;
 
 import java.nio.file.Files;
@@ -10,6 +9,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,6 +31,20 @@ public class EvidenceController {
             @RequestParam("file") MultipartFile file) {
 
         return evidenceService.uploadEvidence(reviewId, file);
+    }
+
+    /*
+     * =========================
+     * MODERATOR / ADMIN
+     * REQUEST EVIDENCE
+     * =========================
+     */
+    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
+    @PostMapping("/review/{reviewId}/request")
+    public String requestEvidence(
+            @PathVariable Long reviewId) {
+
+        return evidenceService.requestEvidence(reviewId);
     }
 
     @GetMapping("/review/{reviewId}")
@@ -90,4 +104,3 @@ public class EvidenceController {
         }
     }
 }
-

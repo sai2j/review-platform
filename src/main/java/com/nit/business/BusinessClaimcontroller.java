@@ -5,6 +5,8 @@ import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping({"/business-claims", "/api/v1/business/claims"})
 public class BusinessClaimcontroller {
@@ -20,7 +22,7 @@ public class BusinessClaimcontroller {
     // Logged-in user can create a business claim
     @PostMapping
     public BusinessClaim createBusinessClaim(
-            @RequestBody BusinessClaim businessClaim) {
+            @Valid @RequestBody BusinessClaim businessClaim) {
 
         return businessClaimService.saveBusinessClaim(
                 businessClaim);

@@ -17,8 +17,11 @@ public class AppealController {
 
     private final AppealService appealService;
 
-    public AppealController(AppealService appealService) {
-        this.appealService = appealService;
+    public AppealController(
+            AppealService appealService) {
+
+        this.appealService =
+                appealService;
     }
 
     // =========================
@@ -45,7 +48,9 @@ public class AppealController {
     public List<Appeal> getAppealsByReviewId(
             @PathVariable Long reviewId) {
 
-        return appealService.getAppealsByReviewId(reviewId);
+        return appealService.getAppealsByReviewId(
+                reviewId
+        );
     }
 
     // =========================
@@ -70,7 +75,9 @@ public class AppealController {
     public Appeal getAppealById(
             @PathVariable Long id) {
 
-        return appealService.getAppealById(id);
+        return appealService.getAppealById(
+                id
+        );
     }
 
     // =========================

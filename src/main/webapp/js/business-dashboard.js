@@ -1,8 +1,11 @@
 /* =========================
+
    GET LOGGED-IN USER
+
 ========================= */
 
 const loggedInUser =
+
     JSON.parse(localStorage.getItem("loggedInUser"));
 
 if (!loggedInUser || !loggedInUser.id) {
@@ -10,45 +13,64 @@ if (!loggedInUser || !loggedInUser.id) {
     alert("Please login first.");
 
     window.location.href = "login.html";
+
 }
 
 
 /* =========================
+
    USER ID
+
 ========================= */
 
 const USER_ID = loggedInUser.id;
 
 
 /* =========================
+
    API URLs
+
 ========================= */
 
 const BUSINESS_API =
+
     "/review-platform/business-dashboard/user/"
+
     + USER_ID;
 
 const WEBSITE_API =
+
     "/review-platform/business-dashboard/user/"
+
     + USER_ID
+
     + "/website";
 
 const REVIEWS_API =
+
     "/review-platform/business-dashboard/user/"
+
     + USER_ID
+
     + "/reviews";
 
 const METRICS_API =
+
     "/review-platform/business-dashboard/user/"
+
     + USER_ID
+
     + "/metrics";
 
 const RESPONSE_API =
+
     "/review-platform/business-responses";
 
 
 /* =========================
+
    LOAD BUSINESS
+
 ========================= */
 
 function loadBusiness() {
@@ -58,15 +80,19 @@ function loadBusiness() {
         .then(function(response) {
 
             if (!response.ok) {
+
                 throw new Error("Business API Error");
+
             }
 
             return response.json();
+
         })
 
         .then(function(business) {
 
             displayBusiness(business);
+
         })
 
         .catch(function(error) {
@@ -74,36 +100,48 @@ function loadBusiness() {
             console.error(error);
 
             const businessInfo =
+
                 document.getElementById("businessInfo");
 
             if (businessInfo) {
 
                 businessInfo.innerHTML =
+
                     "<p>Unable to load business information.</p>";
+
             }
+
         });
+
 }
 
 
 /* =========================
+
    DISPLAY BUSINESS
+
 ========================= */
 
 function displayBusiness(business) {
 
     const businessInfo =
+
         document.getElementById("businessInfo");
 
     if (!businessInfo) {
+
         return;
+
     }
 
     if (!business) {
 
         businessInfo.innerHTML =
+
             "<p>No approved business found.</p>";
 
         return;
+
     }
 
     businessInfo.innerHTML = `
@@ -111,38 +149,72 @@ function displayBusiness(business) {
         <div class="info-card">
 
             <p>
+
                 <strong>Business ID:</strong>
-                ${business.id}
+
+                ${Number(business.id) || 0}
+
             </p>
 
             <p>
+
                 <strong>Name:</strong>
-                ${business.name || "Not available"}
+
+                ${escapeHtml(
+
+                    business.name || "Not available"
+
+                )}
+
             </p>
 
             <p>
+
                 <strong>Description:</strong>
-                ${business.description || "Not available"}
+
+                ${escapeHtml(
+
+                    business.description || "Not available"
+
+                )}
+
             </p>
 
             <p>
+
                 <strong>Official URL:</strong>
-                ${business.officialUrl || "Not available"}
+
+                ${escapeHtml(
+
+                    business.officialUrl || "Not available"
+
+                )}
+
             </p>
 
             <p>
+
                 <strong>Status:</strong>
-                ${business.status || "Not available"}
+
+                ${escapeHtml(
+
+                    business.status || "Not available"
+
+                )}
+
             </p>
 
         </div>
 
     `;
+
 }
 
 
 /* =========================
+
    LOAD WEBSITE
+
 ========================= */
 
 function loadWebsite() {
@@ -152,15 +224,19 @@ function loadWebsite() {
         .then(function(response) {
 
             if (!response.ok) {
+
                 throw new Error("Website API Error");
+
             }
 
             return response.json();
+
         })
 
         .then(function(website) {
 
             displayWebsite(website);
+
         })
 
         .catch(function(error) {
@@ -168,36 +244,48 @@ function loadWebsite() {
             console.error(error);
 
             const websiteInfo =
+
                 document.getElementById("websiteInfo");
 
             if (websiteInfo) {
 
                 websiteInfo.innerHTML =
+
                     "<p>Unable to load website information.</p>";
+
             }
+
         });
+
 }
 
 
 /* =========================
+
    DISPLAY WEBSITE
+
 ========================= */
 
 function displayWebsite(website) {
 
     const websiteInfo =
+
         document.getElementById("websiteInfo");
 
     if (!websiteInfo) {
+
         return;
+
     }
 
     if (!website) {
 
         websiteInfo.innerHTML =
+
             "<p>No matching website found.</p>";
 
         return;
+
     }
 
     websiteInfo.innerHTML = `
@@ -205,38 +293,72 @@ function displayWebsite(website) {
         <div class="info-card">
 
             <p>
+
                 <strong>Website ID:</strong>
-                ${website.id}
+
+                ${Number(website.id) || 0}
+
             </p>
 
             <p>
+
                 <strong>Name:</strong>
-                ${website.name || "Not available"}
+
+                ${escapeHtml(
+
+                    website.name || "Not available"
+
+                )}
+
             </p>
 
             <p>
+
                 <strong>URL:</strong>
-                ${website.url || "Not available"}
+
+                ${escapeHtml(
+
+                    website.url || "Not available"
+
+                )}
+
             </p>
 
             <p>
+
                 <strong>Description:</strong>
-                ${website.description || "Not available"}
+
+                ${escapeHtml(
+
+                    website.description || "Not available"
+
+                )}
+
             </p>
 
             <p>
+
                 <strong>Domain:</strong>
-                ${website.canonicalDomain || "Not available"}
+
+                ${escapeHtml(
+
+                    website.canonicalDomain || "Not available"
+
+                )}
+
             </p>
 
         </div>
 
     `;
+
 }
 
 
 /* =========================
+
    LOAD REVIEWS
+
 ========================= */
 
 function loadReviews() {
@@ -246,10 +368,13 @@ function loadReviews() {
         .then(function(response) {
 
             if (!response.ok) {
+
                 throw new Error("Reviews API Error");
+
             }
 
             return response.json();
+
         })
 
         .then(function(reviews) {
@@ -257,6 +382,7 @@ function loadReviews() {
             displayReviews(reviews);
 
             calculateSummary(reviews);
+
         })
 
         .catch(function(error) {
@@ -264,19 +390,26 @@ function loadReviews() {
             console.error(error);
 
             const reviewList =
+
                 document.getElementById("reviewList");
 
             if (reviewList) {
 
                 reviewList.innerHTML =
+
                     "<p>Unable to load reviews.</p>";
+
             }
+
         });
+
 }
 
 
 /* =========================
+
    LOAD DASHBOARD METRICS
+
 ========================= */
 
 function loadDashboardMetrics() {
@@ -286,15 +419,23 @@ function loadDashboardMetrics() {
         .then(function(response) {
 
             if (!response.ok) {
-                throw new Error("Dashboard Metrics API Error");
+
+                throw new Error(
+
+                    "Dashboard Metrics API Error"
+
+                );
+
             }
 
             return response.json();
+
         })
 
         .then(function(metrics) {
 
             displayDashboardMetrics(metrics);
+
         })
 
         .catch(function(error) {
@@ -302,85 +443,117 @@ function loadDashboardMetrics() {
             console.error(error);
 
             const responseRate =
+
                 document.getElementById("responseRate");
 
             const ratingTrend =
+
                 document.getElementById("ratingTrend");
 
             if (responseRate) {
+
                 responseRate.textContent = "0.0%";
+
             }
 
             if (ratingTrend) {
+
                 ratingTrend.innerHTML =
+
                     "<p>Unable to load rating trend.</p>";
+
             }
+
         });
+
 }
 
 
 /* =========================
+
    DISPLAY DASHBOARD METRICS
+
 ========================= */
 
 function displayDashboardMetrics(metrics) {
 
     if (!metrics) {
+
         return;
+
     }
 
     const responseRate =
+
         document.getElementById("responseRate");
 
     if (responseRate) {
 
         responseRate.textContent =
+
             Number(metrics.responseRate || 0)
+
                 .toFixed(1) + "%";
+
     }
 
     const averageRating =
+
         document.getElementById("averageRating");
 
     if (averageRating) {
 
         averageRating.textContent =
+
             Number(metrics.averageRating || 0)
+
                 .toFixed(1);
+
     }
 
     const reviewCount =
+
         document.getElementById("reviewCount");
 
     if (reviewCount) {
 
         reviewCount.textContent =
-            metrics.reviewCount || 0;
+
+            Number(metrics.reviewCount || 0);
+
     }
 
     displayRatingTrend(metrics.ratingTrend || []);
+
 }
 
 
 /* =========================
+
    DISPLAY RATING TREND
+
 ========================= */
 
 function displayRatingTrend(trend) {
 
     const ratingTrend =
+
         document.getElementById("ratingTrend");
 
     if (!ratingTrend) {
+
         return;
+
     }
 
     if (!trend || trend.length === 0) {
 
         ratingTrend.innerHTML =
+
             "<p>No rating trend data available yet.</p>";
 
         return;
+
     }
 
     ratingTrend.innerHTML = "";
@@ -392,31 +565,46 @@ function displayRatingTrend(trend) {
             <div class="info-card">
 
                 <p>
+
                     <strong>Month:</strong>
-                    ${item.month}
+
+                    ${escapeHtml(item.month || "")}
+
                 </p>
 
                 <p>
+
                     <strong>Average Rating:</strong>
+
                     ${Number(item.averageRating || 0)
+
                         .toFixed(1)}
+
                     / 5
+
                 </p>
 
                 <p>
+
                     <strong>Reviews:</strong>
-                    ${item.reviewCount || 0}
+
+                    ${Number(item.reviewCount || 0)}
+
                 </p>
 
             </div>
 
         `;
+
     });
+
 }
 
 
 /* =========================
+
    LOAD BUSINESS RESPONSES
+
 ========================= */
 
 function loadResponses() {
@@ -428,11 +616,15 @@ function loadResponses() {
             if (!response.ok) {
 
                 throw new Error(
+
                     "Business Response API Error"
+
                 );
+
             }
 
             return response.json();
+
         })
 
         .catch(function(error) {
@@ -440,21 +632,28 @@ function loadResponses() {
             console.error(error);
 
             return [];
+
         });
+
 }
 
 
 /* =========================
+
    DISPLAY REVIEWS
+
 ========================= */
 
 function displayReviews(reviews) {
 
     const reviewList =
+
         document.getElementById("reviewList");
 
     if (!reviewList) {
+
         return;
+
     }
 
     reviewList.innerHTML = "";
@@ -462,9 +661,11 @@ function displayReviews(reviews) {
     if (!reviews || reviews.length === 0) {
 
         reviewList.innerHTML =
+
             "<p>No customer reviews found.</p>";
 
         return;
+
     }
 
     loadResponses()
@@ -474,13 +675,28 @@ function displayReviews(reviews) {
             reviews.forEach(function(review) {
 
                 const response =
+
                     responses.find(function(item) {
 
                         return Number(item.reviewId)
+
                             === Number(review.id);
+
                     });
 
                 let responseHTML = "";
+
+                const reviewId =
+
+                    Number(review.id) || 0;
+
+                const userId =
+
+                    Number(review.userId) || 0;
+
+                const rating =
+
+                    Number(review.rating) || 0;
 
                 if (response) {
 
@@ -491,11 +707,18 @@ function displayReviews(reviews) {
                             <h4>Business Response</h4>
 
                             <p>
-                                ${response.response || ""}
+
+                                ${escapeHtml(
+
+                                    response.response || ""
+
+                                )}
+
                             </p>
 
                             <button
-                                onclick="updateResponse(${review.id})">
+
+                                onclick="updateResponse(${reviewId})">
 
                                 Update Response
 
@@ -512,11 +735,14 @@ function displayReviews(reviews) {
                         <div class="business-response">
 
                             <p>
+
                                 No response added yet.
+
                             </p>
 
                             <button
-                                onclick="respondToReview(${review.id})">
+
+                                onclick="respondToReview(${reviewId})">
 
                                 Respond
 
@@ -525,6 +751,7 @@ function displayReviews(reviews) {
                         </div>
 
                     `;
+
                 }
 
                 reviewList.innerHTML += `
@@ -532,21 +759,35 @@ function displayReviews(reviews) {
                     <div class="review-card">
 
                         <h3>
-                            ⭐ ${review.rating}/5
+
+                            ⭐ ${rating}/5
+
                         </h3>
 
                         <p>
-                            ${review.comment || "No comment"}
+
+                            ${escapeHtml(
+
+                                review.comment || "No comment"
+
+                            )}
+
                         </p>
 
                         <p>
+
                             <strong>User ID:</strong>
-                            ${review.userId}
+
+                            ${userId}
+
                         </p>
 
                         <p>
+
                             <strong>Review ID:</strong>
-                            ${review.id}
+
+                            ${reviewId}
+
                         </p>
 
                         ${responseHTML}
@@ -554,30 +795,40 @@ function displayReviews(reviews) {
                     </div>
 
                 `;
+
             });
+
         });
+
 }
 
 
 /* =========================
+
    CALCULATE SUMMARY
+
 ========================= */
 
 function calculateSummary(reviews) {
 
     const reviewCount =
+
         reviews ? reviews.length : 0;
 
     const reviewCountElement =
+
         document.getElementById("reviewCount");
 
     const averageRatingElement =
+
         document.getElementById("averageRating");
 
     if (reviewCountElement) {
 
         reviewCountElement.textContent =
+
             reviewCount;
+
     }
 
     if (reviewCount === 0) {
@@ -585,10 +836,13 @@ function calculateSummary(reviews) {
         if (averageRatingElement) {
 
             averageRatingElement.textContent =
+
                 "0.0";
+
         }
 
         return;
+
     }
 
     let totalRating = 0;
@@ -596,50 +850,105 @@ function calculateSummary(reviews) {
     reviews.forEach(function(review) {
 
         totalRating +=
+
             Number(review.rating) || 0;
+
     });
 
     const averageRating =
+
         totalRating / reviewCount;
 
     if (averageRatingElement) {
 
         averageRatingElement.textContent =
+
             averageRating.toFixed(1);
+
     }
+
 }
 
 
 /* =========================
+
    RESPOND TO REVIEW
+
 ========================= */
 
 function respondToReview(reviewId) {
 
     window.location.href =
+
         "business-response.html?reviewId="
-        + reviewId;
+
+        + Number(reviewId);
+
 }
 
 
 /* =========================
+
    UPDATE RESPONSE
+
 ========================= */
 
 function updateResponse(reviewId) {
 
     window.location.href =
+
         "business-response.html?reviewId="
-        + reviewId;
+
+        + Number(reviewId);
+
 }
 
 
 /* =========================
+
+   ESCAPE HTML
+
+========================= */
+
+function escapeHtml(value) {
+
+    if (
+
+        value === null ||
+
+        value === undefined
+
+    ) {
+
+        return "";
+
+    }
+
+    return String(value)
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+
+}
+
+
+/* =========================
+
    PAGE LOAD
+
 ========================= */
 
 document.addEventListener(
+
     "DOMContentLoaded",
+
     function() {
 
         loadBusiness();
@@ -649,5 +958,7 @@ document.addEventListener(
         loadReviews();
 
         loadDashboardMetrics();
+
     }
+
 );

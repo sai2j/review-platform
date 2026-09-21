@@ -10,11 +10,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class MetadataController {
 
 	private final MetadataService metadataService;
-
 	public MetadataController(MetadataService metadataService) {
 		this.metadataService = metadataService;
 	}
-
 	@GetMapping("/fetch")
 	public WebsiteMetaData fetchMetaData(@RequestParam String url) {
 		return metadataService.fetchMetaData(url);

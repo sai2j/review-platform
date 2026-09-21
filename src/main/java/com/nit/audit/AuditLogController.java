@@ -11,17 +11,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/audit-logs")
 public class AuditLogController {
 
-    private final AuditLogService auditLogService;
+	private final AuditLogService auditLogService;
 
-    public AuditLogController(AuditLogService auditLogService) {
+	public AuditLogController(AuditLogService auditLogService) {
+		this.auditLogService = auditLogService;
+	}
 
-        this.auditLogService = auditLogService;
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
-    public List<AuditLog> getAllLogs() {
-
-        return auditLogService.getAllLogs();
-    }
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping
+	public List<AuditLog> getAllLogs() {
+		return auditLogService.getAllLogs();
+	}
 }

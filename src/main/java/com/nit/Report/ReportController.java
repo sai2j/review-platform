@@ -18,58 +18,43 @@ import jakarta.validation.Valid;
 @RequestMapping("/reports")
 public class ReportController {
 
-    private final ReportService reportService;
+	private final ReportService reportService;
 
-    public ReportController(ReportService reportService) {
-        this.reportService = reportService;
-    }
+	public ReportController(ReportService reportService) {
+		this.reportService = reportService;
+	}
+	@PostMapping
+	public Report createReport(@Valid @RequestBody Report report) {
+		return reportService.saveReport(report);
+	}
+	@PostMapping("/review/{reviewId}")
+	public Report createReportForReview(@PathVariable Long reviewId, @Valid @RequestBody Report report) {
+		report.setReviewId(reviewId);
+		return reportService.saveReport(report);
+	}
 
-    // Logged-in users can create reports
-    @PostMapping
-    public Report createReport(@Valid @RequestBody Report report) {
-        return reportService.saveReport(report);
-    }
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping
+	public List<Report> getAllReports() {
+		return reportService.getallReports();
+	}
 
-    // CREATE REPORT FOR REVIEW - PDF API
-    @PostMapping("/review/{reviewId}")
-    public Report createReportForReview(
-            @PathVariable Long reviewId,
-            @Valid @RequestBody Report report) {
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("/{id}")
+	public Report getReportById(@PathVariable Long id) {
+		return reportService.getReportById(id);
+	}
 
-        report.setReviewId(reviewId);
+	@PreAuthorize("hasRole('ADMIN')")
+	@org.springframework.web.bind.annotation.PutMapping("/{id}/status")
+	public Report updateReportStatus(@PathVariable Long id, @RequestParam String status) {
+		return reportService.updateReportStatus(id, status);
+	}
 
-        return reportService.saveReport(report);
-    }
-
-    // Only ADMIN can view all reports
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
-    public List<Report> getAllReports() {
-        return reportService.getallReports();
-    }
-
-    // Only ADMIN can view a report
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/{id}")
-    public Report getReportById(@PathVariable Long id) {
-        return reportService.getReportById(id);
-    }
-
-    // Only ADMIN can change report status
-    @PreAuthorize("hasRole('ADMIN')")
-    @org.springframework.web.bind.annotation.PutMapping("/{id}/status")
-    public Report updateReportStatus(
-            @PathVariable Long id,
-            @RequestParam String status) {
-
-        return reportService.updateReportStatus(id, status);
-    }
-
-    // Only ADMIN can delete reports
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id}")
-    public String deleteReport(@PathVariable Long id) {
-        reportService.deleteReport(id);
-        return "Report deleted successfully";
-    }
+	@PreAuthorize("hasRole('ADMIN')")
+	@DeleteMapping("/{id}")
+	public String deleteReport(@PathVariable Long id) {
+		reportService.deleteReport(id);
+		return "Report deleted successfully";
+	}
 }

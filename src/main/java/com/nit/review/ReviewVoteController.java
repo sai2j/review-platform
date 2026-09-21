@@ -15,80 +15,34 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/review-votes")
 public class ReviewVoteController {
 
-    private final ReviewVoteService reviewVoteService;
+	private final ReviewVoteService reviewVoteService;
 
-    public ReviewVoteController(
-            ReviewVoteService reviewVoteService) {
+	public ReviewVoteController(ReviewVoteService reviewVoteService) {
+		this.reviewVoteService = reviewVoteService;
+	}
+	@PostMapping
+	public ReviewVote saveVote(@RequestBody ReviewVote vote) {
+		return reviewVoteService.saveVote(vote.getReviewId(), vote.getVoteType());
+	}
 
-        this.reviewVoteService = reviewVoteService;
-    }
+	@GetMapping("/{reviewId}/user")
+	public ReviewVote getUserVote(@PathVariable Long reviewId) {
+		return reviewVoteService.getUserVote(reviewId);
+	}
 
-    // =========================================
-    // ADD / UPDATE VOTE
-    // =========================================
+	@GetMapping("/{reviewId}/count")
+	public Map<String, Long> getVoteCounts(@PathVariable Long reviewId) {
+		long helpful = reviewVoteService.getHelpfulCount(reviewId);
+		long notHelpful = reviewVoteService.getNotHelpfulCount(reviewId);
+		Map<String, Long> response = new HashMap<>();
+		response.put("helpful", helpful);
+		response.put("notHelpful", notHelpful);
+		return response;
+	}
 
-    @PostMapping
-    public ReviewVote saveVote(
-            @RequestBody ReviewVote vote) {
-
-        return reviewVoteService.saveVote(
-                vote.getReviewId(),
-                vote.getVoteType());
-    }
-
-    // =========================================
-    // GET CURRENT USER VOTE
-    // =========================================
-
-    @GetMapping("/{reviewId}/user")
-    public ReviewVote getUserVote(
-            @PathVariable Long reviewId) {
-
-        return reviewVoteService.getUserVote(
-                reviewId);
-    }
-
-    // =========================================
-    // GET VOTE COUNTS
-    // =========================================
-
-    @GetMapping("/{reviewId}/count")
-    public Map<String, Long> getVoteCounts(
-            @PathVariable Long reviewId) {
-
-        long helpful =
-                reviewVoteService
-                        .getHelpfulCount(reviewId);
-
-        long notHelpful =
-                reviewVoteService
-                        .getNotHelpfulCount(reviewId);
-
-        Map<String, Long> response =
-                new HashMap<>();
-
-        response.put(
-                "helpful",
-                helpful);
-
-        response.put(
-                "notHelpful",
-                notHelpful);
-
-        return response;
-    }
-
-    // =========================================
-    // DELETE CURRENT USER VOTE
-    // =========================================
-
-    @DeleteMapping("/{reviewId}/user")
-    public String deleteVote(
-            @PathVariable Long reviewId) {
-
-        reviewVoteService.deleteVote(
-                reviewId);
-
-        return "Vote deleted successfully";
-    }
+	@DeleteMapping("/{reviewId}/user")
+	public String deleteVote(@PathVariable Long reviewId) {
+		reviewVoteService.deleteVote(reviewId);
+		return "Vote deleted successfully";
+	}
 }

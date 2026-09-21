@@ -13,13 +13,9 @@ public class ReviewVote {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
-
     private Long reviewId;
-
     private Long userId;
-
     private String voteType;
-
     public ReviewVote() {
     }
 
@@ -32,27 +28,21 @@ public class ReviewVote {
     public Long getId() {
         return id;
     }
-
     public Long getReviewId() {
         return reviewId;
     }
-
     public void setReviewId(Long reviewId) {
         this.reviewId = reviewId;
     }
-
     public Long getUserId() {
         return userId;
     }
-
     public void setUserId(Long userId) {
         this.userId = userId;
     }
-
     public String getVoteType() {
         return voteType;
     }
-
     public void setVoteType(String voteType) {
         this.voteType = voteType;
     }

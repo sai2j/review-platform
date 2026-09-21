@@ -9,43 +9,26 @@ import com.nit.user.User;
 import com.nit.user.UserRepository;
 
 @Service
-public class CustomUserDetailsService
-        implements UserDetailsService {
+public class CustomUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+	private final UserRepository userRepository;
 
-    public CustomUserDetailsService(
-            UserRepository userRepository) {
+	public CustomUserDetailsService(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
 
-        this.userRepository = userRepository;
-    }
+	@Override
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		User user = userRepository.findByEmail(email);
+		if (user == null) {
+			throw new UsernameNotFoundException("User not found with email: " + email);
+		}
 
-    @Override
-    public UserDetails loadUserByUsername(String email)
-            throws UsernameNotFoundException {
+		if ("RESTRICTED".equalsIgnoreCase(user.getStatus())) {
+			throw new UsernameNotFoundException("User account is restricted");
+		}
 
-        User user =
-                userRepository.findByEmail(email);
-
-        if (user == null) {
-
-            throw new UsernameNotFoundException(
-                    "User not found with email: " + email
-            );
-        }
-
-        // Block restricted accounts
-        if ("RESTRICTED".equalsIgnoreCase(user.getStatus())) {
-
-            throw new UsernameNotFoundException(
-                    "User account is restricted"
-            );
-        }
-
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getEmail())
-                .password(user.getPassword())
-                .roles(user.getRole())
-                .build();
-    }
+		return org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
+				.password(user.getPassword()).roles(user.getRole()).build();
+	}
 }

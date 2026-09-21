@@ -4,189 +4,153 @@ package com.nit.dto;
 import java.time.LocalDateTime;
 
 public class ReviewResponseDTO {
+	private Long id;
+	private Integer rating;
+	private String comment;
+	private Long userId;
+	private Long websiteId;
+	private String status;
+	private String verificationStatus;
+	private Integer deliveryRating;
+	private Integer supportRating;
+	private Integer refundRating;
+	private Integer productRating;
+	private Integer pricingRating;
+	private LocalDateTime createdAt;
+	public ReviewResponseDTO() {
+	}
 
-    private Long id;
+	public ReviewResponseDTO(Long id, Integer rating, String comment, Long userId, Long websiteId, String status,
+			String verificationStatus, Integer deliveryRating, Integer supportRating, Integer refundRating,
+			Integer productRating, Integer pricingRating, LocalDateTime createdAt) {
+		this.id = id;
+		this.rating = rating;
+		this.comment = comment;
+		this.userId = userId;
+		this.websiteId = websiteId;
+		this.status = status;
+		this.verificationStatus = verificationStatus;
+		this.deliveryRating = deliveryRating;
+		this.supportRating = supportRating;
+		this.refundRating = refundRating;
+		this.productRating = productRating;
+		this.pricingRating = pricingRating;
+		this.createdAt = createdAt;
+	}
 
-    private Integer rating;
+	public ReviewResponseDTO(Long id, Integer rating, String comment, Long userId, Long websiteId, String status,
+			String verificationStatus, LocalDateTime createdAt) {
+		this.id = id;
+		this.rating = rating;
+		this.comment = comment;
+		this.userId = userId;
+		this.websiteId = websiteId;
+		this.status = status;
+		this.verificationStatus = verificationStatus;
+		this.createdAt = createdAt;
+	}
 
-    private String comment;
+	public Long getId() {
+		return id;
+	}
 
-    private Long userId;
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    private Long websiteId;
+	public Integer getRating() {
+		return rating;
+	}
 
-    private String status;
+	public void setRating(Integer rating) {
+		this.rating = rating;
+	}
 
-    private String verificationStatus;
+	public String getComment() {
+		return comment;
+	}
 
-    private Integer deliveryRating;
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
 
-    private Integer supportRating;
+	public Long getUserId() {
+		return userId;
+	}
 
-    private Integer refundRating;
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 
-    private Integer productRating;
+	public Long getWebsiteId() {
+		return websiteId;
+	}
 
-    private Integer pricingRating;
+	public void setWebsiteId(Long websiteId) {
+		this.websiteId = websiteId;
+	}
 
-    private LocalDateTime createdAt;
+	public String getStatus() {
+		return status;
+	}
 
-    public ReviewResponseDTO() {
-    }
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
-    public ReviewResponseDTO(
-            Long id,
-            Integer rating,
-            String comment,
-            Long userId,
-            Long websiteId,
-            String status,
-            String verificationStatus,
-            Integer deliveryRating,
-            Integer supportRating,
-            Integer refundRating,
-            Integer productRating,
-            Integer pricingRating,
-            LocalDateTime createdAt) {
+	public String getVerificationStatus() {
+		return verificationStatus;
+	}
 
-        this.id = id;
-        this.rating = rating;
-        this.comment = comment;
-        this.userId = userId;
-        this.websiteId = websiteId;
-        this.status = status;
-        this.verificationStatus = verificationStatus;
-        this.deliveryRating = deliveryRating;
-        this.supportRating = supportRating;
-        this.refundRating = refundRating;
-        this.productRating = productRating;
-        this.pricingRating = pricingRating;
-        this.createdAt = createdAt;
-    }
+	public void setVerificationStatus(String verificationStatus) {
+		this.verificationStatus = verificationStatus;
+	}
 
-    // Old constructor preserved
-    public ReviewResponseDTO(
-            Long id,
-            Integer rating,
-            String comment,
-            Long userId,
-            Long websiteId,
-            String status,
-            String verificationStatus,
-            LocalDateTime createdAt) {
+	public Integer getDeliveryRating() {
+		return deliveryRating;
+	}
 
-        this.id = id;
-        this.rating = rating;
-        this.comment = comment;
-        this.userId = userId;
-        this.websiteId = websiteId;
-        this.status = status;
-        this.verificationStatus = verificationStatus;
-        this.createdAt = createdAt;
-    }
+	public void setDeliveryRating(Integer deliveryRating) {
+		this.deliveryRating = deliveryRating;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Integer getSupportRating() {
+		return supportRating;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public void setSupportRating(Integer supportRating) {
+		this.supportRating = supportRating;
+	}
 
-    public Integer getRating() {
-        return rating;
-    }
+	public Integer getRefundRating() {
+		return refundRating;
+	}
 
-    public void setRating(Integer rating) {
-        this.rating = rating;
-    }
+	public void setRefundRating(Integer refundRating) {
+		this.refundRating = refundRating;
+	}
 
-    public String getComment() {
-        return comment;
-    }
+	public Integer getProductRating() {
+		return productRating;
+	}
 
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
+	public void setProductRating(Integer productRating) {
+		this.productRating = productRating;
+	}
 
-    public Long getUserId() {
-        return userId;
-    }
+	public Integer getPricingRating() {
+		return pricingRating;
+	}
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+	public void setPricingRating(Integer pricingRating) {
+		this.pricingRating = pricingRating;
+	}
 
-    public Long getWebsiteId() {
-        return websiteId;
-    }
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
 
-    public void setWebsiteId(Long websiteId) {
-        this.websiteId = websiteId;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getVerificationStatus() {
-        return verificationStatus;
-    }
-
-    public void setVerificationStatus(String verificationStatus) {
-        this.verificationStatus = verificationStatus;
-    }
-
-    public Integer getDeliveryRating() {
-        return deliveryRating;
-    }
-
-    public void setDeliveryRating(Integer deliveryRating) {
-        this.deliveryRating = deliveryRating;
-    }
-
-    public Integer getSupportRating() {
-        return supportRating;
-    }
-
-    public void setSupportRating(Integer supportRating) {
-        this.supportRating = supportRating;
-    }
-
-    public Integer getRefundRating() {
-        return refundRating;
-    }
-
-    public void setRefundRating(Integer refundRating) {
-        this.refundRating = refundRating;
-    }
-
-    public Integer getProductRating() {
-        return productRating;
-    }
-
-    public void setProductRating(Integer productRating) {
-        this.productRating = productRating;
-    }
-
-    public Integer getPricingRating() {
-        return pricingRating;
-    }
-
-    public void setPricingRating(Integer pricingRating) {
-        this.pricingRating = pricingRating;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 }
-

@@ -7,51 +7,48 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "business_claims")
 public class BusinessClaim {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Long id;
+	@NotNull(message = "Business ID is required")
+	private Long businessId;
+	private Long userId;
+	private String status;
 
-    @NotNull(message = "Business ID is required")
-    private Long businessId;
+	public BusinessClaim() {
+	}
 
-    private Long userId;
+	public BusinessClaim(Long businessId, Long userId, String status) {
+		this.businessId = businessId;
+		this.userId = userId;
+		this.status = status;
+	}
 
-    private String status;
+	public Long getId() {
+		return id;
+	}
 
-    public BusinessClaim() {
-    }
+	public Long getBusinessId() {
+		return businessId;
+	}
 
-    public BusinessClaim(Long businessId, Long userId, String status) {
-        this.businessId = businessId;
-        this.userId = userId;
-        this.status = status;
-    }
+	public void setBusinessId(Long businessId) {
+		this.businessId = businessId;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public Long getUserId() {
+		return userId;
+	}
 
-    public Long getBusinessId() {
-        return businessId;
-    }
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 
-    public void setBusinessId(Long businessId) {
-        this.businessId = businessId;
-    }
+	public String getStatus() {
+		return status;
+	}
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
+	public void setStatus(String status) {
+		this.status = status;
+	}
 }

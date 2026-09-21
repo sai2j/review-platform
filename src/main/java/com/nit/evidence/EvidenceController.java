@@ -17,90 +17,51 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/evidence")
 public class EvidenceController {
 
-    private final EvidenceService evidenceService;
+	private final EvidenceService evidenceService;
 
-    public EvidenceController(EvidenceService evidenceService) {
-        this.evidenceService = evidenceService;
-    }
+	public EvidenceController(EvidenceService evidenceService) {
+		this.evidenceService = evidenceService;
+	}
 
-    @PostMapping(
-            value = "/review/{reviewId}",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Evidence uploadEvidence(
-            @PathVariable Long reviewId,
-            @RequestParam("file") MultipartFile file) {
+	@PostMapping(value = "/review/{reviewId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public Evidence uploadEvidence(@PathVariable Long reviewId, @RequestParam("file") MultipartFile file) {
+		return evidenceService.uploadEvidence(reviewId, file);
+	}
 
-        return evidenceService.uploadEvidence(reviewId, file);
-    }
+	@PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
+	@PostMapping("/review/{reviewId}/request")
+	public String requestEvidence(@PathVariable Long reviewId) {
+		return evidenceService.requestEvidence(reviewId);
+	}
 
-    /*
-     * =========================
-     * MODERATOR / ADMIN
-     * REQUEST EVIDENCE
-     * =========================
-     */
-    @PreAuthorize("hasAnyRole('ADMIN','MODERATOR')")
-    @PostMapping("/review/{reviewId}/request")
-    public String requestEvidence(
-            @PathVariable Long reviewId) {
+	@GetMapping("/review/{reviewId}")
+	public List<Evidence> getEvidenceByReviewId(@PathVariable Long reviewId) {
+		return evidenceService.getEvidenceByReviewId(reviewId);
+	}
 
-        return evidenceService.requestEvidence(reviewId);
-    }
+	@GetMapping("/{id}")
+	public Evidence getEvidenceById(@PathVariable Long id) {
+		return evidenceService.getEvidenceById(id);
+	}
 
-    @GetMapping("/review/{reviewId}")
-    public List<Evidence> getEvidenceByReviewId(
-            @PathVariable Long reviewId) {
+	@GetMapping("/{id}/file")
+	public ResponseEntity<Resource> downloadEvidence(@PathVariable Long id) {
+		Path path = evidenceService.getEvidenceFile(id);
+		try {
+			Resource resource = new UrlResource(path.toUri());
+			if (!resource.exists() || !resource.isReadable()) {
+				throw new RuntimeException("Evidence file cannot be read");
+			}
 
-        return evidenceService.getEvidenceByReviewId(reviewId);
-    }
-
-    @GetMapping("/{id}")
-    public Evidence getEvidenceById(
-            @PathVariable Long id) {
-
-        return evidenceService.getEvidenceById(id);
-    }
-
-    @GetMapping("/{id}/file")
-    public ResponseEntity<Resource> downloadEvidence(
-            @PathVariable Long id) {
-
-        Path path = evidenceService.getEvidenceFile(id);
-
-        try {
-
-            Resource resource =
-                    new UrlResource(path.toUri());
-
-            if (!resource.exists()
-                    || !resource.isReadable()) {
-
-                throw new RuntimeException(
-                        "Evidence file cannot be read");
-            }
-
-            String contentType =
-                    Files.probeContentType(path);
-
-            if (contentType == null) {
-                contentType =
-                        MediaType.APPLICATION_OCTET_STREAM_VALUE;
-            }
-
-            return ResponseEntity.ok()
-                    .contentType(
-                            MediaType.parseMediaType(contentType))
-                    .header(
-                            HttpHeaders.CONTENT_DISPOSITION,
-                            "attachment; filename=\""
-                                    + path.getFileName()
-                                    + "\"")
-                    .body(resource);
-
-        } catch (Exception e) {
-
-            throw new RuntimeException(
-                    "Unable to read evidence file");
-        }
-    }
+			String contentType = Files.probeContentType(path);
+			if (contentType == null) {
+				contentType = MediaType.APPLICATION_OCTET_STREAM_VALUE;
+			}
+			return ResponseEntity.ok().contentType(MediaType.parseMediaType(contentType))
+					.header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + path.getFileName() + "\"")
+					.body(resource);
+		} catch (Exception e) {
+			throw new RuntimeException("Unable to read evidence file");
+		}
+	}
 }

@@ -11,93 +11,84 @@ import jakarta.validation.constraints.NotBlank;
 @Table(name = "websites")
 public class Website {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Long id;
+	@NotBlank(message = "Website name is required")
+	private String name;
+	@NotBlank(message = "Website URL is required")
+	private String url;
+	private String description;
+	private String canonicalDomain;
+	private String seoTitle;
+	private String seoDescription;
+	private String canonicalUrl;
+	public Website() {
+	}
 
-    @NotBlank(message = "Website name is required")
-    private String name;
+	public Website(String name, String url, String description) {
+		this.name = name;
+		this.url = url;
+		this.description = description;
+	}
 
-    @NotBlank(message = "Website URL is required")
-    private String url;
+	public Long getId() {
+		return id;
+	}
 
-    private String description;
+	public String getName() {
+		return name;
+	}
 
-    private String canonicalDomain;
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    // SEO fields
-    private String seoTitle;
+	public String getUrl() {
+		return url;
+	}
 
-    private String seoDescription;
+	public void setUrl(String url) {
+		this.url = url;
+	}
 
-    private String canonicalUrl;
+	public String getDescription() {
+		return description;
+	}
 
-    public Website() {
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public Website(String name, String url, String description) {
-        this.name = name;
-        this.url = url;
-        this.description = description;
-    }
+	public String getCanonicalDomain() {
+		return canonicalDomain;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public void setCanonicalDomain(String canonicalDomain) {
+		this.canonicalDomain = canonicalDomain;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getSeoTitle() {
+		return seoTitle;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setSeoTitle(String seoTitle) {
+		this.seoTitle = seoTitle;
+	}
 
-    public String getUrl() {
-        return url;
-    }
+	public String getSeoDescription() {
+		return seoDescription;
+	}
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
+	public void setSeoDescription(String seoDescription) {
+		this.seoDescription = seoDescription;
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	public String getCanonicalUrl() {
+		return canonicalUrl;
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getCanonicalDomain() {
-        return canonicalDomain;
-    }
-
-    public void setCanonicalDomain(String canonicalDomain) {
-        this.canonicalDomain = canonicalDomain;
-    }
-
-    public String getSeoTitle() {
-        return seoTitle;
-    }
-
-    public void setSeoTitle(String seoTitle) {
-        this.seoTitle = seoTitle;
-    }
-
-    public String getSeoDescription() {
-        return seoDescription;
-    }
-
-    public void setSeoDescription(String seoDescription) {
-        this.seoDescription = seoDescription;
-    }
-
-    public String getCanonicalUrl() {
-        return canonicalUrl;
-    }
-
-    public void setCanonicalUrl(String canonicalUrl) {
-        this.canonicalUrl = canonicalUrl;
-    }
+	public void setCanonicalUrl(String canonicalUrl) {
+		this.canonicalUrl = canonicalUrl;
+	}
 }

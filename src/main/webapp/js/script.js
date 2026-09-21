@@ -1,18 +1,110 @@
 const WEBSITE_API = "/review-platform/websites";
 
-const DISCOVERY_API = "/review-platform/discovery/search";
+const DISCOVERY_API =
+    "/review-platform/discovery/search";
 
-const REVIEW_API = "/review-platform/reviews";
+const REVIEW_API =
+    "/review-platform/reviews";
 
-const METADATA_API = "/review-platform/metadata/fetch";
+const METADATA_API =
+    "/review-platform/metadata/fetch";
 
 let allWebsites = [];
 
 
 /* =========================================================
+   INTERNAL SEARCH SEO
+========================================================= */
 
+function updateSearchRobotsMeta(
+    isSearchPage
+) {
+
+    let robotsMeta =
+        document.querySelector(
+            'meta[name="robots"]'
+        );
+
+
+    if (!robotsMeta) {
+
+        robotsMeta =
+            document.createElement("meta");
+
+        robotsMeta.setAttribute(
+            "name",
+            "robots"
+        );
+
+        document.head.appendChild(
+            robotsMeta
+        );
+
+    }
+
+
+    if (isSearchPage) {
+
+        robotsMeta.setAttribute(
+            "content",
+            "noindex, follow"
+        );
+
+    } else {
+
+        robotsMeta.setAttribute(
+            "content",
+            "index, follow"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   UPDATE SEARCH URL
+========================================================= */
+
+function updateSearchUrl(
+    keyword
+) {
+
+    const url =
+        new URL(
+            window.location.href
+        );
+
+
+    if (keyword && keyword.trim() !== "") {
+
+        url.searchParams.set(
+            "q",
+            keyword.trim()
+        );
+
+        updateSearchRobotsMeta(true);
+
+    } else {
+
+        url.searchParams.delete("q");
+
+        updateSearchRobotsMeta(false);
+
+    }
+
+
+    window.history.pushState(
+        {},
+        "",
+        url
+    );
+
+}
+
+
+/* =========================================================
    LOAD SAVED WEBSITES
-
 ========================================================= */
 
 function loadWebsites() {
@@ -23,9 +115,12 @@ function loadWebsites() {
 
             if (!response.ok) {
 
-                throw new Error("Website API error");
+                throw new Error(
+                    "Website API error"
+                );
 
             }
+
 
             return response.json();
 
@@ -33,9 +128,12 @@ function loadWebsites() {
 
         .then(function(websites) {
 
-            allWebsites = websites;
+            allWebsites =
+                websites;
 
-            displayWebsites(websites);
+            displayWebsites(
+                websites
+            );
 
         })
 
@@ -43,15 +141,26 @@ function loadWebsites() {
 
             console.error(error);
 
-            document.getElementById("websiteList").innerHTML = `
 
-                <p class="error-message">
+            const websiteList =
+                document.getElementById(
+                    "websiteList"
+                );
 
-                    Unable to load websites.
 
-                </p>
+            if (websiteList) {
 
-            `;
+                websiteList.innerHTML = `
+
+                    <p class="error-message">
+
+                        Unable to load websites.
+
+                    </p>
+
+                `;
+
+            }
 
         });
 
@@ -59,16 +168,17 @@ function loadWebsites() {
 
 
 /* =========================================================
-
    DISPLAY SAVED WEBSITES
-
 ========================================================= */
 
 function displayWebsites(websites) {
 
     const websiteList =
 
-        document.getElementById("websiteList");
+        document.getElementById(
+            "websiteList"
+        );
+
 
     if (!websiteList) {
 
@@ -76,7 +186,9 @@ function displayWebsites(websites) {
 
     }
 
+
     websiteList.innerHTML = "";
+
 
     if (websites.length === 0) {
 
@@ -94,6 +206,7 @@ function displayWebsites(websites) {
 
     }
 
+
     websites.forEach(function(website) {
 
         websiteList.innerHTML += `
@@ -102,7 +215,9 @@ function displayWebsites(websites) {
 
                 <h3>
 
-                    ${escapeHtml(website.name)}
+                    ${escapeHtml(
+                        website.name
+                    )}
 
                 </h3>
 
@@ -126,11 +241,15 @@ function displayWebsites(websites) {
 
                     <a
 
-                        href="${escapeAttribute(website.url)}"
+                        href="${escapeAttribute(
+                            website.url
+                        )}"
 
                         target="_blank">
 
-                        ${escapeHtml(website.url)}
+                        ${escapeHtml(
+                            website.url
+                        )}
 
                     </a>
 
@@ -158,42 +277,81 @@ function displayWebsites(websites) {
 
 
 /* =========================================================
-
    SEARCH WEBSITES
-
 ========================================================= */
 
 function searchWebsites() {
 
     const searchInput =
 
-        document.getElementById("searchInput");
+        document.getElementById(
+            "searchInput"
+        );
 
-    const keyword =
 
-        searchInput.value.trim();
-
-    if (keyword === "") {
-
-        alert("Please enter a website name.");
+    if (!searchInput) {
 
         return;
 
     }
 
+
+    const keyword =
+
+        searchInput.value.trim();
+
+
+    if (keyword === "") {
+
+        alert(
+            "Please enter a website name."
+        );
+
+        updateSearchUrl("");
+
+        loadWebsites();
+
+        return;
+
+    }
+
+
+    /* =========================
+       NOINDEX INTERNAL SEARCH
+    ========================= */
+
+    updateSearchUrl(
+        keyword
+    );
+
+
     const websiteList =
 
-        document.getElementById("websiteList");
+        document.getElementById(
+            "websiteList"
+        );
 
-    websiteList.innerHTML = `
+
+    if (websiteList) {
+
+        websiteList.innerHTML = `
 
         <p>
 
-            Searching for <strong>${escapeHtml(keyword)}</strong>...
+            Searching for
+
+            <strong>
+
+                ${escapeHtml(keyword)}
+
+            </strong>...
 
         </p>
 
-    `;
+        `;
+
+    }
+
 
     fetch(
 
@@ -201,7 +359,9 @@ function searchWebsites() {
 
         "?keyword=" +
 
-        encodeURIComponent(keyword)
+        encodeURIComponent(
+            keyword
+        )
 
     )
 
@@ -217,13 +377,16 @@ function searchWebsites() {
 
             }
 
+
             return response.json();
 
         })
 
         .then(function(results) {
 
-            displaySearchResults(results);
+            displaySearchResults(
+                results
+            );
 
         })
 
@@ -231,15 +394,20 @@ function searchWebsites() {
 
             console.error(error);
 
-            websiteList.innerHTML = `
 
-                <p class="error-message">
+            if (websiteList) {
 
-                    Unable to search website.
+                websiteList.innerHTML = `
 
-                </p>
+                    <p class="error-message">
 
-            `;
+                        Unable to search website.
+
+                    </p>
+
+                `;
+
+            }
 
         });
 
@@ -247,16 +415,24 @@ function searchWebsites() {
 
 
 /* =========================================================
-
    DISPLAY SEARCH RESULT
-
 ========================================================= */
 
 function displaySearchResults(results) {
 
     const websiteList =
 
-        document.getElementById("websiteList");
+        document.getElementById(
+            "websiteList"
+        );
+
+
+    if (!websiteList) {
+
+        return;
+
+    }
+
 
     websiteList.innerHTML = `
 
@@ -267,6 +443,7 @@ function displaySearchResults(results) {
         </h2>
 
     `;
+
 
     if (!results || results.length === 0) {
 
@@ -284,9 +461,12 @@ function displaySearchResults(results) {
 
     }
 
+
     // Only one result
 
-    const result = results[0];
+    const result =
+        results[0];
+
 
     websiteList.innerHTML += `
 
@@ -300,7 +480,9 @@ function displaySearchResults(results) {
 
             <h3>
 
-                ${escapeHtml(result.title)}
+                ${escapeHtml(
+                    result.title
+                )}
 
             </h3>
 
@@ -324,11 +506,15 @@ function displaySearchResults(results) {
 
                 <a
 
-                    href="${escapeAttribute(result.url)}"
+                    href="${escapeAttribute(
+                        result.url
+                    )}"
 
                     target="_blank">
 
-                    ${escapeHtml(result.url)}
+                    ${escapeHtml(
+                        result.url
+                    )}
 
                 </a>
 
@@ -340,11 +526,17 @@ function displaySearchResults(results) {
 
                 class="view-website-button search-website-button"
 
-                data-title="${escapeAttribute(result.title)}"
+                data-title="${escapeAttribute(
+                    result.title
+                )}"
 
-                data-url="${escapeAttribute(result.url)}"
+                data-url="${escapeAttribute(
+                    result.url
+                )}"
 
-                data-description="${escapeAttribute(result.description || "")}">
+                data-description="${escapeAttribute(
+                    result.description || ""
+                )}">
 
                 View Website & Review
 
@@ -358,9 +550,7 @@ function displaySearchResults(results) {
 
 
 /* =========================================================
-
    OPEN WEBSITE FOR REVIEW
-
 ========================================================= */
 
 function openWebsiteForReview(
@@ -375,12 +565,13 @@ function openWebsiteForReview(
 
     const existingWebsite =
 
-        findExistingWebsite(url);
+        findExistingWebsite(
+            url
+        );
+
 
     /*
-
      * Website already exists in database
-
      */
 
     if (existingWebsite) {
@@ -397,22 +588,23 @@ function openWebsiteForReview(
 
 
     /*
-
      * Website does not exist.
-
      * Automatically save it to database.
-
      */
 
     const website = {
 
-        name: title,
+        name:
+            title,
 
-        url: url,
+        url:
+            url,
 
-        description: description
+        description:
+            description
 
     };
+
 
     fetch(
 
@@ -420,19 +612,20 @@ function openWebsiteForReview(
 
         {
 
-            method: "POST",
+            method:
+                "POST",
 
             headers: {
 
                 "Content-Type":
-
                     "application/json"
 
             },
 
             body:
-
-                JSON.stringify(website)
+                JSON.stringify(
+                    website
+                )
 
         }
 
@@ -450,6 +643,7 @@ function openWebsiteForReview(
 
             }
 
+
             return response.json();
 
         })
@@ -457,11 +651,8 @@ function openWebsiteForReview(
         .then(function(savedWebsite) {
 
             /*
-
              * Open review page using
-
              * newly generated website ID
-
              */
 
             window.location.href =
@@ -476,6 +667,7 @@ function openWebsiteForReview(
 
             console.error(error);
 
+
             alert(
 
                 "Unable to open website review page."
@@ -488,22 +680,30 @@ function openWebsiteForReview(
 
 
 /* =========================================================
-
    FIND EXISTING WEBSITE
-
 ========================================================= */
 
 function findExistingWebsite(url) {
 
-    if (!url || allWebsites.length === 0) {
+    if (
+
+        !url ||
+
+        allWebsites.length === 0
+
+    ) {
 
         return null;
 
     }
 
+
     const searchedHost =
 
-        normalizeWebsiteUrl(url);
+        normalizeWebsiteUrl(
+            url
+        );
+
 
     for (
 
@@ -523,7 +723,13 @@ function findExistingWebsite(url) {
 
             );
 
-        if (searchedHost === savedHost) {
+
+        if (
+
+            searchedHost ===
+            savedHost
+
+        ) {
 
             return allWebsites[i];
 
@@ -531,15 +737,14 @@ function findExistingWebsite(url) {
 
     }
 
+
     return null;
 
 }
 
 
 /* =========================================================
-
    NORMALIZE WEBSITE URL
-
 ========================================================= */
 
 function normalizeWebsiteUrl(url) {
@@ -547,20 +752,22 @@ function normalizeWebsiteUrl(url) {
     try {
 
         const parsedUrl =
-
             new URL(url);
 
-        let hostname =
 
+        let hostname =
             parsedUrl.hostname.toLowerCase();
 
-        if (hostname.startsWith("www.")) {
+
+        if (
+            hostname.startsWith("www.")
+        ) {
 
             hostname =
-
                 hostname.substring(4);
 
         }
+
 
         return hostname;
 
@@ -570,11 +777,20 @@ function normalizeWebsiteUrl(url) {
 
             .toLowerCase()
 
-            .replace(/^https?:\/\//, "")
+            .replace(
+                /^https?:\/\//,
+                ""
+            )
 
-            .replace(/^www\./, "")
+            .replace(
+                /^www\./,
+                ""
+            )
 
-            .replace(/\/$/, "");
+            .replace(
+                /\/$/,
+                ""
+            );
 
     }
 
@@ -582,9 +798,7 @@ function normalizeWebsiteUrl(url) {
 
 
 /* =========================================================
-
    VIEW SAVED WEBSITE
-
 ========================================================= */
 
 function viewWebsite(websiteId) {
@@ -599,9 +813,7 @@ function viewWebsite(websiteId) {
 
 
 /* =========================================================
-
    SELECT WEBSITE
-
 ========================================================= */
 
 function selectWebsite(
@@ -620,30 +832,32 @@ function selectWebsite(
 
     ).value = title;
 
+
     document.getElementById(
 
         "websiteUrl"
 
     ).value = url;
 
+
     document.getElementById(
 
         "websiteDescription"
 
-    ).value = description || "";
+    ).value =
+        description || "";
 
 }
 
 
 /* =========================================================
-
    ADD WEBSITE
-
 ========================================================= */
 
 function addWebsite(event) {
 
     event.preventDefault();
+
 
     const name =
 
@@ -653,6 +867,7 @@ function addWebsite(event) {
 
         ).value.trim();
 
+
     const url =
 
         document.getElementById(
@@ -660,6 +875,7 @@ function addWebsite(event) {
             "websiteUrl"
 
         ).value.trim();
+
 
     const description =
 
@@ -669,6 +885,7 @@ function addWebsite(event) {
 
         ).value.trim();
 
+
     const message =
 
         document.getElementById(
@@ -677,15 +894,20 @@ function addWebsite(event) {
 
         );
 
+
     const website = {
 
-        name: name,
+        name:
+            name,
 
-        url: url,
+        url:
+            url,
 
-        description: description
+        description:
+            description
 
     };
+
 
     fetch(
 
@@ -693,19 +915,20 @@ function addWebsite(event) {
 
         {
 
-            method: "POST",
+            method:
+                "POST",
 
             headers: {
 
                 "Content-Type":
-
                     "application/json"
 
             },
 
             body:
-
-                JSON.stringify(website)
+                JSON.stringify(
+                    website
+                )
 
         }
 
@@ -723,27 +946,41 @@ function addWebsite(event) {
 
             }
 
+
             return response.json();
 
         })
 
         .then(function(data) {
 
-            message.innerHTML = `
+            if (message) {
 
-                <span class="success-message">
+                message.innerHTML = `
 
-                    Website added successfully!
+                    <span class="success-message">
 
-                </span>
+                        Website added successfully!
 
-            `;
+                    </span>
 
-            document
+                `;
 
-                .getElementById("websiteForm")
+            }
 
-                .reset();
+
+            const websiteForm =
+
+                document.getElementById(
+                    "websiteForm"
+                );
+
+
+            if (websiteForm) {
+
+                websiteForm.reset();
+
+            }
+
 
             loadWebsites();
 
@@ -753,15 +990,20 @@ function addWebsite(event) {
 
             console.error(error);
 
-            message.innerHTML = `
 
-                <span class="error-message">
+            if (message) {
 
-                    Website could not be added.
+                message.innerHTML = `
 
-                </span>
+                    <span class="error-message">
 
-            `;
+                        Website could not be added.
+
+                    </span>
+
+                `;
+
+            }
 
         });
 
@@ -769,80 +1011,193 @@ function addWebsite(event) {
 
 
 /* =========================================================
-
    ESCAPE HTML
-
 ========================================================= */
 
 function escapeHtml(value) {
 
-    if (value === null || value === undefined) {
+    if (
+
+        value === null ||
+
+        value === undefined
+
+    ) {
 
         return "";
 
     }
 
+
     return String(value)
 
-        .replace(/&/g, "&amp;")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
 
-        .replace(/</g, "&lt;")
+        .replace(
+            /</g,
+            "&lt;"
+        )
 
-        .replace(/>/g, "&gt;")
+        .replace(
+            />/g,
+            "&gt;"
+        )
 
-        .replace(/"/g, "&quot;")
+        .replace(
+            /"/g,
+            "&quot;"
+        )
 
-        .replace(/'/g, "&#039;");
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
 
 /* =========================================================
-
    ESCAPE ATTRIBUTE
-
 ========================================================= */
 
 function escapeAttribute(value) {
 
-    return escapeHtml(value);
+    return escapeHtml(
+        value
+    );
 
 }
 
 
 /* =========================================================
-
    ESCAPE JAVASCRIPT
-
 ========================================================= */
 
 function escapeJs(value) {
 
-    if (value === null || value === undefined) {
+    if (
+
+        value === null ||
+
+        value === undefined
+
+    ) {
 
         return "";
 
     }
 
+
     return String(value)
 
-        .replace(/\\/g, "\\\\")
+        .replace(
+            /\\/g,
+            "\\\\"
+        )
 
-        .replace(/'/g, "\\'")
+        .replace(
+            /'/g,
+            "\\'"
+        )
 
-        .replace(/"/g, '\\"')
+        .replace(
+            /"/g,
+            '\\"'
+        )
 
-        .replace(/\n/g, "\\n")
+        .replace(
+            /\n/g,
+            "\\n"
+        )
 
-        .replace(/\r/g, "\\r");
+        .replace(
+            /\r/g,
+            "\\r"
+        );
 
 }
 
 
 /* =========================================================
+   HANDLE URL SEARCH
+========================================================= */
 
+function loadSearchFromUrl() {
+
+    const urlParams =
+
+        new URLSearchParams(
+
+            window.location.search
+
+        );
+
+
+    const query =
+
+        urlParams.get("q");
+
+
+    const searchInput =
+
+        document.getElementById(
+            "searchInput"
+        );
+
+
+    if (
+        query &&
+        query.trim() !== ""
+    ) {
+
+        updateSearchRobotsMeta(
+            true
+        );
+
+
+        if (searchInput) {
+
+            searchInput.value =
+                query;
+
+        }
+
+
+        searchWebsites();
+
+    } else {
+
+        updateSearchRobotsMeta(
+            false
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   BROWSER BACK / FORWARD
+========================================================= */
+
+window.addEventListener(
+
+    "popstate",
+
+    function() {
+
+        loadSearchFromUrl();
+
+    }
+
+);
+
+
+/* =========================================================
    SEARCH BUTTON + WEBSITE BUTTONS
-
 ========================================================= */
 
 document.addEventListener(
@@ -858,6 +1213,7 @@ document.addEventListener(
                 "searchButton"
 
             );
+
 
         if (searchButton) {
 
@@ -880,6 +1236,7 @@ document.addEventListener(
 
             );
 
+
         if (searchInput) {
 
             searchInput.addEventListener(
@@ -888,7 +1245,12 @@ document.addEventListener(
 
                 function(event) {
 
-                    if (event.key === "Enter") {
+                    if (
+
+                        event.key ===
+                        "Enter"
+
+                    ) {
 
                         searchWebsites();
 
@@ -902,15 +1264,10 @@ document.addEventListener(
 
 
         /*
-
          * Add Website form is no longer
-
          * present in the new index.html.
-
          * So we only add the listener
-
          * if it exists.
-
          */
 
         const websiteForm =
@@ -920,6 +1277,7 @@ document.addEventListener(
                 "websiteForm"
 
             );
+
 
         if (websiteForm) {
 
@@ -935,15 +1293,10 @@ document.addEventListener(
 
 
         /*
-
          * View Website & Review buttons
-
          * are handled using JavaScript.
-
          * This avoids inline onclick handlers
-
          * which are blocked by CSP.
-
          */
 
         const websiteList =
@@ -953,6 +1306,7 @@ document.addEventListener(
                 "websiteList"
 
             );
+
 
         if (websiteList) {
 
@@ -970,6 +1324,7 @@ document.addEventListener(
 
                         );
 
+
                     if (!button) {
 
                         return;
@@ -981,9 +1336,12 @@ document.addEventListener(
 
                         button.dataset.websiteId;
 
+
                     if (websiteId) {
 
-                        viewWebsite(websiteId);
+                        viewWebsite(
+                            websiteId
+                        );
 
                         return;
 
@@ -994,16 +1352,23 @@ document.addEventListener(
 
                         button.dataset.title;
 
+
                     const url =
 
                         button.dataset.url;
+
 
                     const description =
 
                         button.dataset.description || "";
 
 
-                    if (title && url) {
+                    if (
+
+                        title &&
+                        url
+
+                    ) {
 
                         openWebsiteForReview(
 
@@ -1024,7 +1389,42 @@ document.addEventListener(
         }
 
 
-        loadWebsites();
+        /* =========================
+           LOAD SEARCH FROM URL
+        ========================= */
+
+        loadSearchFromUrl();
+
+
+        /*
+         * Only load all websites when
+         * there is no active search.
+         */
+
+        const currentParams =
+
+            new URLSearchParams(
+
+                window.location.search
+
+            );
+
+
+        const currentQuery =
+
+            currentParams.get("q");
+
+
+        if (
+
+            !currentQuery ||
+            currentQuery.trim() === ""
+
+        ) {
+
+            loadWebsites();
+
+        }
 
     }
 

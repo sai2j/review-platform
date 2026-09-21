@@ -15,82 +15,39 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/complaints")
 public class ComplaintController {
 
-    private final ComplaintService complaintService;
+	private final ComplaintService complaintService;
 
-    public ComplaintController(ComplaintService complaintService) {
-        this.complaintService = complaintService;
-    }
+	public ComplaintController(ComplaintService complaintService) {
+		this.complaintService = complaintService;
+	}
 
-    // =========================
-    // CREATE COMPLAINT
-    // LOGGED-IN USER
-    // =========================
+	@PostMapping
+	public Complaint createComplaint(@RequestParam Long reviewId, @RequestParam String topic,
+			@RequestParam(required = false) String description) {
+		return complaintService.createComplaint(reviewId, topic, description);
+	}
 
-    @PostMapping
-    public Complaint createComplaint(
-            @RequestParam Long reviewId,
-            @RequestParam String topic,
-            @RequestParam(required = false) String description) {
+	@GetMapping("/review/{reviewId}")
+	public List<Complaint> getComplaintsByReviewId(@PathVariable Long reviewId) {
+		return complaintService.getComplaintsByReviewId(reviewId);
+	}
 
-        return complaintService.createComplaint(
-                reviewId,
-                topic,
-                description
-        );
-    }
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping
+	public List<Complaint> getAllComplaints() {
+		return complaintService.getAllComplaints();
+	}
 
-    // =========================
-    // GET COMPLAINTS BY REVIEW
-    // =========================
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("/{id}")
+	public Complaint getComplaintById(@PathVariable Long id) {
+		return complaintService.getComplaintById(id);
+	}
 
-    @GetMapping("/review/{reviewId}")
-    public List<Complaint> getComplaintsByReviewId(
-            @PathVariable Long reviewId) {
-
-        return complaintService.getComplaintsByReviewId(reviewId);
-    }
-
-    // =========================
-    // GET ALL COMPLAINTS
-    // ADMIN ONLY
-    // =========================
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
-    public List<Complaint> getAllComplaints() {
-
-        return complaintService.getAllComplaints();
-    }
-
-    // =========================
-    // GET COMPLAINT BY ID
-    // ADMIN ONLY
-    // =========================
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/{id}")
-    public Complaint getComplaintById(
-            @PathVariable Long id) {
-
-        return complaintService.getComplaintById(id);
-    }
-
-    // =========================
-    // UPDATE STATUS + RESOLUTION
-    // ADMIN ONLY
-    // =========================
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}/resolution")
-    public Complaint updateComplaintResolution(
-            @PathVariable Long id,
-            @RequestParam String status,
-            @RequestParam(required = false) String resolution) {
-
-        return complaintService.updateComplaintStatus(
-                id,
-                status,
-                resolution
-        );
-    }
+	@PreAuthorize("hasRole('ADMIN')")
+	@PutMapping("/{id}/resolution")
+	public Complaint updateComplaintResolution(@PathVariable Long id, @RequestParam String status,
+			@RequestParam(required = false) String resolution) {
+		return complaintService.updateComplaintStatus(id, status, resolution);
+	}
 }

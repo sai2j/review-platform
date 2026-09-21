@@ -32,23 +32,18 @@ public class MetadataService {
 		HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
 
 		Map<String, Object> response = restTemplate.postForObject(apiUrl, entity, Map.class);
-
 		if (response == null) {
 			return new WebsiteMetaData();
 		}
-
 		List<Map<String, Object>> results = (List<Map<String, Object>>) response.get("results");
 
 		if (results == null || results.isEmpty()) {
 			return new WebsiteMetaData();
 		}
-
 		Map<String, Object> result = results.get(0);
-
 		String title = result.get("title") != null ? result.get("title").toString() : "";
 		String resultUrl = result.get("url") != null ? result.get("url").toString() : url;
 		String description = result.get("description") != null ? result.get("description").toString() : "";
-
 		return new WebsiteMetaData(title, resultUrl, description);
 	}
 

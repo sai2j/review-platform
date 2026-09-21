@@ -14,81 +14,52 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping({"/business-responses", "/api/v1/business"})
+@RequestMapping({ "/business-responses", "/api/v1/business" })
 public class BusinessResponseController {
 
-    private final BusinessResponseService businessResponseService;
+	private final BusinessResponseService businessResponseService;
 
-    public BusinessResponseController(
-            BusinessResponseService businessResponseService) {
+	public BusinessResponseController(BusinessResponseService businessResponseService) {
+		this.businessResponseService = businessResponseService;
+	}
 
-        this.businessResponseService = businessResponseService;
-    }
+	@PreAuthorize("@businessResponseService.canAccessBusiness(#businessResponse.businessId)")
+	@PostMapping
+	public BusinessResponse createBusinessResponse(@Valid @RequestBody BusinessResponse businessResponse) {
+		return businessResponseService.saveBusinessResponse(businessResponse);
+	}
 
-    // Only verified business user can create response
-    @PreAuthorize("@businessResponseService.canAccessBusiness(#businessResponse.businessId)")
-    @PostMapping
-    public BusinessResponse createBusinessResponse(
-            @Valid @RequestBody BusinessResponse businessResponse) {
+	@PreAuthorize("@businessResponseService.canAccessBusiness(#businessResponse.businessId)")
+	@PostMapping("/reviews/{id}/responses")
+	public BusinessResponse createBusinessResponseForReview(@PathVariable Long id,
+			@Valid @RequestBody BusinessResponse businessResponse) {
+		businessResponse.setReviewId(id);
+		return businessResponseService.saveBusinessResponse(businessResponse);
+	}
 
-        return businessResponseService
-                .saveBusinessResponse(businessResponse);
-    }
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping
+	public List<BusinessResponse> getAllBusinessResponses() {
+		return businessResponseService.getAllBusinessResponses();
+	}
 
-    // PDF API: POST /api/v1/business/reviews/{id}/responses
-    @PreAuthorize("@businessResponseService.canAccessBusiness(#businessResponse.businessId)")
-    @PostMapping("/reviews/{id}/responses")
-    public BusinessResponse createBusinessResponseForReview(
-            @PathVariable Long id,
-            @Valid @RequestBody BusinessResponse businessResponse) {
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("/{id}")
+	public BusinessResponse getBusinessResponseById(@PathVariable Long id) {
+		return businessResponseService.getBusinessResponseById(id);
+	}
 
-        businessResponse.setReviewId(id);
+	@PreAuthorize("@businessResponseService.canAccessResponse(#id)")
+	@org.springframework.web.bind.annotation.PutMapping("/{id}")
+	public BusinessResponse updateBusinessResponse(@PathVariable Long id,
+			@Valid @RequestBody BusinessResponse businessResponse) {
+		return businessResponseService.updateBusinessResponse(id, businessResponse);
+	}
 
-        return businessResponseService
-                .saveBusinessResponse(businessResponse);
-    }
-
-    // Only ADMIN can view all responses
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
-    public List<BusinessResponse> getAllBusinessResponses() {
-
-        return businessResponseService
-                .getAllBusinessResponses();
-    }
-
-    // Only ADMIN can view response by ID
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/{id}")
-    public BusinessResponse getBusinessResponseById(
-            @PathVariable Long id) {
-
-        return businessResponseService
-                .getBusinessResponseById(id);
-    }
-
-    // Only verified business user can update response
-    @PreAuthorize("@businessResponseService.canAccessResponse(#id)")
-    @org.springframework.web.bind.annotation.PutMapping("/{id}")
-    public BusinessResponse updateBusinessResponse(
-            @PathVariable Long id,
-            @Valid @RequestBody BusinessResponse businessResponse) {
-
-        return businessResponseService
-                .updateBusinessResponse(
-                        id,
-                        businessResponse);
-    }
-
-    // Only verified business user can delete response
-    @PreAuthorize("@businessResponseService.canAccessResponse(#id)")
-    @DeleteMapping("/{id}")
-    public String deleteBusinessResponse(
-            @PathVariable Long id) {
-
-        businessResponseService
-                .deleteBusinessResponse(id);
-
-        return "Business response deleted successfully";
-    }
+	@PreAuthorize("@businessResponseService.canAccessResponse(#id)")
+	@DeleteMapping("/{id}")
+	public String deleteBusinessResponse(@PathVariable Long id) {
+		businessResponseService.deleteBusinessResponse(id);
+		return "Business response deleted successfully";
+	}
 }

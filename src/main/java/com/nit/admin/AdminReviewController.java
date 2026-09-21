@@ -17,28 +17,21 @@ import com.nit.review.ReviewService;
 @RequestMapping("/api/v1/admin/reviews")
 public class AdminReviewController {
 
-    private final ReviewService reviewService;
+	private final ReviewService reviewService;
 
-    public AdminReviewController(ReviewService reviewService) {
-        this.reviewService = reviewService;
-    }
+	public AdminReviewController(ReviewService reviewService) {
+		this.reviewService = reviewService;
+	}
 
-    // Admin: get all reviews
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping
-    public List<ReviewResponseDTO> getAllReviews() {
-        return reviewService.convertToResponseDTOList(
-                reviewService.getAllReviews()
-        );
-    }
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping
+	public List<ReviewResponseDTO> getAllReviews() {
+		return reviewService.convertToResponseDTOList(reviewService.getAllReviews());
+	}
 
-    // Admin review moderation
-    @PreAuthorize("hasRole('ADMIN')")
-    @PatchMapping("/{id}")
-    public ReviewResponseDTO updateReviewStatus(
-            @PathVariable Long id,
-            @RequestParam String status) {
-
-        return reviewService.updateReviewStatus(id, status);
-    }
+	@PreAuthorize("hasRole('ADMIN')")
+	@PatchMapping("/{id}")
+	public ReviewResponseDTO updateReviewStatus(@PathVariable Long id, @RequestParam String status) {
+		return reviewService.updateReviewStatus(id, status);
+	}
 }

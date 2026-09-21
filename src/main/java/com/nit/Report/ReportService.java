@@ -11,61 +11,47 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReportService {
 
-    private final ReportRepository reportRepository;
-    private final UserRepository userRepository;
-    public ReportService(
-            ReportRepository reportRepository,
-            UserRepository userRepository) {
+	private final ReportRepository reportRepository;
+	private final UserRepository userRepository;
 
-        this.reportRepository = reportRepository;
-        this.userRepository = userRepository;
-    }
+	public ReportService(ReportRepository reportRepository, UserRepository userRepository) {
+		this.reportRepository = reportRepository;
+		this.userRepository = userRepository;
+	}
 
-    public Report saveReport(Report report) {
+	public Report saveReport(Report report) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String loggedInEmail = authentication.getName();
+		User loggedInUser = userRepository.findByEmail(loggedInEmail);
+		if (loggedInUser == null) {
+			throw new RuntimeException("User not found");
+		}
 
-        Authentication authentication =
-                SecurityContextHolder.getContext().getAuthentication();
+		report.setUserId(loggedInUser.getId());
+		if (report.getStatus() == null || report.getStatus().isBlank()) {
+			report.setStatus("PENDING");
+		}
+		return reportRepository.save(report);
+	}
 
-        String loggedInEmail = authentication.getName();
+	public List<Report> getallReports() {
+		return reportRepository.findAll();
+	}
 
-        User loggedInUser =
-                userRepository.findByEmail(loggedInEmail);
+	public Report getReportById(Long id) {
+		return reportRepository.findById(id).orElse(null);
+	}
 
-        if (loggedInUser == null) {
-            throw new RuntimeException("User not found");
-        }
+	public Report updateReportStatus(Long id, String status) {
+		Report report = reportRepository.findById(id).orElse(null);
+		if (report == null) {
+			return null;
+		}
+		report.setStatus(status);
+		return reportRepository.save(report);
+	}
 
-        // Do not trust userId from frontend
-        report.setUserId(loggedInUser.getId());
-
-        if (report.getStatus() == null || report.getStatus().isBlank()) {
-            report.setStatus("PENDING");
-        }
-
-        return reportRepository.save(report);
-    }
-    public List<Report> getallReports() {
-        return reportRepository.findAll();
-    }
-
-    public Report getReportById(Long id) {
-        return reportRepository.findById(id).orElse(null);
-    }
-
-    public Report updateReportStatus(Long id, String status) {
-
-        Report report = reportRepository.findById(id).orElse(null);
-
-        if (report == null) {
-            return null;
-        }
-
-        report.setStatus(status);
-
-        return reportRepository.save(report);
-    }
-
-    public void deleteReport(Long id) {
-        reportRepository.deleteById(id);
-    }
+	public void deleteReport(Long id) {
+		reportRepository.deleteById(id);
+	}
 }

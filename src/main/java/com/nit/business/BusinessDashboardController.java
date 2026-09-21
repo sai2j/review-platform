@@ -17,116 +17,68 @@ import com.nit.user.User;
 import com.nit.user.UserRepository;
 
 @RestController
-@RequestMapping({"/business-dashboard", "/api/v1/business"})
+@RequestMapping({ "/business-dashboard", "/api/v1/business" })
 public class BusinessDashboardController {
 
-    private final BusinessClamService businessClaimService;
-    private final BusinessService businessService;
-    private final ReviewService reviewService;
-    private final BusinessDashboardService dashboardService;
-    private final UserRepository userRepository;
+	private final BusinessClamService businessClaimService;
+	private final BusinessService businessService;
+	private final ReviewService reviewService;
+	private final BusinessDashboardService dashboardService;
+	private final UserRepository userRepository;
 
-    public BusinessDashboardController(
-            BusinessClamService businessClaimService,
-            BusinessService businessService,
-            ReviewService reviewService,
-            BusinessDashboardService dashboardService,
-            UserRepository userRepository) {
+	public BusinessDashboardController(BusinessClamService businessClaimService, BusinessService businessService,
+			ReviewService reviewService, BusinessDashboardService dashboardService, UserRepository userRepository) {
+		this.businessClaimService = businessClaimService;
+		this.businessService = businessService;
+		this.reviewService = reviewService;
+		this.dashboardService = dashboardService;
+		this.userRepository = userRepository;
+	}
+	@GetMapping("/dashboard")
+	public Map<String, Object> getBusinessDashboard() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		String loggedInEmail = authentication.getName();
+		User loggedInUser = userRepository.findByEmail(loggedInEmail);
+		if (loggedInUser == null) {
+			throw new RuntimeException("User not found");
+		}
+		return dashboardService.getDashboardMetrics(loggedInUser.getId());
+	}
 
-        this.businessClaimService = businessClaimService;
-        this.businessService = businessService;
-        this.reviewService = reviewService;
-        this.dashboardService = dashboardService;
-        this.userRepository = userRepository;
-    }
+	@GetMapping("/user/{userId}")
+	public Business getBusinessForUser(@PathVariable Long userId) {
+		BusinessClaim claim = businessClaimService.getApprovedClaimByUserId(userId);
+		if (claim == null) {
+			return null;
+		}
+		return businessService.getBusinessById(claim.getBusinessId());
+	}
 
-    // PDF API: GET /api/v1/business/dashboard
-    @GetMapping("/dashboard")
-    public Map<String, Object> getBusinessDashboard() {
+	@GetMapping("/user/{userId}/website")
+	public Website getWebsiteForUser(@PathVariable Long userId) {
+		BusinessClaim claim = businessClaimService.getApprovedClaimByUserId(userId);
+		if (claim == null) {
+			return null;
+		}
+		return businessService.getWebsiteForBusiness(claim.getBusinessId());
+	}
 
-        Authentication authentication =
-                SecurityContextHolder.getContext()
-                        .getAuthentication();
+	@GetMapping("/user/{userId}/reviews")
+	public List<Review> getBusinessReviews(@PathVariable Long userId) {
+		BusinessClaim claim = businessClaimService.getApprovedClaimByUserId(userId);
+		if (claim == null) {
+			return List.of();
+		}
 
-        String loggedInEmail =
-                authentication.getName();
+		Website website = businessService.getWebsiteForBusiness(claim.getBusinessId());
+		if (website == null) {
+			return List.of();
+		}
+		return reviewService.getReviewsByWebsiteId(website.getId());
+	}
 
-        User loggedInUser =
-                userRepository.findByEmail(loggedInEmail);
-
-        if (loggedInUser == null) {
-            throw new RuntimeException("User not found");
-        }
-
-        return dashboardService
-                .getDashboardMetrics(loggedInUser.getId());
-    }
-
-    // Logged-in user can access only their own business
-    @GetMapping("/user/{userId}")
-    public Business getBusinessForUser(
-            @PathVariable Long userId) {
-
-        BusinessClaim claim =
-                businessClaimService
-                        .getApprovedClaimByUserId(userId);
-
-        if (claim == null) {
-            return null;
-        }
-
-        return businessService.getBusinessById(
-                claim.getBusinessId());
-    }
-
-    // Logged-in user can access only their own website
-    @GetMapping("/user/{userId}/website")
-    public Website getWebsiteForUser(
-            @PathVariable Long userId) {
-
-        BusinessClaim claim =
-                businessClaimService
-                        .getApprovedClaimByUserId(userId);
-
-        if (claim == null) {
-            return null;
-        }
-
-        return businessService.getWebsiteForBusiness(
-                claim.getBusinessId());
-    }
-
-    // Logged-in user can access only reviews of their business
-    @GetMapping("/user/{userId}/reviews")
-    public List<Review> getBusinessReviews(
-            @PathVariable Long userId) {
-
-        BusinessClaim claim =
-                businessClaimService
-                        .getApprovedClaimByUserId(userId);
-
-        if (claim == null) {
-            return List.of();
-        }
-
-        Website website =
-                businessService.getWebsiteForBusiness(
-                        claim.getBusinessId());
-
-        if (website == null) {
-            return List.of();
-        }
-
-        return reviewService.getReviewsByWebsiteId(
-                website.getId());
-    }
-
-    // Existing dashboard metrics endpoint
-    @GetMapping("/user/{userId}/metrics")
-    public Map<String, Object> getDashboardMetrics(
-            @PathVariable Long userId) {
-
-        return dashboardService
-                .getDashboardMetrics(userId);
-    }
+	@GetMapping("/user/{userId}/metrics")
+	public Map<String, Object> getDashboardMetrics(@PathVariable Long userId) {
+		return dashboardService.getDashboardMetrics(userId);
+	}
 }

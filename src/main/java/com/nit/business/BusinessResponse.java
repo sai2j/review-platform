@@ -12,52 +12,48 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "business_responses")
 public class BusinessResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Long id;
+	@NotNull(message = "Business ID is required")
+	private Long businessId;
+	private Long reviewId;
+	@NotBlank(message = "Response is required")
+	private String response;
+	public BusinessResponse() {
+	}
 
-    @NotNull(message = "Business ID is required")
-    private Long businessId;
+	public BusinessResponse(Long businessId, Long reviewId, String response) {
+		this.businessId = businessId;
+		this.reviewId = reviewId;
+		this.response = response;
+	}
 
-    private Long reviewId;
+	public Long getId() {
+		return id;
+	}
 
-    @NotBlank(message = "Response is required")
-    private String response;
+	public Long getBusinessId() {
+		return businessId;
+	}
 
-    public BusinessResponse() {
-    }
+	public void setBusinessId(Long businessId) {
+		this.businessId = businessId;
+	}
 
-    public BusinessResponse(Long businessId, Long reviewId, String response) {
-        this.businessId = businessId;
-        this.reviewId = reviewId;
-        this.response = response;
-    }
+	public Long getReviewId() {
+		return reviewId;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public void setReviewId(Long reviewId) {
+		this.reviewId = reviewId;
+	}
 
-    public Long getBusinessId() {
-        return businessId;
-    }
+	public String getResponse() {
+		return response;
+	}
 
-    public void setBusinessId(Long businessId) {
-        this.businessId = businessId;
-    }
-
-    public Long getReviewId() {
-        return reviewId;
-    }
-
-    public void setReviewId(Long reviewId) {
-        this.reviewId = reviewId;
-    }
-
-    public String getResponse() {
-        return response;
-    }
-
-    public void setResponse(String response) {
-        this.response = response;
-    }
+	public void setResponse(String response) {
+		this.response = response;
+	}
 }

@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RatingSummary {
-
 	private double averageRating;
 	private int totalReview;
 	private int fivestar;
@@ -16,5 +15,4 @@ public class RatingSummary {
 	private int threeStar;
 	private int twoStar;
 	private int oneStar;
-	
 }

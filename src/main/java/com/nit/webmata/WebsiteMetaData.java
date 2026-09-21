@@ -8,9 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class WebsiteMetaData {
-
 	private String title;
 	private String url;
 	private String description;
-
 }

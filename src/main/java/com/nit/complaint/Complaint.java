@@ -14,113 +14,96 @@ import jakarta.persistence.Table;
 @Table(name = "COMPLAINTS")
 public class Complaint {
 
-    @Id
-    @GeneratedValue(
-        strategy = GenerationType.SEQUENCE,
-        generator = "complaints_seq_generator"
-    )
-    @SequenceGenerator(
-        name = "complaints_seq_generator",
-        sequenceName = "COMPLAINTS_SEQ",
-        allocationSize = 1
-    )
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "complaints_seq_generator")
+	@SequenceGenerator(name = "complaints_seq_generator", sequenceName = "COMPLAINTS_SEQ", allocationSize = 1)
+	private Long id;
 
-    @Column(name = "REVIEW_ID", nullable = false)
-    private Long reviewId;
+	@Column(name = "REVIEW_ID", nullable = false)
+	private Long reviewId;
+	@Column(name = "USER_ID", nullable = false)
+	private Long userId;
+	@Column(name = "TOPIC", nullable = false, length = 100)
+	private String topic;
+	@Column(name = "DESCRIPTION", length = 1000)
+	private String description;
+	@Column(name = "STATUS", length = 50)
+	private String status;
+	@Column(name = "RESOLUTION", length = 1000)
+	private String resolution;
+	@Column(name = "CREATED_AT")
+	private LocalDateTime createdAt;
 
-    @Column(name = "USER_ID", nullable = false)
-    private Long userId;
+	public Complaint() {
+	}
 
-    @Column(name = "TOPIC", nullable = false, length = 100)
-    private String topic;
+	public Complaint(Long reviewId, Long userId, String topic, String description) {
 
-    @Column(name = "DESCRIPTION", length = 1000)
-    private String description;
+		this.reviewId = reviewId;
+		this.userId = userId;
+		this.topic = topic;
+		this.description = description;
+		this.status = "PENDING";
+		this.createdAt = LocalDateTime.now();
+	}
 
-    @Column(name = "STATUS", length = 50)
-    private String status;
+	public Long getId() {
+		return id;
+	}
 
-    @Column(name = "RESOLUTION", length = 1000)
-    private String resolution;
+	public Long getReviewId() {
+		return reviewId;
+	}
 
-    @Column(name = "CREATED_AT")
-    private LocalDateTime createdAt;
+	public void setReviewId(Long reviewId) {
+		this.reviewId = reviewId;
+	}
 
-    public Complaint() {
-    }
+	public Long getUserId() {
+		return userId;
+	}
 
-    public Complaint(
-            Long reviewId,
-            Long userId,
-            String topic,
-            String description) {
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 
-        this.reviewId = reviewId;
-        this.userId = userId;
-        this.topic = topic;
-        this.description = description;
-        this.status = "PENDING";
-        this.createdAt = LocalDateTime.now();
-    }
+	public String getTopic() {
+		return topic;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public void setTopic(String topic) {
+		this.topic = topic;
+	}
 
-    public Long getReviewId() {
-        return reviewId;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public void setReviewId(Long reviewId) {
-        this.reviewId = reviewId;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public Long getUserId() {
-        return userId;
-    }
+	public String getStatus() {
+		return status;
+	}
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
-    public String getTopic() {
-        return topic;
-    }
+	public String getResolution() {
+		return resolution;
+	}
 
-    public void setTopic(String topic) {
-        this.topic = topic;
-    }
+	public void setResolution(String resolution) {
+		this.resolution = resolution;
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public String getResolution() {
-        return resolution;
-    }
-
-    public void setResolution(String resolution) {
-        this.resolution = resolution;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 }

@@ -22,6 +22,7 @@ public class Evidence {
 	private Long uploadedBy;
 	@Column(name = "created_at")
 	private LocalDateTime createdAt;
+
 	public Evidence() {
 	}
 
@@ -37,39 +38,51 @@ public class Evidence {
 	public Long getId() {
 		return id;
 	}
+
 	public Long getReviewId() {
 		return reviewId;
 	}
+
 	public void setReviewId(Long reviewId) {
 		this.reviewId = reviewId;
 	}
+
 	public String getFileName() {
 		return fileName;
 	}
+
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
+
 	public String getContentType() {
 		return contentType;
 	}
+
 	public void setContentType(String contentType) {
 		this.contentType = contentType;
 	}
+
 	public String getStoragePath() {
 		return storagePath;
 	}
+
 	public void setStoragePath(String storagePath) {
 		this.storagePath = storagePath;
 	}
+
 	public Long getUploadedBy() {
 		return uploadedBy;
 	}
+
 	public void setUploadedBy(Long uploadedBy) {
 		this.uploadedBy = uploadedBy;
 	}
+
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
+
 	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}

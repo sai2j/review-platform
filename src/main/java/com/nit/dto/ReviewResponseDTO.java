@@ -17,6 +17,7 @@ public class ReviewResponseDTO {
 	private Integer productRating;
 	private Integer pricingRating;
 	private LocalDateTime createdAt;
+
 	public ReviewResponseDTO() {
 	}
 

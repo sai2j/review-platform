@@ -34,25 +34,38 @@ public class BusinessResponseService {
 		if (!canAccessBusiness(businessResponse.getBusinessId())) {
 			throw new AccessDeniedException("You can respond only for your approved business");
 		}
-		if (businessResponse.getBusinessId() == null|| !businessRepository.existsById(businessResponse.getBusinessId())) {
+
+		if (businessResponse.getBusinessId() == null
+				|| !businessRepository.existsById(businessResponse.getBusinessId())) {
 			throw new RuntimeException("Business does not exist");
 		}
 
 		if (businessResponse.getReviewId() == null || !reviewRepository.existsById(businessResponse.getReviewId())) {
 			throw new RuntimeException("Review does not exist");
 		}
+
 		BusinessResponse existingResponse = businessResponseRepository
 				.findByBusinessIdAndReviewId(businessResponse.getBusinessId(), businessResponse.getReviewId())
 				.orElse(null);
+
 		if (existingResponse != null) {
 			existingResponse.setResponse(businessResponse.getResponse());
 			return businessResponseRepository.save(existingResponse);
 		}
+
 		return businessResponseRepository.save(businessResponse);
 	}
 
 	public List<BusinessResponse> getAllBusinessResponses() {
 		return businessResponseRepository.findAll();
+	}
+
+	public List<BusinessResponse> getBusinessResponses(Long businessId) {
+		if (!canAccessBusiness(businessId)) {
+			throw new AccessDeniedException("You can access only your business responses");
+		}
+
+		return businessResponseRepository.findByBusinessId(businessId);
 	}
 
 	public BusinessResponse getBusinessResponseById(Long id) {
@@ -63,11 +76,15 @@ public class BusinessResponseService {
 		if (!canAccessResponse(id)) {
 			throw new AccessDeniedException("You can update only your business response");
 		}
+
 		BusinessResponse existingResponse = businessResponseRepository.findById(id).orElse(null);
+
 		if (existingResponse == null) {
 			return null;
 		}
+
 		existingResponse.setResponse(businessResponse.getResponse());
+
 		return businessResponseRepository.save(existingResponse);
 	}
 
@@ -75,30 +92,39 @@ public class BusinessResponseService {
 		if (!canAccessResponse(id)) {
 			throw new AccessDeniedException("You can delete only your business response");
 		}
+
 		businessResponseRepository.deleteById(id);
 	}
 
 	public boolean canAccessBusiness(Long businessId) {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
 		if (authentication == null || !authentication.isAuthenticated()) {
 			return false;
 		}
+
 		User loggedInUser = userRepository.findByEmail(authentication.getName());
+
 		if (loggedInUser == null) {
 			return false;
 		}
+
 		BusinessClaim claim = businessClaimService.getApprovedClaimByUserId(loggedInUser.getId());
+
 		if (claim == null) {
 			return false;
 		}
+
 		return claim.getBusinessId().equals(businessId);
 	}
 
 	public boolean canAccessResponse(Long responseId) {
 		BusinessResponse response = businessResponseRepository.findById(responseId).orElse(null);
+
 		if (response == null) {
 			return false;
 		}
+
 		return canAccessBusiness(response.getBusinessId());
 	}
 }

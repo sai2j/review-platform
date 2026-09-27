@@ -25,6 +25,8 @@ let currentWebsiteForStructuredData = null;
 
 let currentReviewsForStructuredData = [];
 
+let currentBusinessForClaim = null;
+
 
 /* =========================================================
 
@@ -1182,129 +1184,291 @@ LOAD BUSINESS CLAIM STATUS
 function loadClaimStatus() {
 
     if (!websiteId) {
-
         return;
-
     }
-
 
     const claimStatus =
-
-        document.getElementById(
-
-            "claimStatus"
-
-        );
-
+        document.getElementById("claimStatus");
 
     if (!claimStatus) {
-
         return;
-
     }
 
-
     fetch(
-
         BUSINESS_API +
-
         "/website/" +
-
         websiteId
-
     )
 
         .then(function(response) {
 
             if (!response.ok) {
-
-                throw new Error(
-
-                    "Business not found"
-
-                );
-
+                throw new Error("Business not found");
             }
 
-
             return response.json();
-
         })
 
         .then(function(business) {
 
-            if (
-
-                !business ||
-
-                !business.id
-
-            ) {
-
+            if (!business || !business.id) {
+                currentBusinessForClaim = null;
                 claimStatus.innerHTML = "";
-
                 return;
-
             }
 
+            currentBusinessForClaim = business;
 
             if (
-
-                String(
-
-                    business.status || ""
-
-                )
-
-                    .toUpperCase() ===
-
+                String(business.status || "").toUpperCase() ===
                 "VERIFIED"
-
             ) {
 
                 claimStatus.innerHTML = `
+                    <div class="claimed-badge">
+                        ✓ Verified Business
+                    </div>
+                `;
 
-                <div class="claimed-badge">
-
-                    ✓ Verified Business
-
-                </div>
-
-            `;
-
-            } else {
-
-                claimStatus.innerHTML = "";
-
+                return;
             }
 
+            const user = getLoggedInUser();
+
+            if (!user || !user.id) {
+                renderClaimBusinessBox();
+                return;
+            }
+
+            fetch(
+                BUSINESS_CLAIM_API +
+                "/user/" +
+                user.id
+            )
+
+                .then(function(response) {
+
+                    if (!response.ok) {
+                        throw new Error("Unable to load claim status");
+                    }
+
+                    return response.json();
+                })
+
+                .then(function(claim) {
+
+                    if (
+                        !claim ||
+                        !claim.id ||
+                        Number(claim.businessId) !== Number(business.id)
+                    ) {
+
+                        renderClaimBusinessBox();
+                        return;
+                    }
+
+                    const status =
+                        String(claim.status || "").toUpperCase();
+
+                    if (status === "PENDING") {
+
+                        claimStatus.innerHTML = `
+                            <div
+                                class="claim-business-box"
+                                style="margin-top: 20px; padding: 20px; border: 1px solid #fde68a; border-radius: 10px; background: #fffbeb;">
+
+                                <h3>
+                                    Claim Pending
+                                </h3>
+
+                                <p>
+                                    Your claim request is waiting for admin approval.
+                                </p>
+
+                                <button
+                                    type="button"
+                                    class="write-review-button"
+                                    data-claim-navigation="dashboard">
+                                    View My Dashboard
+                                </button>
+
+                            </div>
+                        `;
+
+                        setupClaimNavigationButton();
+                        return;
+                    }
+
+                    if (status === "APPROVED") {
+
+                        claimStatus.innerHTML = `
+                            <div
+                                class="claim-business-box"
+                                style="margin-top: 20px; padding: 20px; border: 1px solid #a7f3d0; border-radius: 10px; background: #ecfdf5;">
+
+                                <h3>
+                                    Claim Approved
+                                </h3>
+
+                                <p>
+                                    Your ownership claim is approved. Complete business verification from your dashboard.
+                                </p>
+
+                                <button
+                                    type="button"
+                                    class="write-review-button"
+                                    data-claim-navigation="verification">
+                                    Open Verification
+                                </button>
+
+                            </div>
+                        `;
+
+                        setupClaimNavigationButton();
+                        return;
+                    }
+
+                    renderClaimBusinessBox();
+
+                })
+
+                .catch(function(error) {
+                    console.error("Unable to load claim status:", error);
+                    renderClaimBusinessBox();
+                });
         })
 
         .catch(function(error) {
 
             console.error(
-
                 "Unable to load business verification status:",
-
                 error
-
             );
 
-
+            currentBusinessForClaim = null;
             claimStatus.innerHTML = "";
-
         });
-
 }
 
 
 /* =========================================================
-
-LOAD RATING SUMMARY
-
+RENDER CLAIM BUSINESS BOX
 ========================================================= */
 
-function loadRatingSummary() {
+function renderClaimBusinessBox() {
+
+    const claimStatus =
+        document.getElementById("claimStatus");
+
+    if (!claimStatus) {
+        return;
+    }
+
+    claimStatus.innerHTML = `
+
+        <div
+            class="claim-business-box"
+            style="margin-top: 20px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 10px; background: #ffffff;">
+
+            <h3>
+                Is this your business?
+            </h3>
+
+            <p>
+                Claim this business profile to manage your business information and respond to customer reviews.
+            </p>
+
+            <button
+                type="button"
+                id="claimBusinessButton"
+                class="write-review-button">
+                Claim This Business
+            </button>
+
+            <p
+                id="claimBusinessMessage"
+                class="claim-business-message">
+            </p>
+
+        </div>
+
+    `;
+
+    setupClaimBusinessButton();
+}
+
+
+/* =========================================================
+CLAIM BUSINESS BUTTON
+========================================================= */
+
+function setupClaimBusinessButton() {
+
+    const claimBusinessButton =
+        document.getElementById("claimBusinessButton");
+
+    if (!claimBusinessButton) {
+        return;
+    }
+
+    claimBusinessButton.addEventListener(
+        "click",
+        function() {
+
+            if (!currentBusinessForClaim || !currentBusinessForClaim.id) {
+
+                const message =
+                    document.getElementById("claimBusinessMessage");
+
+                if (message) {
+                    message.innerHTML = `
+                        <span class="error-message">
+                            Business information is not available.
+                        </span>
+                    `;
+                }
+
+                return;
+            }
+
+            const user = getLoggedInUser();
+
+            if (!user || !user.id) {
+
+                const message =
+                    document.getElementById("claimBusinessMessage");
+
+                if (message) {
+                    message.innerHTML = `
+                        <span class="error-message">
+                            Please login before claiming this business.
+                        </span>
+                        <br>
+                        <a href="login.html">
+                            Log in to continue
+                        </a>
+                    `;
+                }
+
+                return;
+            }
+
+            window.location.href =
+                "business-claim.html?businessId=" +
+                encodeURIComponent(
+                    currentBusinessForClaim.id
+                );
+
+        }
+    );
+}
+
+
+/* =========================================================
+LOAD RATING SUMMARY
+========================================================= */
+function loadRatingSummary()
+{
 
     if (!websiteId) {
 
@@ -3704,58 +3868,38 @@ function setupReviewButtonHandlers() {
 function setupWriteReviewButton() {
 
     const writeReviewButton =
-
         document.getElementById(
-
             "writeReviewButton"
-
         );
 
+    const writeReviewSection =
+        document.querySelector(
+            ".write-review-section"
+        );
 
-    if (!writeReviewButton) {
-
+    if (
+        !writeReviewButton ||
+        !writeReviewSection
+    ) {
         return;
-
     }
 
-
     writeReviewButton.addEventListener(
-
         "click",
-
         function() {
 
-            const reviewForm =
+            writeReviewSection.classList.add(
+                "show"
+            );
 
-                document.getElementById(
-
-                    "reviewForm"
-
-                );
-
-
-            if (reviewForm) {
-
-                reviewForm.scrollIntoView({
-
-                    behavior: "smooth"
-
-                });
-
-            }
+            writeReviewSection.scrollIntoView({
+                behavior: "smooth",
+                block: "start"
+            });
 
         }
-
     );
-
 }
-
-
-/* =========================================================
-
-ESCAPE HTML
-
-========================================================= */
 
 function escapeHtml(value) {
 
@@ -3823,6 +3967,50 @@ function escapeJs(value) {
 
 
 /* =========================================================
+ACCOUNT NAVIGATION
+========================================================= */
+
+function setupAccountNavigation() {
+
+    const navLinks =
+        document.querySelector(".nav-links");
+
+    if (!navLinks) {
+        return;
+    }
+
+    const existingLink =
+        document.getElementById("accountNavLink");
+
+    if (existingLink) {
+        existingLink.remove();
+    }
+
+    let loggedInUser = null;
+
+    try {
+        loggedInUser =
+            JSON.parse(localStorage.getItem("loggedInUser"));
+    } catch (error) {
+        loggedInUser = null;
+    }
+
+    if (!loggedInUser || !loggedInUser.id) {
+        return;
+    }
+
+    const accountLink =
+        document.createElement("a");
+
+    accountLink.href = "user-dashboard.html";
+    accountLink.id = "accountNavLink";
+    accountLink.textContent = "My Dashboard";
+
+    navLinks.appendChild(accountLink);
+}
+
+
+/* =========================================================
 
 PAGE LOAD
 
@@ -3833,6 +4021,8 @@ document.addEventListener(
     "DOMContentLoaded",
 
     function() {
+
+        setupAccountNavigation();
 
         loadWebsiteInfo();
 

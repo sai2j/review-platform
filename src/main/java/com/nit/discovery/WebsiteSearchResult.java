@@ -4,6 +4,7 @@ public class WebsiteSearchResult {
 	private String title;
 	private String url;
 	private String description;
+
 	public WebsiteSearchResult() {
 
 	}

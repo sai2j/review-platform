@@ -3,13 +3,7 @@ package com.nit.business;
 import java.util.List;
 
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
@@ -25,15 +19,20 @@ public class BusinessResponseController {
 
 	@PreAuthorize("@businessResponseService.canAccessBusiness(#businessResponse.businessId)")
 	@PostMapping
-	public BusinessResponse createBusinessResponse(@Valid @RequestBody BusinessResponse businessResponse) {
+	public BusinessResponse createBusinessResponse(
+			@Valid @RequestBody BusinessResponse businessResponse) {
+
 		return businessResponseService.saveBusinessResponse(businessResponse);
 	}
 
 	@PreAuthorize("@businessResponseService.canAccessBusiness(#businessResponse.businessId)")
 	@PostMapping("/reviews/{id}/responses")
-	public BusinessResponse createBusinessResponseForReview(@PathVariable Long id,
+	public BusinessResponse createBusinessResponseForReview(
+			@PathVariable Long id,
 			@Valid @RequestBody BusinessResponse businessResponse) {
+
 		businessResponse.setReviewId(id);
+
 		return businessResponseService.saveBusinessResponse(businessResponse);
 	}
 
@@ -43,6 +42,14 @@ public class BusinessResponseController {
 		return businessResponseService.getAllBusinessResponses();
 	}
 
+	@PreAuthorize("@businessResponseService.canAccessBusiness(#businessId)")
+	@GetMapping("/business/{businessId}")
+	public List<BusinessResponse> getBusinessResponses(
+			@PathVariable Long businessId) {
+
+		return businessResponseService.getBusinessResponses(businessId);
+	}
+
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/{id}")
 	public BusinessResponse getBusinessResponseById(@PathVariable Long id) {
@@ -50,16 +57,20 @@ public class BusinessResponseController {
 	}
 
 	@PreAuthorize("@businessResponseService.canAccessResponse(#id)")
-	@org.springframework.web.bind.annotation.PutMapping("/{id}")
-	public BusinessResponse updateBusinessResponse(@PathVariable Long id,
+	@PutMapping("/{id}")
+	public BusinessResponse updateBusinessResponse(
+			@PathVariable Long id,
 			@Valid @RequestBody BusinessResponse businessResponse) {
+
 		return businessResponseService.updateBusinessResponse(id, businessResponse);
 	}
 
 	@PreAuthorize("@businessResponseService.canAccessResponse(#id)")
 	@DeleteMapping("/{id}")
 	public String deleteBusinessResponse(@PathVariable Long id) {
+
 		businessResponseService.deleteBusinessResponse(id);
+
 		return "Business response deleted successfully";
 	}
 }

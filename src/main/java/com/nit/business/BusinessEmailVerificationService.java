@@ -11,9 +11,11 @@ public class BusinessEmailVerificationService {
 	private final JavaMailSender mailSender;
 	@Value("${app.base-url:http://localhost:8080/review-platform}")
 	private String baseUrl;
+
 	public BusinessEmailVerificationService(JavaMailSender mailSender) {
 		this.mailSender = mailSender;
 	}
+
 	public void sendVerificationEmail(Business business) {
 		if (business.getBusinessEmail() == null || business.getBusinessEmail().isBlank()) {
 			throw new RuntimeException("Business email is required");

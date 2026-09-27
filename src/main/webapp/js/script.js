@@ -1,20 +1,265 @@
 const WEBSITE_API = "/review-platform/websites";
-
 const DISCOVERY_API =
     "/review-platform/discovery/search";
-
 const REVIEW_API =
     "/review-platform/reviews";
-
 const METADATA_API =
     "/review-platform/metadata/fetch";
-
 let allWebsites = [];
+const RECENT_WEBSITES_KEY =
+    "reviewPlatformRecentWebsites";
+const MAX_RECENT_WEBSITES = 5;
+const MAX_RECENT_REVIEWS = 4;
+function loadRecentReviews() {
 
+    const recentReviewsList =
+        document.getElementById(
+            "recentReviewsList"
+        );
 
-/* =========================================================
-   INTERNAL SEARCH SEO
-========================================================= */
+    if (!recentReviewsList) {
+        return;
+    }
+
+    fetch(
+        REVIEW_API +
+        "?page=0&size=" +
+        MAX_RECENT_REVIEWS +
+        "&sort=createdAt,desc"
+    )
+
+        .then(function(response) {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Recent reviews API error"
+                );
+
+            }
+
+            return response.json();
+
+        })
+
+        .then(function(data) {
+
+            const reviews =
+                data.content || [];
+
+            displayRecentReviews(
+                reviews
+            );
+
+        })
+
+        .catch(function(error) {
+
+            console.error(
+                "Unable to load recent reviews:",
+                error
+            );
+
+            recentReviewsList.innerHTML = `
+                <p class="recent-reviews-empty">
+                    Unable to load recent reviews.
+                </p>
+            `;
+
+        });
+
+}
+
+function displayRecentReviews(
+    reviews
+) {
+
+    const recentReviewsList =
+        document.getElementById(
+            "recentReviewsList"
+        );
+
+    if (!recentReviewsList) {
+        return;
+    }
+
+    const approvedReviews =
+        (reviews || []).filter(
+            function(review) {
+
+                return (
+                    review.status &&
+                    String(
+                        review.status
+                    ).toUpperCase() ===
+                    "APPROVED"
+                );
+
+            }
+        );
+
+    if (approvedReviews.length === 0) {
+
+        recentReviewsList.innerHTML = `
+            <p class="recent-reviews-empty">
+                No approved reviews available yet.
+            </p>
+        `;
+
+        return;
+    }
+
+    recentReviewsList.innerHTML = "";
+
+    approvedReviews.forEach(
+        function(review) {
+
+            const rating =
+                Math.max(
+                    0,
+                    Math.min(
+                        5,
+                        Number(
+                            review.rating
+                        ) || 0
+                    )
+                );
+
+            let stars = "";
+
+            for (
+                let i = 1;
+                i <= 5;
+                i++
+            ) {
+
+                stars += `
+                    <span class="recent-review-star ${
+                        i <= rating
+                            ? ""
+                            : "empty"
+                    }">
+                        ★
+                    </span>
+                `;
+
+            }
+
+            const website =
+                allWebsites.find(
+                    function(item) {
+
+                        return String(
+                            item.id
+                        ) === String(
+                            review.websiteId
+                        );
+
+                    }
+                );
+
+            const websiteName =
+                website &&
+                website.name
+                    ? website.name
+                    : "Website";
+
+            const websiteDomain =
+                website
+                    ? getWebsiteDomain(
+                        website.url
+                    )
+                    : "";
+
+            const userName =
+                review.userId
+                    ? "User #" +
+                      review.userId
+                    : "User";
+
+            const initial =
+                getWebsiteInitial(
+                    userName
+                );
+
+            const reviewComment =
+                review.comment ||
+                "No review comment.";
+
+            recentReviewsList.innerHTML += `
+
+                <div class="recent-review-card">
+
+                    <div class="recent-review-content">
+
+                        <div class="recent-review-user">
+
+                            <div class="recent-review-avatar">
+                                ${escapeHtml(
+                                    initial
+                                )}
+                            </div>
+
+                            <div class="recent-review-user-info">
+
+                                <p class="recent-review-user-name">
+                                    ${escapeHtml(
+                                        userName
+                                    )}
+                                </p>
+
+                                <div class="recent-review-rating">
+                                    ${stars}
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <p class="recent-review-text">
+                            ${escapeHtml(
+                                reviewComment
+                            )}
+                        </p>
+
+                    </div>
+
+                    <div class="recent-review-website">
+
+                        <div class="recent-review-website-logo">
+                            ${escapeHtml(
+                                getWebsiteInitial(
+                                    websiteName
+                                )
+                            )}
+                        </div>
+
+                        <div class="recent-review-website-info">
+
+                            <p class="recent-review-website-name">
+                                ${escapeHtml(
+                                    websiteName
+                                )}
+                            </p>
+
+                            <p class="recent-review-website-domain">
+                                ${escapeHtml(
+                                    websiteDomain
+                                )}
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+}
 
 function updateSearchRobotsMeta(
     isSearchPage
@@ -24,7 +269,6 @@ function updateSearchRobotsMeta(
         document.querySelector(
             'meta[name="robots"]'
         );
-
 
     if (!robotsMeta) {
 
@@ -41,7 +285,6 @@ function updateSearchRobotsMeta(
         );
 
     }
-
 
     if (isSearchPage) {
 
@@ -61,11 +304,6 @@ function updateSearchRobotsMeta(
 
 }
 
-
-/* =========================================================
-   UPDATE SEARCH URL
-========================================================= */
-
 function updateSearchUrl(
     keyword
 ) {
@@ -75,24 +313,29 @@ function updateSearchUrl(
             window.location.href
         );
 
-
-    if (keyword && keyword.trim() !== "") {
+    if (
+        keyword &&
+        keyword.trim() !== ""
+    ) {
 
         url.searchParams.set(
             "q",
             keyword.trim()
         );
 
-        updateSearchRobotsMeta(true);
+        updateSearchRobotsMeta(
+            true
+        );
 
     } else {
 
         url.searchParams.delete("q");
 
-        updateSearchRobotsMeta(false);
+        updateSearchRobotsMeta(
+            false
+        );
 
     }
-
 
     window.history.pushState(
         {},
@@ -101,11 +344,6 @@ function updateSearchUrl(
     );
 
 }
-
-
-/* =========================================================
-   LOAD SAVED WEBSITES
-========================================================= */
 
 function loadWebsites() {
 
@@ -121,7 +359,6 @@ function loadWebsites() {
 
             }
 
-
             return response.json();
 
         })
@@ -135,18 +372,18 @@ function loadWebsites() {
                 websites
             );
 
+            loadRecentReviews();
+
         })
 
         .catch(function(error) {
 
             console.error(error);
 
-
             const websiteList =
                 document.getElementById(
                     "websiteList"
                 );
-
 
             if (websiteList) {
 
@@ -166,29 +403,20 @@ function loadWebsites() {
 
 }
 
-
-/* =========================================================
-   DISPLAY SAVED WEBSITES
-========================================================= */
-
-function displayWebsites(websites) {
+function displayWebsites(
+    websites
+) {
 
     const websiteList =
-
         document.getElementById(
             "websiteList"
         );
 
-
     if (!websiteList) {
-
         return;
-
     }
 
-
     websiteList.innerHTML = "";
-
 
     if (websites.length === 0) {
 
@@ -206,100 +434,87 @@ function displayWebsites(websites) {
 
     }
 
+    websites.forEach(
+        function(website) {
 
-    websites.forEach(function(website) {
+            websiteList.innerHTML += `
 
-        websiteList.innerHTML += `
+                <div class="website-card">
 
-            <div class="website-card">
-
-                <h3>
-
-                    ${escapeHtml(
-                        website.name
-                    )}
-
-                </h3>
-
-                <p>
-
-                    ${escapeHtml(
-
-                        website.description || ""
-
-                    )}
-
-                </p>
-
-                <p>
-
-                    <strong>
-
-                        URL:
-
-                    </strong>
-
-                    <a
-
-                        href="${escapeAttribute(
-                            website.url
-                        )}"
-
-                        target="_blank">
+                    <h3>
 
                         ${escapeHtml(
-                            website.url
+                            website.name
                         )}
 
-                    </a>
+                    </h3>
 
-                </p>
+                    <p>
 
-                <button
+                        ${escapeHtml(
+                            website.description || ""
+                        )}
 
-                    type="button"
+                    </p>
 
-                    class="view-website-button"
+                    <p>
 
-                    data-website-id="${website.id}">
+                        <strong>
 
-                    View Website & Review
+                            URL:
 
-                </button>
+                        </strong>
 
-            </div>
+                        <a
 
-        `;
+                            href="${escapeAttribute(
+                                website.url
+                            )}"
 
-    });
+                            target="_blank">
+
+                            ${escapeHtml(
+                                website.url
+                            )}
+
+                        </a>
+
+                    </p>
+
+                    <button
+
+                        type="button"
+
+                        class="view-website-button"
+
+                        data-website-id="${website.id}">
+
+                        View Website & Review
+
+                    </button>
+
+                </div>
+
+            `;
+
+        }
+    );
 
 }
-
-
-/* =========================================================
-   SEARCH WEBSITES
-========================================================= */
 
 function searchWebsites() {
 
     const searchInput =
-
         document.getElementById(
             "searchInput"
         );
 
-
     if (!searchInput) {
-
         return;
-
     }
 
-
     const keyword =
-
         searchInput.value.trim();
-
 
     if (keyword === "") {
 
@@ -315,54 +530,43 @@ function searchWebsites() {
 
     }
 
-
-    /* =========================
-       NOINDEX INTERNAL SEARCH
-    ========================= */
-
     updateSearchUrl(
         keyword
     );
 
-
     const websiteList =
-
         document.getElementById(
             "websiteList"
         );
-
 
     if (websiteList) {
 
         websiteList.innerHTML = `
 
-        <p>
+            <p>
 
-            Searching for
+                Searching for
 
-            <strong>
+                <strong>
 
-                ${escapeHtml(keyword)}
+                    ${escapeHtml(
+                        keyword
+                    )}
 
-            </strong>...
+                </strong>...
 
-        </p>
+            </p>
 
         `;
 
     }
 
-
     fetch(
-
         DISCOVERY_API +
-
         "?keyword=" +
-
         encodeURIComponent(
             keyword
         )
-
     )
 
         .then(function(response) {
@@ -370,13 +574,10 @@ function searchWebsites() {
             if (!response.ok) {
 
                 throw new Error(
-
                     "Website search failed"
-
                 );
 
             }
-
 
             return response.json();
 
@@ -393,7 +594,6 @@ function searchWebsites() {
         .catch(function(error) {
 
             console.error(error);
-
 
             if (websiteList) {
 
@@ -413,26 +613,18 @@ function searchWebsites() {
 
 }
 
-
-/* =========================================================
-   DISPLAY SEARCH RESULT
-========================================================= */
-
-function displaySearchResults(results) {
+function displaySearchResults(
+    results
+) {
 
     const websiteList =
-
         document.getElementById(
             "websiteList"
         );
 
-
     if (!websiteList) {
-
         return;
-
     }
-
 
     websiteList.innerHTML = `
 
@@ -444,8 +636,10 @@ function displaySearchResults(results) {
 
     `;
 
-
-    if (!results || results.length === 0) {
+    if (
+        !results ||
+        results.length === 0
+    ) {
 
         websiteList.innerHTML += `
 
@@ -461,12 +655,8 @@ function displaySearchResults(results) {
 
     }
 
-
-    // Only one result
-
     const result =
         results[0];
-
 
     websiteList.innerHTML += `
 
@@ -489,9 +679,7 @@ function displaySearchResults(results) {
             <p>
 
                 ${escapeHtml(
-
                     result.description || ""
-
                 )}
 
             </p>
@@ -548,49 +736,30 @@ function displaySearchResults(results) {
 
 }
 
-
-/* =========================================================
-   OPEN WEBSITE FOR REVIEW
-========================================================= */
-
 function openWebsiteForReview(
-
     title,
-
     url,
-
     description
-
 ) {
 
     const existingWebsite =
-
         findExistingWebsite(
             url
         );
 
-
-    /*
-     * Website already exists in database
-     */
-
     if (existingWebsite) {
 
+        saveRecentWebsite(
+            existingWebsite
+        );
+
         window.location.href =
-
             "review.html?websiteId=" +
-
             existingWebsite.id;
 
         return;
 
     }
-
-
-    /*
-     * Website does not exist.
-     * Automatically save it to database.
-     */
 
     const website = {
 
@@ -605,11 +774,8 @@ function openWebsiteForReview(
 
     };
 
-
     fetch(
-
         WEBSITE_API,
-
         {
 
             method:
@@ -628,7 +794,6 @@ function openWebsiteForReview(
                 )
 
         }
-
     )
 
         .then(function(response) {
@@ -636,13 +801,10 @@ function openWebsiteForReview(
             if (!response.ok) {
 
                 throw new Error(
-
                     "Website could not be saved"
-
                 );
 
             }
-
 
             return response.json();
 
@@ -650,15 +812,12 @@ function openWebsiteForReview(
 
         .then(function(savedWebsite) {
 
-            /*
-             * Open review page using
-             * newly generated website ID
-             */
+            saveRecentWebsite(
+                savedWebsite
+            );
 
             window.location.href =
-
                 "review.html?websiteId=" +
-
                 savedWebsite.id;
 
         })
@@ -667,68 +826,46 @@ function openWebsiteForReview(
 
             console.error(error);
 
-
             alert(
-
                 "Unable to open website review page."
-
             );
 
         });
 
 }
 
-
-/* =========================================================
-   FIND EXISTING WEBSITE
-========================================================= */
-
-function findExistingWebsite(url) {
+function findExistingWebsite(
+    url
+) {
 
     if (
-
         !url ||
-
         allWebsites.length === 0
-
     ) {
 
         return null;
 
     }
 
-
     const searchedHost =
-
         normalizeWebsiteUrl(
             url
         );
 
-
     for (
-
         let i = 0;
-
         i < allWebsites.length;
-
         i++
-
     ) {
 
         const savedHost =
-
             normalizeWebsiteUrl(
-
                 allWebsites[i].url
-
             );
 
-
         if (
-
             searchedHost ===
             savedHost
-
         ) {
 
             return allWebsites[i];
@@ -737,27 +874,21 @@ function findExistingWebsite(url) {
 
     }
 
-
     return null;
 
 }
 
-
-/* =========================================================
-   NORMALIZE WEBSITE URL
-========================================================= */
-
-function normalizeWebsiteUrl(url) {
+function normalizeWebsiteUrl(
+    url
+) {
 
     try {
 
         const parsedUrl =
             new URL(url);
 
-
         let hostname =
             parsedUrl.hostname.toLowerCase();
-
 
         if (
             hostname.startsWith("www.")
@@ -767,7 +898,6 @@ function normalizeWebsiteUrl(url) {
                 hostname.substring(4);
 
         }
-
 
         return hostname;
 
@@ -796,104 +926,373 @@ function normalizeWebsiteUrl(url) {
 
 }
 
+function viewWebsite(
+    websiteId
+) {
 
-/* =========================================================
-   VIEW SAVED WEBSITE
-========================================================= */
+    const website =
+        allWebsites.find(
+            function(item) {
 
-function viewWebsite(websiteId) {
+                return String(
+                    item.id
+                ) === String(
+                    websiteId
+                );
+
+            }
+        );
+
+    if (website) {
+
+        saveRecentWebsite(
+            website
+        );
+
+    }
 
     window.location.href =
-
         "review.html?websiteId=" +
-
         websiteId;
 
 }
 
+function saveRecentWebsite(
+    website
+) {
 
-/* =========================================================
-   SELECT WEBSITE
-========================================================= */
+    if (
+        !website ||
+        !website.id
+    ) {
+
+        return;
+
+    }
+
+    let recentWebsites = [];
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                RECENT_WEBSITES_KEY
+            );
+
+        if (saved) {
+
+            recentWebsites =
+                JSON.parse(saved);
+
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Unable to read recent websites.",
+            error
+        );
+
+        recentWebsites = [];
+
+    }
+
+    if (
+        !Array.isArray(
+            recentWebsites
+        )
+    ) {
+
+        recentWebsites = [];
+
+    }
+
+    recentWebsites =
+        recentWebsites.filter(
+            function(item) {
+
+                return String(
+                    item.id
+                ) !== String(
+                    website.id
+                );
+
+            }
+        );
+
+    recentWebsites.unshift(
+        website
+    );
+
+    recentWebsites =
+        recentWebsites.slice(
+            0,
+            MAX_RECENT_WEBSITES
+        );
+
+    try {
+
+        localStorage.setItem(
+            RECENT_WEBSITES_KEY,
+            JSON.stringify(
+                recentWebsites
+            )
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Unable to save recent websites.",
+            error
+        );
+
+    }
+
+}
+
+
+function getRecentWebsites() {
+
+    try {
+
+        const saved =
+            localStorage.getItem(
+                RECENT_WEBSITES_KEY
+            );
+
+        if (!saved) {
+            return [];
+        }
+
+        const recentWebsites =
+            JSON.parse(
+                saved
+            );
+
+        if (
+            !Array.isArray(
+                recentWebsites
+            )
+        ) {
+
+            return [];
+
+        }
+
+        return recentWebsites.slice(
+            0,
+            MAX_RECENT_WEBSITES
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Unable to load recent websites.",
+            error
+        );
+
+        return [];
+
+    }
+
+}
+
+
+function getWebsiteInitial(
+    name
+) {
+
+    if (
+        !name ||
+        name.trim() === ""
+    ) {
+
+        return "W";
+
+    }
+
+    return name
+        .trim()
+        .charAt(0)
+        .toUpperCase();
+
+}
+
+
+function getWebsiteDomain(
+    url
+) {
+
+    if (
+        !url ||
+        url.trim() === ""
+    ) {
+
+        return "";
+
+    }
+
+    try {
+
+        const parsedUrl =
+            new URL(url);
+
+        return parsedUrl.hostname.replace(
+            /^www\./,
+            ""
+        );
+
+    } catch (error) {
+
+        return url;
+
+    }
+
+}
+
+
+function displayRecentWebsites() {
+
+    const continueList =
+        document.getElementById(
+            "continueList"
+        );
+
+    if (!continueList) {
+        return;
+    }
+
+    const recentWebsites =
+        getRecentWebsites();
+
+    if (
+        recentWebsites.length === 0
+    ) {
+
+        continueList.innerHTML = `
+
+            <p class="recent-empty-message">
+
+                No recently visited websites.
+
+            </p>
+
+        `;
+
+        return;
+
+    }
+
+    continueList.innerHTML = "";
+
+    recentWebsites.forEach(
+        function(website) {
+
+            continueList.innerHTML += `
+
+                <div class="continue-card">
+
+                    <div class="website-logo-placeholder">
+
+                        ${escapeHtml(
+                            getWebsiteInitial(
+                                website.name
+                            )
+                        )}
+
+                    </div>
+
+                    <div class="continue-card-content">
+
+                        <h3>
+
+                            ${escapeHtml(
+                                website.name
+                            )}
+
+                        </h3>
+
+                        <p class="website-domain">
+
+                            ${escapeHtml(
+                                getWebsiteDomain(
+                                    website.url
+                                )
+                            )}
+
+                        </p>
+
+                        <button
+
+                            type="button"
+
+                            class="continue-button"
+
+                            data-recent-website-id="${website.id}">
+
+                            View Website
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            `;
+
+        }
+    );
+
+}
 
 function selectWebsite(
-
     title,
-
     url,
-
     description
-
 ) {
 
     document.getElementById(
-
         "websiteName"
-
-    ).value = title;
-
+    ).value =
+        title;
 
     document.getElementById(
-
         "websiteUrl"
-
-    ).value = url;
-
+    ).value =
+        url;
 
     document.getElementById(
-
         "websiteDescription"
-
     ).value =
         description || "";
 
 }
 
-
-/* =========================================================
-   ADD WEBSITE
-========================================================= */
-
-function addWebsite(event) {
+function addWebsite(
+    event
+) {
 
     event.preventDefault();
 
-
     const name =
-
         document.getElementById(
-
             "websiteName"
-
         ).value.trim();
-
 
     const url =
-
         document.getElementById(
-
             "websiteUrl"
-
         ).value.trim();
-
 
     const description =
-
         document.getElementById(
-
             "websiteDescription"
-
         ).value.trim();
 
-
     const message =
-
         document.getElementById(
-
             "websiteMessage"
-
         );
-
 
     const website = {
 
@@ -908,11 +1307,8 @@ function addWebsite(event) {
 
     };
 
-
     fetch(
-
         WEBSITE_API,
-
         {
 
             method:
@@ -931,7 +1327,6 @@ function addWebsite(event) {
                 )
 
         }
-
     )
 
         .then(function(response) {
@@ -939,13 +1334,10 @@ function addWebsite(event) {
             if (!response.ok) {
 
                 throw new Error(
-
                     "Website could not be added"
-
                 );
 
             }
-
 
             return response.json();
 
@@ -967,20 +1359,16 @@ function addWebsite(event) {
 
             }
 
-
             const websiteForm =
-
                 document.getElementById(
                     "websiteForm"
                 );
-
 
             if (websiteForm) {
 
                 websiteForm.reset();
 
             }
-
 
             loadWebsites();
 
@@ -989,7 +1377,6 @@ function addWebsite(event) {
         .catch(function(error) {
 
             console.error(error);
-
 
             if (message) {
 
@@ -1009,25 +1396,18 @@ function addWebsite(event) {
 
 }
 
-
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
-
-function escapeHtml(value) {
+function escapeHtml(
+    value
+) {
 
     if (
-
         value === null ||
-
         value === undefined
-
     ) {
 
         return "";
 
     }
-
 
     return String(value)
 
@@ -1058,12 +1438,9 @@ function escapeHtml(value) {
 
 }
 
-
-/* =========================================================
-   ESCAPE ATTRIBUTE
-========================================================= */
-
-function escapeAttribute(value) {
+function escapeAttribute(
+    value
+) {
 
     return escapeHtml(
         value
@@ -1071,25 +1448,18 @@ function escapeAttribute(value) {
 
 }
 
-
-/* =========================================================
-   ESCAPE JAVASCRIPT
-========================================================= */
-
-function escapeJs(value) {
+function escapeJs(
+    value
+) {
 
     if (
-
         value === null ||
-
         value === undefined
-
     ) {
 
         return "";
 
     }
-
 
     return String(value)
 
@@ -1120,33 +1490,22 @@ function escapeJs(value) {
 
 }
 
-
-/* =========================================================
-   HANDLE URL SEARCH
-========================================================= */
-
 function loadSearchFromUrl() {
 
     const urlParams =
-
         new URLSearchParams(
-
             window.location.search
-
         );
 
-
     const query =
-
-        urlParams.get("q");
-
+        urlParams.get(
+            "q"
+        );
 
     const searchInput =
-
         document.getElementById(
             "searchInput"
         );
-
 
     if (
         query &&
@@ -1157,14 +1516,12 @@ function loadSearchFromUrl() {
             true
         );
 
-
         if (searchInput) {
 
             searchInput.value =
                 query;
 
         }
-
 
         searchWebsites();
 
@@ -1178,78 +1535,48 @@ function loadSearchFromUrl() {
 
 }
 
-
-/* =========================================================
-   BROWSER BACK / FORWARD
-========================================================= */
-
 window.addEventListener(
-
     "popstate",
-
     function() {
 
         loadSearchFromUrl();
 
     }
-
 );
 
-
-/* =========================================================
-   SEARCH BUTTON + WEBSITE BUTTONS
-========================================================= */
-
 document.addEventListener(
-
     "DOMContentLoaded",
-
     function() {
 
         const searchButton =
-
             document.getElementById(
-
                 "searchButton"
-
             );
-
 
         if (searchButton) {
 
             searchButton.addEventListener(
-
                 "click",
-
                 searchWebsites
-
             );
 
         }
 
 
         const searchInput =
-
             document.getElementById(
-
                 "searchInput"
-
             );
-
 
         if (searchInput) {
 
             searchInput.addEventListener(
-
                 "keypress",
-
                 function(event) {
 
                     if (
-
                         event.key ===
                         "Enter"
-
                     ) {
 
                         searchWebsites();
@@ -1257,73 +1584,39 @@ document.addEventListener(
                     }
 
                 }
-
             );
 
         }
 
-
-        /*
-         * Add Website form is no longer
-         * present in the new index.html.
-         * So we only add the listener
-         * if it exists.
-         */
-
         const websiteForm =
-
             document.getElementById(
-
                 "websiteForm"
-
             );
-
 
         if (websiteForm) {
 
             websiteForm.addEventListener(
-
                 "submit",
-
                 addWebsite
-
             );
 
         }
 
-
-        /*
-         * View Website & Review buttons
-         * are handled using JavaScript.
-         * This avoids inline onclick handlers
-         * which are blocked by CSP.
-         */
-
         const websiteList =
-
             document.getElementById(
-
                 "websiteList"
-
             );
-
 
         if (websiteList) {
 
             websiteList.addEventListener(
-
                 "click",
-
                 function(event) {
 
                     const button =
-
                         event.target.closest(
-
                             ".view-website-button"
-
                         );
-
 
                     if (!button) {
 
@@ -1331,11 +1624,8 @@ document.addEventListener(
 
                     }
 
-
                     const websiteId =
-
                         button.dataset.websiteId;
-
 
                     if (websiteId) {
 
@@ -1347,79 +1637,89 @@ document.addEventListener(
 
                     }
 
-
                     const title =
-
                         button.dataset.title;
 
-
                     const url =
-
                         button.dataset.url;
 
-
                     const description =
-
-                        button.dataset.description || "";
-
+                        button.dataset.description ||
+                        "";
 
                     if (
-
                         title &&
                         url
-
                     ) {
 
                         openWebsiteForReview(
-
                             title,
-
                             url,
-
                             description
-
                         );
 
                     }
 
                 }
-
             );
 
         }
 
 
-        /* =========================
-           LOAD SEARCH FROM URL
-        ========================= */
-
-        loadSearchFromUrl();
-
-
-        /*
-         * Only load all websites when
-         * there is no active search.
-         */
-
-        const currentParams =
-
-            new URLSearchParams(
-
-                window.location.search
-
+        const continueList =
+            document.getElementById(
+                "continueList"
             );
 
+        if (continueList) {
+
+            continueList.addEventListener(
+                "click",
+                function(event) {
+
+                    const button =
+                        event.target.closest(
+                            ".continue-button"
+                        );
+
+                    if (!button) {
+
+                        return;
+
+                    }
+
+                    const websiteId =
+                        button.dataset.recentWebsiteId;
+
+                    if (websiteId) {
+
+                        viewWebsite(
+                            websiteId
+                        );
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        displayRecentWebsites();
+        loadSearchFromUrl();
+        const currentParams =
+            new URLSearchParams(
+                window.location.search
+            );
 
         const currentQuery =
-
-            currentParams.get("q");
-
+            currentParams.get(
+                "q"
+            );
 
         if (
-
             !currentQuery ||
             currentQuery.trim() === ""
-
         ) {
 
             loadWebsites();
@@ -1427,5 +1727,4 @@ document.addEventListener(
         }
 
     }
-
 );

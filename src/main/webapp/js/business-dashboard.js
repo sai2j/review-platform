@@ -1,11 +1,8 @@
 /* =========================
-
    GET LOGGED-IN USER
-
 ========================= */
 
 const loggedInUser =
-
     JSON.parse(localStorage.getItem("loggedInUser"));
 
 if (!loggedInUser || !loggedInUser.id) {
@@ -18,59 +15,57 @@ if (!loggedInUser || !loggedInUser.id) {
 
 
 /* =========================
-
    USER ID
-
 ========================= */
 
-const USER_ID = loggedInUser.id;
+const USER_ID =
+    loggedInUser.id;
 
 
 /* =========================
-
    API URLs
-
 ========================= */
 
 const BUSINESS_API =
-
     "/review-platform/business-dashboard/user/"
-
     + USER_ID;
 
 const WEBSITE_API =
-
     "/review-platform/business-dashboard/user/"
-
     + USER_ID
-
     + "/website";
 
 const REVIEWS_API =
-
     "/review-platform/business-dashboard/user/"
-
     + USER_ID
-
     + "/reviews";
 
 const METRICS_API =
-
     "/review-platform/business-dashboard/user/"
-
     + USER_ID
-
     + "/metrics";
 
 const RESPONSE_API =
-
     "/review-platform/business-responses";
 
 
 /* =========================
+   LOGOUT
+========================= */
 
+function logoutUser() {
+
+    localStorage.removeItem("loggedInUser");
+
+    localStorage.removeItem("myBusiness");
+
+    window.location.href = "login.html";
+
+}
+
+
+/* =========================
    LOAD BUSINESS
-
 ========================= */
 
 function loadBusiness() {
@@ -100,13 +95,11 @@ function loadBusiness() {
             console.error(error);
 
             const businessInfo =
-
                 document.getElementById("businessInfo");
 
             if (businessInfo) {
 
                 businessInfo.innerHTML =
-
                     "<p>Unable to load business information.</p>";
 
             }
@@ -117,15 +110,12 @@ function loadBusiness() {
 
 
 /* =========================
-
    DISPLAY BUSINESS
-
 ========================= */
 
 function displayBusiness(business) {
 
     const businessInfo =
-
         document.getElementById("businessInfo");
 
     if (!businessInfo) {
@@ -137,7 +127,6 @@ function displayBusiness(business) {
     if (!business) {
 
         businessInfo.innerHTML =
-
             "<p>No approved business found.</p>";
 
         return;
@@ -212,9 +201,7 @@ function displayBusiness(business) {
 
 
 /* =========================
-
    LOAD WEBSITE
-
 ========================= */
 
 function loadWebsite() {
@@ -244,13 +231,11 @@ function loadWebsite() {
             console.error(error);
 
             const websiteInfo =
-
                 document.getElementById("websiteInfo");
 
             if (websiteInfo) {
 
                 websiteInfo.innerHTML =
-
                     "<p>Unable to load website information.</p>";
 
             }
@@ -261,15 +246,12 @@ function loadWebsite() {
 
 
 /* =========================
-
    DISPLAY WEBSITE
-
 ========================= */
 
 function displayWebsite(website) {
 
     const websiteInfo =
-
         document.getElementById("websiteInfo");
 
     if (!websiteInfo) {
@@ -281,7 +263,6 @@ function displayWebsite(website) {
     if (!website) {
 
         websiteInfo.innerHTML =
-
             "<p>No matching website found.</p>";
 
         return;
@@ -356,60 +337,132 @@ function displayWebsite(website) {
 
 
 /* =========================
-
    LOAD REVIEWS
-
 ========================= */
 
 function loadReviews() {
 
-    fetch(REVIEWS_API)
+    Promise.all([
 
-        .then(function(response) {
+        fetch(REVIEWS_API)
 
-            if (!response.ok) {
+            .then(function(response) {
 
-                throw new Error("Reviews API Error");
+                if (!response.ok) {
 
-            }
+                    throw new Error(
 
-            return response.json();
+                        "Reviews API Error"
 
-        })
+                    );
 
-        .then(function(reviews) {
+                }
 
-            displayReviews(reviews);
+                return response.json();
 
-            calculateSummary(reviews);
+            }),
 
-        })
+        fetch(BUSINESS_API)
 
-        .catch(function(error) {
+            .then(function(response) {
 
-            console.error(error);
+                if (!response.ok) {
 
-            const reviewList =
+                    throw new Error(
 
-                document.getElementById("reviewList");
+                        "Business API Error"
 
-            if (reviewList) {
+                    );
 
-                reviewList.innerHTML =
+                }
 
-                    "<p>Unable to load reviews.</p>";
+                return response.json();
 
-            }
+            })
 
-        });
+    ])
+
+    .then(function(results) {
+
+        const reviews = results[0];
+
+        const business = results[1];
+
+        if (!business || !business.id) {
+
+            throw new Error(
+
+                "Business ID not found"
+
+            );
+
+        }
+
+        const businessResponseAPI =
+
+            RESPONSE_API
+
+            + "/business/"
+
+            + business.id;
+
+        return fetch(businessResponseAPI)
+
+            .then(function(response) {
+
+                if (!response.ok) {
+
+                    throw new Error(
+
+                        "Business Response API Error"
+
+                    );
+
+                }
+
+                return response.json();
+
+            })
+
+            .then(function(responses) {
+
+                displayReviews(
+
+                    reviews,
+
+                    responses
+
+                );
+
+                calculateSummary(reviews);
+
+            });
+
+    })
+
+    .catch(function(error) {
+
+        console.error(error);
+
+        const reviewList =
+
+            document.getElementById("reviewList");
+
+        if (reviewList) {
+
+            reviewList.innerHTML =
+
+                "<p>Unable to load reviews.</p>";
+
+        }
+
+    });
 
 }
 
 
 /* =========================
-
    LOAD DASHBOARD METRICS
-
 ========================= */
 
 function loadDashboardMetrics() {
@@ -470,9 +523,7 @@ function loadDashboardMetrics() {
 
 
 /* =========================
-
    DISPLAY DASHBOARD METRICS
-
 ========================= */
 
 function displayDashboardMetrics(metrics) {
@@ -523,15 +574,17 @@ function displayDashboardMetrics(metrics) {
 
     }
 
-    displayRatingTrend(metrics.ratingTrend || []);
+    displayRatingTrend(
+
+        metrics.ratingTrend || []
+
+    );
 
 }
 
 
 /* =========================
-
    DISPLAY RATING TREND
-
 ========================= */
 
 function displayRatingTrend(trend) {
@@ -568,7 +621,11 @@ function displayRatingTrend(trend) {
 
                     <strong>Month:</strong>
 
-                    ${escapeHtml(item.month || "")}
+                    ${escapeHtml(
+
+                        item.month || ""
+
+                    )}
 
                 </p>
 
@@ -576,9 +633,11 @@ function displayRatingTrend(trend) {
 
                     <strong>Average Rating:</strong>
 
-                    ${Number(item.averageRating || 0)
+                    ${Number(
 
-                        .toFixed(1)}
+                        item.averageRating || 0
+
+                    ).toFixed(1)}
 
                     / 5
 
@@ -588,7 +647,11 @@ function displayRatingTrend(trend) {
 
                     <strong>Reviews:</strong>
 
-                    ${Number(item.reviewCount || 0)}
+                    ${Number(
+
+                        item.reviewCount || 0
+
+                    )}
 
                 </p>
 
@@ -602,49 +665,16 @@ function displayRatingTrend(trend) {
 
 
 /* =========================
-
-   LOAD BUSINESS RESPONSES
-
-========================= */
-
-function loadResponses() {
-
-    return fetch(RESPONSE_API)
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Business Response API Error"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            return [];
-
-        });
-
-}
-
-
-/* =========================
-
    DISPLAY REVIEWS
-
 ========================= */
 
-function displayReviews(reviews) {
+function displayReviews(
+
+    reviews,
+
+    responses
+
+) {
 
     const reviewList =
 
@@ -668,145 +698,143 @@ function displayReviews(reviews) {
 
     }
 
-    loadResponses()
+    if (!responses) {
 
-        .then(function(responses) {
+        responses = [];
 
-            reviews.forEach(function(review) {
+    }
 
-                const response =
+    reviews.forEach(function(review) {
 
-                    responses.find(function(item) {
+        const response =
 
-                        return Number(item.reviewId)
+            responses.find(function(item) {
 
-                            === Number(review.id);
+                return Number(item.reviewId)
 
-                    });
-
-                let responseHTML = "";
-
-                const reviewId =
-
-                    Number(review.id) || 0;
-
-                const userId =
-
-                    Number(review.userId) || 0;
-
-                const rating =
-
-                    Number(review.rating) || 0;
-
-                if (response) {
-
-                    responseHTML = `
-
-                        <div class="business-response">
-
-                            <h4>Business Response</h4>
-
-                            <p>
-
-                                ${escapeHtml(
-
-                                    response.response || ""
-
-                                )}
-
-                            </p>
-
-                            <button
-
-                                onclick="updateResponse(${reviewId})">
-
-                                Update Response
-
-                            </button>
-
-                        </div>
-
-                    `;
-
-                } else {
-
-                    responseHTML = `
-
-                        <div class="business-response">
-
-                            <p>
-
-                                No response added yet.
-
-                            </p>
-
-                            <button
-
-                                onclick="respondToReview(${reviewId})">
-
-                                Respond
-
-                            </button>
-
-                        </div>
-
-                    `;
-
-                }
-
-                reviewList.innerHTML += `
-
-                    <div class="review-card">
-
-                        <h3>
-
-                            ⭐ ${rating}/5
-
-                        </h3>
-
-                        <p>
-
-                            ${escapeHtml(
-
-                                review.comment || "No comment"
-
-                            )}
-
-                        </p>
-
-                        <p>
-
-                            <strong>User ID:</strong>
-
-                            ${userId}
-
-                        </p>
-
-                        <p>
-
-                            <strong>Review ID:</strong>
-
-                            ${reviewId}
-
-                        </p>
-
-                        ${responseHTML}
-
-                    </div>
-
-                `;
+                    === Number(review.id);
 
             });
 
-        });
+        const reviewId =
+
+            Number(review.id) || 0;
+
+        const userId =
+
+            Number(review.userId) || 0;
+
+        const rating =
+
+            Number(review.rating) || 0;
+
+        let responseHTML = "";
+
+        if (response) {
+
+            responseHTML = `
+
+                <div class="business-response">
+
+                    <h4>Business Response</h4>
+
+                    <p>
+
+                        ${escapeHtml(
+
+                            response.response || ""
+
+                        )}
+
+                    </p>
+
+                    <button
+
+                        onclick="updateResponse(${reviewId})">
+
+                        Update Response
+
+                    </button>
+
+                </div>
+
+            `;
+
+        } else {
+
+            responseHTML = `
+
+                <div class="business-response">
+
+                    <p>
+
+                        No response added yet.
+
+                    </p>
+
+                    <button
+
+                        onclick="respondToReview(${reviewId})">
+
+                        Respond
+
+                    </button>
+
+                </div>
+
+            `;
+
+        }
+
+        reviewList.innerHTML += `
+
+            <div class="review-card">
+
+                <h3>
+
+                    ⭐ ${rating}/5
+
+                </h3>
+
+                <p>
+
+                    ${escapeHtml(
+
+                        review.comment || "No comment"
+
+                    )}
+
+                </p>
+
+                <p>
+
+                    <strong>User ID:</strong>
+
+                    ${userId}
+
+                </p>
+
+                <p>
+
+                    <strong>Review ID:</strong>
+
+                    ${reviewId}
+
+                </p>
+
+                ${responseHTML}
+
+            </div>
+
+        `;
+
+    });
 
 }
 
 
 /* =========================
-
    CALCULATE SUMMARY
-
 ========================= */
 
 function calculateSummary(reviews) {
@@ -871,9 +899,7 @@ function calculateSummary(reviews) {
 
 
 /* =========================
-
    RESPOND TO REVIEW
-
 ========================= */
 
 function respondToReview(reviewId) {
@@ -888,9 +914,7 @@ function respondToReview(reviewId) {
 
 
 /* =========================
-
    UPDATE RESPONSE
-
 ========================= */
 
 function updateResponse(reviewId) {
@@ -905,9 +929,7 @@ function updateResponse(reviewId) {
 
 
 /* =========================
-
    ESCAPE HTML
-
 ========================= */
 
 function escapeHtml(value) {
@@ -940,9 +962,7 @@ function escapeHtml(value) {
 
 
 /* =========================
-
    PAGE LOAD
-
 ========================= */
 
 document.addEventListener(
@@ -950,6 +970,22 @@ document.addEventListener(
     "DOMContentLoaded",
 
     function() {
+
+        const logoutButton =
+            document.getElementById(
+                "logoutButton"
+            );
+
+
+        if (logoutButton) {
+
+            logoutButton.addEventListener(
+                "click",
+                logoutUser
+            );
+
+        }
+
 
         loadBusiness();
 

@@ -40,13 +40,10 @@ public class BusinessService {
 	private final ReviewRepository reviewRepository;
 	private final BusinessclaimRepository businessClaimRepository;
 	private final UserRepository userRepository;
-	public BusinessService(
-			BusinessRepository businessRepository,
-			WebsiteRepository websiteRepository,
-			WebsiteService websiteService,
-			ReviewRepository reviewRepository,
-			BusinessclaimRepository businessClaimRepository,
-			UserRepository userRepository) {
+
+	public BusinessService(BusinessRepository businessRepository, WebsiteRepository websiteRepository,
+			WebsiteService websiteService, ReviewRepository reviewRepository,
+			BusinessclaimRepository businessClaimRepository, UserRepository userRepository) {
 		this.businessRepository = businessRepository;
 		this.websiteRepository = websiteRepository;
 		this.websiteService = websiteService;
@@ -63,51 +60,45 @@ public class BusinessService {
 		return businessRepository.findAll();
 
 	}
+
 	public Business getBusinessById(Long id) {
 		return businessRepository.findById(id).orElse(null);
 
 	}
 
 	public boolean canAccessBusiness(Long businessId) {
-		Authentication authentication =SecurityContextHolder.getContext()
-						.getAuthentication();
-		if (authentication == null|| !authentication.isAuthenticated()) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
 			return false;
 		}
-		User loggedInUser =userRepository.findByEmail(
-						authentication.getName());
+		User loggedInUser = userRepository.findByEmail(authentication.getName());
 		if (loggedInUser == null) {
 			return false;
 		}
-		BusinessClaim approvedClaim =businessClaimRepository
-						.findByBusinessIdAndStatus(
-								businessId,
-								"APPROVED")
-						.orElse(null);
+		BusinessClaim approvedClaim = businessClaimRepository.findByBusinessIdAndStatus(businessId, "APPROVED")
+				.orElse(null);
 		if (approvedClaim == null) {
 			return false;
 		}
-		return loggedInUser.getId()
-				.equals(approvedClaim.getUserId());
+		return loggedInUser.getId().equals(approvedClaim.getUserId());
 	}
 
 	public Business updateBusiness(Long id, Business business) {
-		Business existingBusiness =businessRepository.findById(id).orElse(null);
+		Business existingBusiness = businessRepository.findById(id).orElse(null);
 		if (existingBusiness == null) {
 			return null;
 		}
-		Authentication authentication =SecurityContextHolder.getContext().getAuthentication();
-		if (authentication == null|| !authentication.isAuthenticated()) {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
 			throw new AccessDeniedException("You must be logged in to edit business profile");
 		}
 		String loggedInEmail = authentication.getName();
-		User loggedInUser =userRepository.findByEmail(loggedInEmail);
+		User loggedInUser = userRepository.findByEmail(loggedInEmail);
 		if (loggedInUser == null) {
 			throw new AccessDeniedException("User not found");
 		}
-		BusinessClaim approvedClaim =businessClaimRepository
-						.findByBusinessIdAndStatus(id,"APPROVED").orElse(null);
-		if (approvedClaim == null|| !loggedInUser.getId().equals(approvedClaim.getUserId())) {
+		BusinessClaim approvedClaim = businessClaimRepository.findByBusinessIdAndStatus(id, "APPROVED").orElse(null);
+		if (approvedClaim == null || !loggedInUser.getId().equals(approvedClaim.getUserId())) {
 			throw new AccessDeniedException("You can edit only your approved claimed business");
 		}
 		if (business.getName() != null) {
@@ -125,7 +116,7 @@ public class BusinessService {
 	}
 
 	public Business verifyBusiness(Long id) {
-		Business business =businessRepository.findById(id).orElse(null);
+		Business business = businessRepository.findById(id).orElse(null);
 		if (business == null) {
 			return null;
 		}
@@ -133,20 +124,20 @@ public class BusinessService {
 		return businessRepository.save(business);
 	}
 
-	public Business createEmailVerificationToken(Long businessId,String email) {
-		Business business =businessRepository.findById(businessId).orElse(null);
+	public Business createEmailVerificationToken(Long businessId, String email) {
+		Business business = businessRepository.findById(businessId).orElse(null);
 		if (business == null) {
 			throw new RuntimeException("Business not found");
 		}
 		if (email == null || email.isBlank()) {
 			throw new RuntimeException("Business email is required");
 		}
-		if (business.getOfficialUrl() == null|| business.getOfficialUrl().isBlank()) {
+		if (business.getOfficialUrl() == null || business.getOfficialUrl().isBlank()) {
 			throw new RuntimeException("Official website URL is required");
 		}
 
 		String emailDomain = getEmailDomain(email);
-		String websiteDomain =normalizeDomain(business.getOfficialUrl());
+		String websiteDomain = normalizeDomain(business.getOfficialUrl());
 		if (!emailDomain.equals(websiteDomain)) {
 			throw new RuntimeException("Business email domain must match official website domain");
 		}
@@ -157,17 +148,17 @@ public class BusinessService {
 		business.setEmailVerificationExpiry(LocalDateTime.now().plusHours(24));
 		return businessRepository.save(business);
 	}
-	public Business verifyBusinessEmail(Long businessId,String token) {
-		Business business =businessRepository.findById(businessId).orElse(null);
+
+	public Business verifyBusinessEmail(Long businessId, String token) {
+		Business business = businessRepository.findById(businessId).orElse(null);
 		if (business == null) {
 			throw new RuntimeException("Business not found");
 		}
-		if (business.getEmailVerificationToken() == null|| !business.getEmailVerificationToken()
-						.equals(token)) {
+		if (business.getEmailVerificationToken() == null || !business.getEmailVerificationToken().equals(token)) {
 			throw new RuntimeException("Invalid verification token");
 		}
-		if (business.getEmailVerificationExpiry() == null|| LocalDateTime.now().isAfter(
-						business.getEmailVerificationExpiry())) {
+		if (business.getEmailVerificationExpiry() == null
+				|| LocalDateTime.now().isAfter(business.getEmailVerificationExpiry())) {
 			throw new RuntimeException("Verification token has expired");
 		}
 		business.setEmailVerified(true);
@@ -178,11 +169,11 @@ public class BusinessService {
 	}
 
 	public Business createMetaVerificationToken(Long businessId) {
-		Business business =businessRepository.findById(businessId).orElse(null);
+		Business business = businessRepository.findById(businessId).orElse(null);
 		if (business == null) {
 			throw new RuntimeException("Business not found");
 		}
-		if (business.getOfficialUrl() == null|| business.getOfficialUrl().isBlank()) {
+		if (business.getOfficialUrl() == null || business.getOfficialUrl().isBlank()) {
 			throw new RuntimeException("Official website URL is required");
 		}
 		String token = UUID.randomUUID().toString();
@@ -190,8 +181,9 @@ public class BusinessService {
 		business.setMetaVerified(false);
 		return businessRepository.save(business);
 	}
+
 	public Business verifyBusinessMetaTag(Long businessId) {
-		Business business =businessRepository.findById(businessId).orElse(null);
+		Business business = businessRepository.findById(businessId).orElse(null);
 		if (business == null) {
 			throw new RuntimeException("Business not found");
 		}
@@ -206,32 +198,22 @@ public class BusinessService {
 		}
 
 		try {
-			if (!officialUrl.startsWith("http://")
-					&& !officialUrl.startsWith("https://")) {
+			if (!officialUrl.startsWith("http://") && !officialUrl.startsWith("https://")) {
 				officialUrl = "https://" + officialUrl;
 			}
-			HttpClient client =HttpClient.newBuilder()
-					.followRedirects(HttpClient.Redirect.NORMAL)
-							.build();
-			HttpRequest request =HttpRequest.newBuilder()
-							.uri(URI.create(officialUrl))
-							.header(
-									"User-Agent",
-									"ReviewPlatformBot/1.0")
-							.GET()
-							.build();
-			HttpResponse<String> response =
-					client.send(
-							request,
-							HttpResponse.BodyHandlers.ofString());
-			if (response.statusCode() < 200|| response.statusCode() >= 300) {
+			HttpClient client = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build();
+			HttpRequest request = HttpRequest.newBuilder().uri(URI.create(officialUrl))
+					.header("User-Agent", "ReviewPlatformBot/1.0").GET().build();
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+			if (response.statusCode() < 200 || response.statusCode() >= 300) {
 				throw new RuntimeException("Unable to access official website");
 			}
 			String html = response.body();
-			String normalizedHtml =html.replaceAll("\\s+", " ");
+			String normalizedHtml = html.replaceAll("\\s+", " ");
 			String escapedToken = Pattern.quote(token);
 			Pattern metaPattern = Pattern
-					.compile("<meta\\s+[^>]*" + "(?:name\\s*=\\s*[\"']review-platform-verification[\"']"
+					.compile(
+							"<meta\\s+[^>]*" + "(?:name\\s*=\\s*[\"']review-platform-verification[\"']"
 									+ "\\s+[^>]*content\\s*=\\s*[\"']" + escapedToken + "[\"']"
 									+ "|content\\s*=\\s*[\"']" + escapedToken + "[\"']"
 									+ "\\s+[^>]*name\\s*=\\s*[\"']review-platform-verification[\"'])" + "[^>]*>",
@@ -254,11 +236,11 @@ public class BusinessService {
 	}
 
 	public Business createDnsVerificationToken(Long businessId) {
-		Business business =businessRepository.findById(businessId).orElse(null);
+		Business business = businessRepository.findById(businessId).orElse(null);
 		if (business == null) {
 			throw new RuntimeException("Business not found");
 		}
-		if (business.getOfficialUrl() == null|| business.getOfficialUrl().isBlank()) {
+		if (business.getOfficialUrl() == null || business.getOfficialUrl().isBlank()) {
 			throw new RuntimeException("Official website URL is required");
 		}
 		String token = UUID.randomUUID().toString();
@@ -266,16 +248,17 @@ public class BusinessService {
 		business.setDnsVerified(false);
 		return businessRepository.save(business);
 	}
+
 	public Business verifyBusinessDns(Long businessId) {
-		Business business =businessRepository.findById(businessId).orElse(null);
+		Business business = businessRepository.findById(businessId).orElse(null);
 		if (business == null) {
 			throw new RuntimeException("Business not found");
 		}
-		String token =business.getDnsVerificationToken();
+		String token = business.getDnsVerificationToken();
 		if (token == null || token.isBlank()) {
 			throw new RuntimeException("DNS verification token has not been generated");
 		}
-		String domain =normalizeDomain(business.getOfficialUrl());
+		String domain = normalizeDomain(business.getOfficialUrl());
 		if (!isDnsTokenPresent(domain, token)) {
 			throw new RuntimeException("DNS verification TXT record not found");
 		}
@@ -285,36 +268,22 @@ public class BusinessService {
 		return businessRepository.save(business);
 	}
 
-	private boolean isDnsTokenPresent(String domain,String expectedToken) {
+	private boolean isDnsTokenPresent(String domain, String expectedToken) {
 		DirContext context = null;
 		try {
-			Hashtable<String, String> environment =
-					new Hashtable<>();
-			environment.put(
-					Context.INITIAL_CONTEXT_FACTORY,
-					"com.sun.jndi.dns.DnsContextFactory");
-			context =
-					new InitialDirContext(environment);
-			Attributes attributes =
-					context.getAttributes(
-							domain,
-							new String[] { "TXT" });
-			Attribute txtAttribute =
-					attributes.get("TXT");
+			Hashtable<String, String> environment = new Hashtable<>();
+			environment.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.dns.DnsContextFactory");
+			context = new InitialDirContext(environment);
+			Attributes attributes = context.getAttributes(domain, new String[] { "TXT" });
+			Attribute txtAttribute = attributes.get("TXT");
 			if (txtAttribute == null) {
 				return false;
 			}
 
-			for (int i = 0;
-					i < txtAttribute.size();
-					i++) {
-				Object value =
-						txtAttribute.get(i);
+			for (int i = 0; i < txtAttribute.size(); i++) {
+				Object value = txtAttribute.get(i);
 				if (value != null) {
-					String txtValue =
-							value.toString()
-									.replace("\"", "")
-									.trim();
+					String txtValue = value.toString().replace("\"", "").trim();
 					if (txtValue.equals(expectedToken)) {
 						return true;
 					}
@@ -338,46 +307,45 @@ public class BusinessService {
 	}
 
 	public Website getWebsiteForBusiness(Long businessId) {
-		Business business =getBusinessById(businessId);
+		Business business = getBusinessById(businessId);
 		if (business == null) {
 			return null;
 		}
-		String officialUrl =business.getOfficialUrl();
-		if (officialUrl == null|| officialUrl.isBlank()) {
+		String officialUrl = business.getOfficialUrl();
+		if (officialUrl == null || officialUrl.isBlank()) {
 			return null;
 		}
 
-		String canonicalDomain =normalizeDomain(officialUrl);
-		return websiteRepository
-				.findByCanonicalDomain(canonicalDomain)
-				.orElse(null);
+		String canonicalDomain = normalizeDomain(officialUrl);
+		return websiteRepository.findByCanonicalDomain(canonicalDomain).orElse(null);
 	}
 
 	public List<Review> getReviewsForBusiness(Long businessId) {
-		Website website =getWebsiteForBusiness(businessId);
+		Website website = getWebsiteForBusiness(businessId);
 		if (website == null) {
 			return List.of();
 		}
 		return reviewRepository.findByWebsiteId(website.getId());
 	}
+
 	public Business getBusinessForWebsite(Long websiteId) {
-		Website website =websiteRepository.findById(websiteId).orElse(null);
+		Website website = websiteRepository.findById(websiteId).orElse(null);
 		if (website == null) {
 			return null;
 		}
-		String canonicalDomain =website.getCanonicalDomain();
-		if (canonicalDomain == null|| canonicalDomain.isBlank()) {
+		String canonicalDomain = website.getCanonicalDomain();
+		if (canonicalDomain == null || canonicalDomain.isBlank()) {
 			return null;
 		}
 
-		List<Business> businesses =businessRepository.findAll();
+		List<Business> businesses = businessRepository.findAll();
 		for (Business business : businesses) {
-			String officialUrl =business.getOfficialUrl();
-			if (officialUrl == null|| officialUrl.isBlank()) {
+			String officialUrl = business.getOfficialUrl();
+			if (officialUrl == null || officialUrl.isBlank()) {
 				continue;
 			}
 
-			String businessDomain =normalizeDomain(officialUrl);
+			String businessDomain = normalizeDomain(officialUrl);
 			if (canonicalDomain.equals(businessDomain)) {
 				return business;
 			}
@@ -386,12 +354,12 @@ public class BusinessService {
 	}
 
 	private String getEmailDomain(String email) {
-		String cleanEmail =email.trim().toLowerCase();
-		int atIndex =cleanEmail.lastIndexOf("@");
-		if (atIndex <= 0|| atIndex == cleanEmail.length() - 1) {
+		String cleanEmail = email.trim().toLowerCase();
+		int atIndex = cleanEmail.lastIndexOf("@");
+		if (atIndex <= 0 || atIndex == cleanEmail.length() - 1) {
 			throw new RuntimeException("Invalid business email");
 		}
-		String domain =cleanEmail.substring(atIndex + 1);
+		String domain = cleanEmail.substring(atIndex + 1);
 		if (domain.startsWith("www.")) {
 			domain = domain.substring(4);
 		}
@@ -400,20 +368,19 @@ public class BusinessService {
 
 	private String normalizeDomain(String url) {
 		try {
-			String cleanUrl =url.trim();
-			if (!cleanUrl.startsWith("http://")
-					&& !cleanUrl.startsWith("https://")) {
+			String cleanUrl = url.trim();
+			if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
 				cleanUrl = "https://" + cleanUrl;
 			}
 
-			URI uri =new URI(cleanUrl);
-			String domain =uri.getHost();
+			URI uri = new URI(cleanUrl);
+			String domain = uri.getHost();
 			if (domain == null) {
 				throw new RuntimeException("Invalid website URL");
 			}
-			domain =domain.toLowerCase();
+			domain = domain.toLowerCase();
 			if (domain.startsWith("www.")) {
-				domain =domain.substring(4);
+				domain = domain.substring(4);
 			}
 			return domain;
 		} catch (Exception e) {

@@ -35,56 +35,99 @@ public class UserService {
 		user.setRole("USER");
 		return userRepository.save(user);
 	}
+
 	public User saveUser(User user) {
 		if (user.getPassword() != null) {
 			user.setPassword(passwordEncoder.encode(user.getPassword()));
 		}
 		return userRepository.save(user);
 	}
+
 	public List<User> getAllUsers() {
 		return userRepository.findAll();
 	}
+
 	public User getUserById(Long id) {
 		return userRepository.findById(id).orElse(null);
 	}
+
 	public User getUserByEmail(String email) {
 		return userRepository.findByEmail(email);
 	}
+
 	public boolean isAdmin(Long userId) {
 		return adminRepository.existsByUserId(userId);
 	}
+
 	public void deleteUser(Long id) {
 		userRepository.deleteById(id);
 	}
+
 	public void deleteOwnAccount() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
 		if (authentication == null || !authentication.isAuthenticated()) {
 			throw new AccessDeniedException("You must be logged in");
 		}
+
 		String email = authentication.getName();
+
 		User user = userRepository.findByEmail(email);
+
 		if (user == null) {
 			throw new RuntimeException("User not found");
 		}
+
 		Long userId = user.getId();
+
 		user.setEmail("deleted-user-" + userId + "@deleted.local");
 		user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
 		user.setStatus("RESTRICTED");
+
 		userRepository.save(user);
 	}
+
 	public User updateUserStatus(Long id, String status) {
 		User user = userRepository.findById(id).orElse(null);
+
 		if (user == null) {
 			throw new RuntimeException("User not found");
 		}
+
 		if (status == null || status.isBlank()) {
 			throw new RuntimeException("Status is required");
 		}
+
 		status = status.toUpperCase();
+
 		if (!status.equals("ACTIVE") && !status.equals("RESTRICTED")) {
 			throw new RuntimeException("Status must be ACTIVE or RESTRICTED");
 		}
+
 		user.setStatus(status);
+
+		return userRepository.save(user);
+	}
+
+	// ADMIN: Update an existing user's password
+	public User updateUserPassword(Long id, String newPassword) {
+
+		User user = userRepository.findById(id).orElse(null);
+
+		if (user == null) {
+			throw new RuntimeException("User not found");
+		}
+
+		if (newPassword == null || newPassword.isBlank()) {
+			throw new RuntimeException("Password is required");
+		}
+
+		if (newPassword.length() < 8 || newPassword.length() > 100) {
+			throw new RuntimeException("Password must be between 8 and 100 characters");
+		}
+
+		user.setPassword(passwordEncoder.encode(newPassword));
+
 		return userRepository.save(user);
 	}
 }

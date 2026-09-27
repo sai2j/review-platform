@@ -33,6 +33,7 @@ public class EvidenceService {
 	private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 	private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of("image/jpeg", "image/png", "application/pdf");
 	private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".jpg", ".jpeg", ".png", ".pdf");
+
 	public EvidenceService(EvidenceRepository evidenceRepository, ReviewRepository reviewRepository,
 			UserRepository userRepository, AuditLogService auditLogService) {
 		this.evidenceRepository = evidenceRepository;
@@ -40,6 +41,7 @@ public class EvidenceService {
 		this.userRepository = userRepository;
 		this.auditLogService = auditLogService;
 	}
+
 	public String requestEvidence(Long reviewId) {
 		Review review = reviewRepository.findById(reviewId).orElse(null);
 		if (review == null) {
@@ -144,6 +146,7 @@ public class EvidenceService {
 		checkReviewAccess(review, loggedInUser);
 		return evidence;
 	}
+
 	public Path getEvidenceFile(Long id) {
 		Evidence evidence = evidenceRepository.findById(id).orElse(null);
 		if (evidence == null) {
@@ -164,6 +167,7 @@ public class EvidenceService {
 		}
 		return path;
 	}
+
 	private void checkReviewAccess(Review review, User loggedInUser) {
 		if (loggedInUser == null) {
 			throw new AccessDeniedException("You must be logged in");
@@ -176,6 +180,7 @@ public class EvidenceService {
 		}
 		throw new AccessDeniedException("You are not authorized to access this evidence");
 	}
+
 	private User getLoggedInUser() {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		if (authentication == null || !authentication.isAuthenticated()) {

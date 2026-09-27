@@ -1,118 +1,307 @@
-const loginForm = document.getElementById("loginForm");
+const loginForm =
 
-loginForm.addEventListener("submit", async function(event) {
+    document.getElementById(
 
-    event.preventDefault();
+        "loginForm"
 
-    const email =
-        document.getElementById("email").value.trim();
-
-    const password =
-        document.getElementById("password").value;
-
-    const message =
-        document.getElementById("message");
-
-    message.textContent = "";
+    );
 
 
-    if (!email || !password) {
+loginForm.addEventListener(
 
-        message.textContent =
-            "Please enter email and password.";
+    "submit",
 
-        return;
-    }
+    async function(event) {
+
+        event.preventDefault();
 
 
-    try {
+        const email =
 
-        const response = await fetch(
-            "/review-platform/users/login",
-            {
-                method: "POST",
+            document.getElementById(
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+                "email"
 
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                })
+            ).value.trim();
+
+
+        const password =
+
+            document.getElementById(
+
+                "password"
+
+            ).value;
+
+
+        const message =
+
+            document.getElementById(
+
+                "message"
+
+            );
+
+
+        message.textContent = "";
+
+
+        if (
+
+            !email ||
+
+            !password
+
+        ) {
+
+            message.textContent =
+
+                "Please enter email and password.";
+
+            return;
+
+        }
+
+
+        try {
+
+            const response =
+
+                await fetch(
+
+                    "/review-platform/users/login",
+
+                    {
+
+                        method: "POST",
+
+                        headers: {
+
+                            "Content-Type":
+
+                                "application/json"
+
+                        },
+
+                        body:
+
+                            JSON.stringify({
+
+                                email:
+
+                                    email,
+
+                                password:
+
+                                    password
+
+                            })
+
+                    }
+
+                );
+
+
+            if (!response.ok) {
+
+                if (
+
+                    response.status === 401
+
+                ) {
+
+                    message.textContent =
+
+                        "Invalid email or password.";
+
+                } else {
+
+                    message.textContent =
+
+                        "Login failed. Please try again.";
+
+                }
+
+                return;
+
             }
-        );
 
 
-        if (!response.ok) {
+            const data =
 
-            if (response.status === 401) {
+                await response.json();
+
+
+            if (
+
+                !data ||
+
+                !data.user
+
+            ) {
 
                 message.textContent =
-                    "Invalid email or password.";
+
+                    "Invalid login response from server.";
+
+                return;
+
+            }
+
+
+            localStorage.setItem(
+
+                "loggedInUser",
+
+                JSON.stringify(
+
+                    data.user
+
+                )
+
+            );
+
+
+            localStorage.setItem(
+
+                "isAdmin",
+
+                String(
+
+                    data.admin === true
+
+                )
+
+            );
+
+
+            if (
+
+                data.admin === true
+
+            ) {
+
+                message.textContent =
+
+                    "Admin login successful!";
+
+
+                setTimeout(
+
+                    function() {
+
+                        window.location.href =
+
+                            "admin.html";
+
+                    },
+
+                    500
+
+                );
 
             } else {
 
                 message.textContent =
-                    "Login failed. Please try again.";
+
+                    "Login successful!";
+
+
+                try {
+
+                    const businessResponse =
+
+                        await fetch(
+
+                            "/review-platform/business-dashboard/user/" +
+
+                            data.user.id,
+
+                            {
+
+                                method: "GET"
+
+                            }
+
+                        );
+
+
+                    if (
+
+                        businessResponse.ok
+
+                    ) {
+
+                        const business =
+
+                            await businessResponse.json();
+
+
+                        if (
+
+                            business &&
+
+                            business.id
+
+                        ) {
+
+                            window.location.href =
+
+                                "business-dashboard.html";
+
+                            return;
+
+                        }
+
+                    }
+
+                } catch (businessError) {
+
+                    console.error(
+
+                        "Business dashboard check error:",
+
+                        businessError
+
+                    );
+
+                }
+
+
+                setTimeout(
+
+                    function() {
+
+                        window.location.href =
+
+                            "index.html";
+
+                    },
+
+                    500
+
+                );
 
             }
 
-            return;
-        }
 
+        } catch (error) {
 
-        const data = await response.json();
+            console.error(
 
+                "Login error:",
 
-        if (!data || !data.user) {
+                error
+
+            );
+
 
             message.textContent =
-                "Invalid login response from server.";
 
-            return;
+                "Server error. Please try again.";
+
         }
-
-
-        localStorage.setItem(
-            "loggedInUser",
-            JSON.stringify(data.user)
-        );
-
-        localStorage.setItem(
-            "isAdmin",
-            String(data.admin === true)
-        );
-
-
-        if (data.admin === true) {
-
-            message.textContent =
-                "Admin login successful!";
-
-            setTimeout(function() {
-
-                window.location.href =
-                    "admin.html";
-
-            }, 500);
-
-			} else {
-			    message.textContent =
-			        "Login successful!";
-			    setTimeout(function() {
-			        window.location.href =
-			            "index.html";
-			    }, 500);
-			}
-
-    } catch (error) {
-
-        console.error("Login error:", error);
-
-        message.textContent =
-            "Server error. Please try again.";
 
     }
 
-});
+);

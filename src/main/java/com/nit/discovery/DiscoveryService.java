@@ -20,10 +20,10 @@ public class DiscoveryService {
 	private final RestTemplate restTemplate;
 	@Value("${tinyfish.api-key:TEST_KEY}")
 	private String apiKey;
+
 	public DiscoveryService() {
 		this.restTemplate = new RestTemplate();
 	}
-
 
 	public List<WebsiteSearchResult> searchWebsites(String keyword) {
 		List<WebsiteSearchResult> results = new ArrayList<>();
@@ -214,11 +214,9 @@ public class DiscoveryService {
 			}
 			String lowerHost = host.toLowerCase();
 			String lowerUrl = url.toLowerCase();
-			String[] unwantedDomains = {
-					"wikipedia.org", "youtube.com", "facebook.com", "instagram.com", "linkedin.com", "reddit.com",
-					"quora.com", "twitter.com", "x.com", "pinterest.com", "apps.apple.com", "play.google.com",
-					"apps.microsoft.com", "microsoft.com/store"
-			};
+			String[] unwantedDomains = { "wikipedia.org", "youtube.com", "facebook.com", "instagram.com",
+					"linkedin.com", "reddit.com", "quora.com", "twitter.com", "x.com", "pinterest.com",
+					"apps.apple.com", "play.google.com", "apps.microsoft.com", "microsoft.com/store" };
 			for (String unwanted : unwantedDomains) {
 				if (lowerHost.equals(unwanted) || lowerHost.endsWith("." + unwanted) || lowerUrl.contains(unwanted)) {
 					return false;
@@ -227,10 +225,8 @@ public class DiscoveryService {
 			String path = uri.getPath();
 			if (path != null && !path.equals("/") && !path.isEmpty()) {
 				String lowerPath = path.toLowerCase();
-				String[] unwantedPaths = {
-						"/wiki/", "/article/", "/articles/", "/news/", "/blog/", "/blogs/", "/search", "/tag/",
-						"/category/", "/topics/", "/stories/", "/post/"
-				};
+				String[] unwantedPaths = { "/wiki/", "/article/", "/articles/", "/news/", "/blog/", "/blogs/",
+						"/search", "/tag/", "/category/", "/topics/", "/stories/", "/post/" };
 				for (String unwantedPath : unwantedPaths) {
 					if (lowerPath.contains(unwantedPath)) {
 						return false;

@@ -32,6 +32,8 @@ let currentReview = null;
 
 let currentBusiness = null;
 
+let currentResponse = null;
+
 
 /* =========================
    LOAD REVIEW
@@ -51,12 +53,13 @@ function loadReview() {
         ).textContent =
             "Rating: Not available";
 
-        return;
-
+        return Promise.reject(
+            new Error("Review ID is missing")
+        );
     }
 
 
-    fetch(
+    return fetch(
         REVIEW_API + "/" + reviewId
     )
 
@@ -67,7 +70,6 @@ function loadReview() {
                 throw new Error(
                     "Review API Error"
                 );
-
             }
 
             return response.json();
@@ -108,8 +110,8 @@ function loadReview() {
             ).textContent =
                 "Rating: Not available";
 
+            throw error;
         });
-
 }
 
 
@@ -129,7 +131,6 @@ function loadBusiness() {
         return Promise.reject(
             new Error("User is not logged in")
         );
-
     }
 
 
@@ -147,7 +148,6 @@ function loadBusiness() {
                 throw new Error(
                     "Business API Error"
                 );
-
             }
 
             return response.json();
@@ -161,13 +161,11 @@ function loadBusiness() {
                 throw new Error(
                     "No approved business found"
                 );
-
             }
 
             currentBusiness = business;
 
             return business;
-
         })
 
         .catch(function(error) {
@@ -180,9 +178,94 @@ function loadBusiness() {
                 "Unable to find your business.";
 
             throw error;
+        });
+}
+
+
+/* =========================
+   LOAD EXISTING RESPONSE
+========================= */
+
+function loadExistingResponse() {
+
+    if (!currentBusiness || !currentReview) {
+
+        return;
+    }
+
+
+    return fetch(RESPONSE_API)
+
+        .then(function(response) {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Business Response API Error"
+                );
+            }
+
+            return response.json();
+
+        })
+
+        .then(function(responses) {
+
+            const existingResponse =
+                responses.find(function(item) {
+
+                    return Number(item.businessId)
+                        === Number(currentBusiness.id)
+                        &&
+                        Number(item.reviewId)
+                        === Number(currentReview.id);
+
+                });
+
+
+            if (existingResponse) {
+
+                currentResponse =
+                    existingResponse;
+
+
+                const responseElement =
+                    document.getElementById(
+                        "response"
+                    );
+
+
+                if (responseElement) {
+
+                    responseElement.value =
+                        existingResponse.response
+                        || "";
+
+                }
+
+
+                const submitButton =
+                    document.querySelector(
+                        "#responseForm button[type='submit']"
+                    );
+
+
+                if (submitButton) {
+
+                    submitButton.textContent =
+                        "Update Response";
+
+                }
+
+            }
+
+        })
+
+        .catch(function(error) {
+
+            console.error(error);
 
         });
-
 }
 
 
@@ -213,7 +296,6 @@ if (responseForm) {
                     "Review information is not available.";
 
                 return;
-
             }
 
 
@@ -225,7 +307,6 @@ if (responseForm) {
                     "Business information is not available.";
 
                 return;
-
             }
 
 
@@ -251,7 +332,6 @@ if (responseForm) {
                     "Please write a response.";
 
                 return;
-
             }
 
 
@@ -272,21 +352,17 @@ if (responseForm) {
             fetch(
                 RESPONSE_API,
                 {
-
                     method: "POST",
 
                     headers: {
-
                         "Content-Type":
                             "application/json"
-
                     },
 
                     body:
                         JSON.stringify(
                             businessResponse
                         )
-
                 }
             )
 
@@ -295,10 +371,12 @@ if (responseForm) {
                     if (!response.ok) {
 
                         return response.text()
+
                             .then(function(errorText) {
 
                                 let errorMessage =
                                     "Response submission failed";
+
 
                                 try {
 
@@ -307,7 +385,13 @@ if (responseForm) {
                                             errorText
                                         );
 
-                                    if (error.error) {
+
+                                    if (error.message) {
+
+                                        errorMessage =
+                                            error.message;
+
+                                    } else if (error.error) {
 
                                         errorMessage =
                                             error.error;
@@ -325,12 +409,12 @@ if (responseForm) {
 
                                 }
 
+
                                 throw new Error(
                                     errorMessage
                                 );
 
                             });
-
                     }
 
                     return response.json();
@@ -339,10 +423,38 @@ if (responseForm) {
 
                 .then(function(data) {
 
-                    messageElement.textContent =
-                        "Response submitted successfully!";
+                    if (currentResponse) {
 
-                    responseElement.value = "";
+                        messageElement.textContent =
+                            "Response updated successfully!";
+
+                    } else {
+
+                        messageElement.textContent =
+                            "Response submitted successfully!";
+
+                    }
+
+
+                    currentResponse = data;
+
+
+                    responseElement.value =
+                        data.response || responseText;
+
+
+                    const submitButton =
+                        document.querySelector(
+                            "#responseForm button[type='submit']"
+                        );
+
+
+                    if (submitButton) {
+
+                        submitButton.textContent =
+                            "Update Response";
+
+                    }
 
                 })
 
@@ -352,13 +464,13 @@ if (responseForm) {
 
                     messageElement.textContent =
                         error.message
-                        || "Unable to submit response.";
+                        ||
+                        "Unable to submit response.";
 
                 });
 
         }
     );
-
 }
 
 
@@ -370,9 +482,19 @@ document.addEventListener(
     "DOMContentLoaded",
     function() {
 
-        loadReview();
+        loadReview()
 
-        loadBusiness();
+            .then(function() {
+
+                return loadBusiness();
+
+            })
+
+            .then(function() {
+
+                return loadExistingResponse();
+
+            });
 
     }
 );

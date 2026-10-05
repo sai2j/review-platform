@@ -16,137 +16,358 @@ import com.nit.review.ReviewRepository;
 @Service
 public class BusinessDashboardService {
 
-	private final BusinessClamService businessClaimService;
-	private final BusinessService businessService;
-	private final ReviewRepository reviewRepository;
-	private final BusinessResponseRepository businessResponseRepository;
+    private final BusinessClamService businessClaimService;
+    private final BusinessService businessService;
+    private final ReviewRepository reviewRepository;
+    private final BusinessResponseRepository businessResponseRepository;
 
-	public BusinessDashboardService(BusinessClamService businessClaimService, BusinessService businessService,
-			ReviewRepository reviewRepository, BusinessResponseRepository businessResponseRepository) {
-		this.businessClaimService = businessClaimService;
-		this.businessService = businessService;
-		this.reviewRepository = reviewRepository;
-		this.businessResponseRepository = businessResponseRepository;
-	}
+    public BusinessDashboardService(
+            BusinessClamService businessClaimService,
+            BusinessService businessService,
+            ReviewRepository reviewRepository,
+            BusinessResponseRepository businessResponseRepository) {
 
-	public Map<String, Object> getDashboardMetrics(Long userId) {
-		BusinessClaim claim = businessClaimService.getApprovedClaimByUserId(userId);
-		Map<String, Object> metrics = new LinkedHashMap<>();
+        this.businessClaimService =
+                businessClaimService;
 
-		if (claim == null) {
-			metrics.put("reviewCount", 0);
-			metrics.put("averageRating", 0.0);
-			metrics.put("responseRate", 0.0);
-			metrics.put("ratingTrend", List.of());
-			return metrics;
-		}
+        this.businessService =
+                businessService;
 
-		Business business = businessService.getBusinessById(claim.getBusinessId());
+        this.reviewRepository =
+                reviewRepository;
 
-		if (business == null || !"VERIFIED".equalsIgnoreCase(business.getStatus())) {
-			metrics.put("reviewCount", 0);
-			metrics.put("averageRating", 0.0);
-			metrics.put("responseRate", 0.0);
-			metrics.put("ratingTrend", List.of());
-			return metrics;
-		}
+        this.businessResponseRepository =
+                businessResponseRepository;
+    }
 
-		Website website = businessService.getWebsiteForBusiness(claim.getBusinessId());
+    public Map<String, Object> getDashboardMetrics(
+            Long userId) {
 
-		if (website == null) {
-			metrics.put("reviewCount", 0);
-			metrics.put("averageRating", 0.0);
-			metrics.put("responseRate", 0.0);
-			metrics.put("ratingTrend", List.of());
-			return metrics;
-		}
+        BusinessClaim claim =
+                businessClaimService.getApprovedClaimByUserId(
+                        userId
+                );
 
-		List<Review> allReviews = reviewRepository.findByWebsiteId(website.getId());
+        Map<String, Object> metrics =
+                new LinkedHashMap<>();
 
-		List<Review> approvedReviews = new ArrayList<>();
+        if (claim == null) {
 
-		for (Review review : allReviews) {
-			if ("APPROVED".equalsIgnoreCase(review.getStatus())) {
-				approvedReviews.add(review);
-			}
-		}
+            metrics.put(
+                    "reviewCount",
+                    0
+            );
 
-		int reviewCount = approvedReviews.size();
+            metrics.put(
+                    "averageRating",
+                    0.0
+            );
 
-		double totalRating = 0.0;
+            metrics.put(
+                    "responseRate",
+                    0.0
+            );
 
-		for (Review review : approvedReviews) {
-			totalRating += review.getRating() != null ? review.getRating() : 0;
-		}
+            metrics.put(
+                    "ratingTrend",
+                    List.of()
+            );
 
-		double averageRating = reviewCount == 0 ? 0.0 : totalRating / reviewCount;
+            return metrics;
+        }
 
-		int responseCount = 0;
+        Business business =
+                businessService.getBusinessById(
+                        claim.getBusinessId()
+                );
 
-		List<BusinessResponse> responses = businessResponseRepository.findAll();
+        if (business == null
+                || !"VERIFIED".equalsIgnoreCase(
+                        business.getStatus()
+                )) {
 
-		for (BusinessResponse response : responses) {
+            metrics.put(
+                    "reviewCount",
+                    0
+            );
 
-			if (!claim.getBusinessId().equals(response.getBusinessId())) {
-				continue;
-			}
+            metrics.put(
+                    "averageRating",
+                    0.0
+            );
 
-			for (Review review : approvedReviews) {
+            metrics.put(
+                    "responseRate",
+                    0.0
+            );
 
-				if (review.getId().equals(response.getReviewId())) {
-					responseCount++;
-					break;
-				}
-			}
-		}
+            metrics.put(
+                    "ratingTrend",
+                    List.of()
+            );
 
-		double responseRate = reviewCount == 0 ? 0.0 : (responseCount * 100.0) / reviewCount;
+            return metrics;
+        }
 
-		Map<String, List<Integer>> monthlyRatings = new LinkedHashMap<>();
+        Website website =
+                businessService.getWebsiteForBusiness(
+                        claim.getBusinessId()
+                );
 
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM");
+        if (website == null) {
 
-		for (Review review : approvedReviews) {
+            metrics.put(
+                    "reviewCount",
+                    0
+            );
 
-			LocalDateTime createdAt = review.getCreatedAt();
+            metrics.put(
+                    "averageRating",
+                    0.0
+            );
 
-			if (createdAt == null) {
-				continue;
-			}
+            metrics.put(
+                    "responseRate",
+                    0.0
+            );
 
-			String month = createdAt.format(formatter);
+            metrics.put(
+                    "ratingTrend",
+                    List.of()
+            );
 
-			monthlyRatings.computeIfAbsent(month, key -> new ArrayList<>()).add(review.getRating());
-		}
+            return metrics;
+        }
 
-		List<Map<String, Object>> ratingTrend = new ArrayList<>();
+        // ==========================================
+        // GET ALL REVIEWS
+        // ==========================================
 
-		for (Map.Entry<String, List<Integer>> entry : monthlyRatings.entrySet()) {
+        List<Review> allReviews =
+                reviewRepository.findByWebsiteId(
+                        website.getId()
+                );
 
-			List<Integer> ratings = entry.getValue();
+        // ==========================================
+        // COUNTED REVIEWS
+        //
+        // PENDING  -> COUNT
+        // APPROVED -> COUNT
+        // HIDDEN   -> IGNORE
+        // REJECTED -> SHOULD BE DELETED
+        // ==========================================
 
-			double monthlyTotal = 0.0;
+        List<Review> countedReviews =
+                new ArrayList<>();
 
-			for (Integer rating : ratings) {
-				monthlyTotal += rating;
-			}
+        for (Review review : allReviews) {
 
-			double monthlyAverage = ratings.isEmpty() ? 0.0 : monthlyTotal / ratings.size();
+            String status =
+                    review.getStatus();
 
-			Map<String, Object> trend = new LinkedHashMap<>();
+            if ("PENDING".equalsIgnoreCase(status)
+                    || "APPROVED".equalsIgnoreCase(status)) {
 
-			trend.put("month", entry.getKey());
-			trend.put("averageRating", Math.round(monthlyAverage * 100.0) / 100.0);
-			trend.put("reviewCount", ratings.size());
+                countedReviews.add(
+                        review
+                );
+            }
+        }
 
-			ratingTrend.add(trend);
-		}
+        // ==========================================
+        // REVIEW COUNT
+        // ==========================================
 
-		metrics.put("reviewCount", reviewCount);
-		metrics.put("averageRating", Math.round(averageRating * 100.0) / 100.0);
-		metrics.put("responseRate", Math.round(responseRate * 100.0) / 100.0);
-		metrics.put("ratingTrend", ratingTrend);
+        int reviewCount =
+                countedReviews.size();
 
-		return metrics;
-	}
+        // ==========================================
+        // AVERAGE RATING
+        // ==========================================
+
+        double totalRating =
+                0.0;
+
+        for (Review review :
+                countedReviews) {
+
+            totalRating +=
+                    review.getRating() != null
+                            ? review.getRating()
+                            : 0;
+        }
+
+        double averageRating =
+                reviewCount == 0
+                        ? 0.0
+                        : totalRating / reviewCount;
+
+        // ==========================================
+        // BUSINESS RESPONSE COUNT
+        // ==========================================
+
+        int responseCount =
+                0;
+
+        List<BusinessResponse> responses =
+                businessResponseRepository.findAll();
+
+        for (BusinessResponse response :
+                responses) {
+
+            if (!claim.getBusinessId()
+                    .equals(
+                            response.getBusinessId()
+                    )) {
+
+                continue;
+            }
+
+            for (Review review :
+                    countedReviews) {
+
+                if (review.getId()
+                        .equals(
+                                response.getReviewId()
+                        )) {
+
+                    responseCount++;
+
+                    break;
+                }
+            }
+        }
+
+        // ==========================================
+        // RESPONSE RATE
+        // ==========================================
+
+        double responseRate =
+                reviewCount == 0
+                        ? 0.0
+                        : (
+                            responseCount * 100.0
+                        ) / reviewCount;
+
+        // ==========================================
+        // RATING TREND
+        // ==========================================
+
+        Map<String, List<Integer>>
+                monthlyRatings =
+                new LinkedHashMap<>();
+
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern(
+                        "yyyy-MM"
+                );
+
+        for (Review review :
+                countedReviews) {
+
+            LocalDateTime createdAt =
+                    review.getCreatedAt();
+
+            if (createdAt == null) {
+                continue;
+            }
+
+            String month =
+                    createdAt.format(
+                            formatter
+                    );
+
+            monthlyRatings
+                    .computeIfAbsent(
+                            month,
+                            key ->
+                                    new ArrayList<>()
+                    )
+                    .add(
+                            review.getRating()
+                    );
+        }
+
+        List<Map<String, Object>>
+                ratingTrend =
+                new ArrayList<>();
+
+        for (Map.Entry<String,
+                List<Integer>> entry :
+                monthlyRatings.entrySet()) {
+
+            List<Integer> ratings =
+                    entry.getValue();
+
+            double monthlyTotal =
+                    0.0;
+
+            for (Integer rating :
+                    ratings) {
+
+                monthlyTotal +=
+                        rating;
+            }
+
+            double monthlyAverage =
+                    ratings.isEmpty()
+                            ? 0.0
+                            : monthlyTotal
+                                / ratings.size();
+
+            Map<String, Object> trend =
+                    new LinkedHashMap<>();
+
+            trend.put(
+                    "month",
+                    entry.getKey()
+            );
+
+            trend.put(
+                    "averageRating",
+                    Math.round(
+                            monthlyAverage * 100.0
+                    ) / 100.0
+            );
+
+            trend.put(
+                    "reviewCount",
+                    ratings.size()
+            );
+
+            ratingTrend.add(
+                    trend
+            );
+        }
+
+        // ==========================================
+        // FINAL METRICS
+        // ==========================================
+
+        metrics.put(
+                "reviewCount",
+                reviewCount
+        );
+
+        metrics.put(
+                "averageRating",
+                Math.round(
+                        averageRating * 100.0
+                ) / 100.0
+        );
+
+        metrics.put(
+                "responseRate",
+                Math.round(
+                        responseRate * 100.0
+                ) / 100.0
+        );
+
+        metrics.put(
+                "ratingTrend",
+                ratingTrend
+        );
+
+        return metrics;
+    }
 }

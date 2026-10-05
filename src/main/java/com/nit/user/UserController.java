@@ -1,11 +1,11 @@
 package com.nit.user;
 
 import java.util.HashMap;
-
-import com.nit.business.BusinessclaimRepository;
-
 import java.util.List;
 import java.util.Map;
+
+import com.nit.business.BusinessclaimRepository;
+import com.nit.security.BruteForceProtectionService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +28,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
-
-import com.nit.security.BruteForceProtectionService;
 
 @RestController
 @RequestMapping("/users")
@@ -41,9 +40,12 @@ public class UserController {
 	private final BruteForceProtectionService bruteForceProtectionService;
 	private final BusinessclaimRepository businessClaimRepository;
 
-	public UserController(UserService userService, AuthenticationManager authenticationManager,
+	public UserController(
+			UserService userService,
+			AuthenticationManager authenticationManager,
 			BruteForceProtectionService bruteForceProtectionService,
 			BusinessclaimRepository businessClaimRepository) {
+
 		this.userService = userService;
 		this.authenticationManager = authenticationManager;
 		this.bruteForceProtectionService = bruteForceProtectionService;
@@ -52,127 +54,271 @@ public class UserController {
 
 	@PostMapping("/register")
 	public User registerUser(@Valid @RequestBody User user) {
-		return userService.registerUser(user.getEmail(), user.getPassword());
+
+		return userService.registerUser(
+				user.getEmail(),
+				user.getPassword()
+		);
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<Map<String, Object>> loginUser(@RequestBody User user, HttpServletRequest request,
+	public ResponseEntity<Map<String, Object>> loginUser(
+			@RequestBody User user,
+			HttpServletRequest request,
 			HttpServletResponse response) {
 
-		String email = user.getEmail() == null ? "" : user.getEmail().trim().toLowerCase();
-		String clientIp = request.getRemoteAddr();
-		String protectionKey = clientIp + ":" + email;
+		String email =
+				user.getEmail() == null
+						? ""
+						: user.getEmail()
+								.trim()
+								.toLowerCase();
 
-		if (bruteForceProtectionService.isBlocked(protectionKey)) {
+		String password =
+				user.getPassword();
 
-			Map<String, Object> errorResponse = new HashMap<>();
+		String clientIp =
+				request.getRemoteAddr();
 
-			errorResponse.put("error", "Too many failed login attempts. Please try again later.");
+		String protectionKey =
+				clientIp + ":" + email;
 
-			return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(errorResponse);
+		if (bruteForceProtectionService
+				.isBlocked(protectionKey)) {
+
+			Map<String, Object> errorResponse =
+					new HashMap<>();
+
+			errorResponse.put(
+					"error",
+					"Too many failed login attempts. Please try again later."
+			);
+
+			return ResponseEntity
+					.status(HttpStatus.TOO_MANY_REQUESTS)
+					.body(errorResponse);
 		}
 
 		try {
 
-			Authentication authentication = authenticationManager
-					.authenticate(new UsernamePasswordAuthenticationToken(user.getEmail(), user.getPassword()));
+			Authentication authentication =
+					authenticationManager.authenticate(
+							new UsernamePasswordAuthenticationToken(
+									email,
+									password
+							)
+					);
 
-			bruteForceProtectionService.recordSuccessfulLogin(protectionKey);
+			bruteForceProtectionService
+					.recordSuccessfulLogin(
+							protectionKey
+					);
 
-			SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
-
-			securityContext.setAuthentication(authentication);
-
-			SecurityContextHolder.setContext(securityContext);
-
+			/*
+			 * Create/use the HTTP session before changing
+			 * the session id. This keeps the authenticated
+			 * user and browser session synchronized.
+			 */
 			request.getSession(true);
 
-			HttpSessionSecurityContextRepository securityContextRepository = new HttpSessionSecurityContextRepository();
+			/*
+			 * Change the session id after successful
+			 * authentication to avoid keeping an old
+			 * authentication session.
+			 */
+			request.changeSessionId();
 
-			securityContextRepository.saveContext(securityContext, request, response);
+			SecurityContext securityContext =
+					SecurityContextHolder
+							.createEmptyContext();
 
-			User loggedInUser = userService.getUserByEmail(user.getEmail());
+			securityContext.setAuthentication(
+					authentication
+			);
 
-			boolean admin = userService.isAdmin(loggedInUser.getId());
+			SecurityContextHolder.setContext(
+					securityContext
+			);
 
-			Map<String, Object> result = new HashMap<>();
+			HttpSessionSecurityContextRepository
+					securityContextRepository =
+							new HttpSessionSecurityContextRepository();
 
-			result.put("user", loggedInUser);
-			result.put("admin", admin);
+			securityContextRepository.saveContext(
+					securityContext,
+					request,
+					response
+			);
+
+			User loggedInUser =
+					userService.getUserByEmail(email);
+
+			if (loggedInUser == null) {
+
+				SecurityContextHolder.clearContext();
+
+				HttpSession session =
+						request.getSession(false);
+
+				if (session != null) {
+					session.invalidate();
+				}
+
+				throw new RuntimeException(
+						"Authenticated user not found"
+				);
+			}
+
+			boolean admin =
+					userService.isAdmin(
+							loggedInUser.getId()
+					);
+
+			Map<String, Object> result =
+					new HashMap<>();
+
+			result.put(
+					"user",
+					loggedInUser
+			);
+
+			result.put(
+					"admin",
+					admin
+			);
 
 			return ResponseEntity.ok(result);
 
 		} catch (Exception e) {
 
-			bruteForceProtectionService.recordFailedAttempt(protectionKey);
+			SecurityContextHolder.clearContext();
 
-			Map<String, Object> errorResponse = new HashMap<>();
+			bruteForceProtectionService
+					.recordFailedAttempt(
+							protectionKey
+					);
 
-			errorResponse.put("error", "Invalid email or password");
+			Map<String, Object> errorResponse =
+					new HashMap<>();
 
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+			errorResponse.put(
+					"error",
+					"Invalid email or password"
+			);
+
+			return ResponseEntity
+					.status(HttpStatus.UNAUTHORIZED)
+					.body(errorResponse);
 		}
+	}
+
+	@PostMapping("/logout")
+	public ResponseEntity<Map<String, String>> logoutUser(
+			HttpServletRequest request) {
+
+		SecurityContextHolder.clearContext();
+
+		HttpSession session =
+				request.getSession(false);
+
+		if (session != null) {
+			session.invalidate();
+		}
+
+		Map<String, String> result =
+				new HashMap<>();
+
+		result.put(
+				"message",
+				"Logout successful"
+		);
+
+		return ResponseEntity.ok(result);
 	}
 
 	@PreAuthorize("isAuthenticated()")
 	@DeleteMapping("/me")
-	public ResponseEntity<Map<String, String>> deleteMyAccount(HttpServletRequest request,
+	public ResponseEntity<Map<String, String>> deleteMyAccount(
+			HttpServletRequest request,
 			HttpServletResponse response) {
 
 		userService.deleteOwnAccount();
 
 		SecurityContextHolder.clearContext();
 
-		var session = request.getSession(false);
+		var session =
+				request.getSession(false);
 
 		if (session != null) {
 			session.invalidate();
 		}
 
-		Map<String, String> result = new HashMap<>();
+		Map<String, String> result =
+				new HashMap<>();
 
-		result.put("message", "Your account has been deleted.");
+		result.put(
+				"message",
+				"Your account has been deleted."
+		);
 
 		return ResponseEntity.ok(result);
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping
-	public User createUser(@Valid @RequestBody User user) {
+	public User createUser(
+			@Valid @RequestBody User user) {
+
 		return userService.saveUser(user);
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping
 	public List<User> getAllUsers() {
+
 		return userService.getAllUsers();
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("/{id}")
-	public User getUserById(@PathVariable Long id) {
+	public User getUserById(
+			@PathVariable Long id) {
+
 		return userService.getUserById(id);
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{id}/status")
-	public User updateUserStatus(@PathVariable Long id, @RequestParam String status) {
-		return userService.updateUserStatus(id, status);
+	public User updateUserStatus(
+			@PathVariable Long id,
+			@RequestParam String status) {
+
+		return userService.updateUserStatus(
+				id,
+				status
+		);
 	}
 
 	// ADMIN: Update an existing user's password
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("/{id}/password")
-	public User updateUserPassword(@PathVariable Long id,
+	public User updateUserPassword(
+			@PathVariable Long id,
 			@RequestParam String newPassword) {
 
-		return userService.updateUserPassword(id, newPassword);
+		return userService.updateUserPassword(
+				id,
+				newPassword
+		);
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("/{id}")
-	public String deleteUser(@PathVariable Long id) {
+	public String deleteUser(
+			@PathVariable Long id) {
+
 		userService.deleteUser(id);
+
 		return "User deleted successfully";
 	}
 }

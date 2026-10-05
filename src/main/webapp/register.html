@@ -1,237 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <meta name="robots"
-          content="noindex, follow">
-
-    <title>Registration - Review Platform</title>
-
-    <link rel="stylesheet"
-          href="css/register.css">
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, follow">
+<title>Registration - Review Platform</title>
+<link rel="stylesheet" href="css/register.css">
 </head>
-
-
 <body>
-
-
-<!-- =====================================================
-     NAVBAR
-===================================================== -->
-
-<header class="top-navbar">
-
-    <div class="navbar-container">
-
-
-        <!-- LOGO -->
-
-        <a href="index.html"
-           class="brand-logo">
-
-            <span class="brand-star">
-                ★
-            </span>
-
-            <span>
-                Review<span class="brand-highlight">Platform</span>
-            </span>
-
-        </a>
-
-
-        <!-- NAVIGATION -->
-
-        <nav class="navbar-links">
-
-
-            <a href="login.html"
-               class="login-link">
-
-                Log in
-
-            </a>
-
-
-            <a href="business-dashboard.html"
-               class="business-button">
-
-                For businesses
-
-            </a>
-
-
-        </nav>
-
-    </div>
-
-</header>
-
-
-
-<!-- =====================================================
-     REGISTER PAGE
-===================================================== -->
-
-<main class="register-page">
-
-
-    <section class="register-section">
-
-
-        <h1>
-            Read reviews. Write reviews. Find companies.
-        </h1>
-
-
-        <!-- REGISTER CARD -->
-
-        <div class="register-card">
-
-
-            <h2>
-                Create your account
-            </h2>
-
-
-            <!-- REGISTER FORM -->
-
-            <form id="registerForm">
-
-
-                <!-- EMAIL -->
-
-                <div class="form-group">
-
-                    <label for="email">
-                        Email
-                    </label>
-
-                    <input
-                        type="email"
-                        id="email"
-                        placeholder="Enter your email"
-                        required>
-
-                </div>
-
-
-                <!-- PASSWORD -->
-
-                <div class="form-group">
-
-                    <label for="password">
-                        Password
-                    </label>
-
-                    <input
-                        type="password"
-                        id="password"
-                        placeholder="Enter your password"
-                        required>
-
-                </div>
-
-
-                <!-- REGISTER BUTTON -->
-
-                <button
-                    type="submit"
-                    class="register-submit-button">
-
-                    Create account
-
-                </button>
-
-
-            </form>
-
-
-            <!-- MESSAGE -->
-
-            <p id="message"></p>
-
-
-            <!-- LOGIN LINK -->
-
-            <p class="login-text">
-
-                Already have an account?
-
-                <a href="login.html">
-                    Log in
-                </a>
-
-            </p>
-
-
-        </div>
-
-
-    </section>
-
-
-
-    <!-- =================================================
-         BUSINESS SECTION
-    ================================================= -->
-
-    <section class="business-section">
-
-
-        <h2>
-            Are you a business?
-        </h2>
-
-
-        <p>
-            Set up your business account on Review Platform for free
-        </p>
-
-
-        <div class="business-actions">
-
-
-            <a
-                href="login.html"
-                class="business-login-button">
-
-                Log in
-
-            </a>
-
-
-            <a
-                href="register.html"
-                class="business-signup-button">
-
-                Sign up
-
-            </a>
-
-
-        </div>
-
-
-    </section>
-
-
-</main>
-
-
-
-<!-- REGISTER JAVASCRIPT -->
-
-<script src="js/register.js"></script>
-
-
+	<header class="top-navbar">
+		<div class="navbar-container">
+			<a href="index.html" class="brand-logo"> <span class="brand-star">
+					★ </span> <span> Review<span class="brand-highlight">Platform</span>
+			</span>
+			</a>
+			<nav class="navbar-links">
+				<a href="login.html" class="login-link"> Log in </a> <a
+					href="business-dashboard.html" class="business-button"> For
+					businesses </a>
+			</nav>
+		</div>
+	</header>
+	<main class="register-page">
+		<section class="register-section">
+			<h1>Read reviews. Write reviews. Find companies.</h1>
+			<div class="register-card">
+				<h2>Create your account</h2>
+				<form id="registerForm">
+					<div class="form-group">
+						<label for="email"> Email </label> <input type="email" id="email"
+							placeholder="Enter your email" required>
+					</div>
+					<div class="form-group">
+						<label for="password"> Password </label> <input type="password"
+							id="password" placeholder="Enter your password" required>
+					</div>
+					<button type="submit" class="register-submit-button">
+						Create account</button>
+				</form>
+				<p id="message"></p>
+				<p class="login-text">
+					Already have an account? <a href="login.html"> Log in </a>
+				</p>
+			</div>
+		</section>
+		<section class="business-section">
+			<h2>Are you a business?</h2>
+			<p>Set up your business account on Review Platform for free</p>
+			<div class="business-actions">
+				<a href="login.html" class="business-login-button"> Log in </a> <a
+					href="register.html" class="business-signup-button"> Sign up </a>
+			</div>
+		</section>
+	</main>
+	<script src="js/register.js"></script>
 </body>
-
 </html>

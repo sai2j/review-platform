@@ -3,234 +3,352 @@
 	margin: 0;
 	padding: 0;
 }
+
 html {
 	scroll-behavior: smooth;
 }
+
 body {
 	font-family: Arial, Helvetica, sans-serif;
-	background: #f7fbfe;
+	background: #eaf7ff;
 	color: #111827;
 	min-height: 100vh;
 }
-.top-navbar {
+.navbar {
 	width: 100%;
-	background: #ffffff;
-	border-bottom: 1px solid #e5e7eb;
+	background: #0b1117;
+	border-bottom: 1px solid #24313d;
 	position: sticky;
 	top: 0;
 	z-index: 1000;
 }
-.navbar-container {
+
+.navbar-inner {
+	width: 100%;
 	max-width: 1200px;
-	margin: 0 auto;
 	min-height: 72px;
+	margin: 0 auto;
 	padding: 0 24px;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 20px;
+	gap: 24px;
 }
-.brand-logo {
+
+.logo {
 	text-decoration: none;
-	color: #111827;
+	color: #ffffff;
 	font-size: 24px;
 	font-weight: 700;
 	display: inline-flex;
 	align-items: center;
-	gap: 8px;
 }
-.brand-star {
-	color: #00b67a;
-	font-size: 25px;
+
+.logo span {
+	color: #46a8df;
+	margin-left: 5px;
 }
-.brand-highlight {
-	color: #00b67a;
-}
-.navbar-links {
+
+.nav-links {
 	display: flex;
 	align-items: center;
 	gap: 24px;
 }
-.navbar-links a {
+
+.nav-links a {
 	text-decoration: none;
-	color: #374151;
-	font-size: 15px;
+	color: #ffffff;
+	font-size: 14px;
 	font-weight: 600;
+	transition: color 0.2s ease;
 }
-.navbar-links a:hover {
-	color: #00a66f;
+
+.nav-links a:hover {
+	color: #a9defa;
 }
+
 .claim-page {
 	width: 100%;
 	min-height: calc(100vh - 72px);
-	padding: 50px 20px 70px;
+	padding: 55px 20px 75px;
 }
+
 .claim-container {
 	width: 100%;
-	max-width: 760px;
+	max-width: 920px;
 	margin: 0 auto;
 }
+
 .claim-header {
 	text-align: center;
-	margin-bottom: 28px;
+	margin-bottom: 32px;
 }
+
 .claim-badge {
 	display: inline-block;
-	margin-bottom: 14px;
 	padding: 7px 14px;
+	margin-bottom: 15px;
+	border: 1px solid #cfe8f7;
 	border-radius: 20px;
-	background: #e8f8f2;
-	color: #008f68;
+	background: #eaf7ff;
+	color: #153b50;
 	font-size: 12px;
 	font-weight: 700;
 	letter-spacing: 0.8px;
 }
+
 .claim-header h1 {
 	margin-bottom: 12px;
-	font-size: 36px;
+	color: #0b1117;
+	font-size: 38px;
+	font-weight: 700;
 	line-height: 1.2;
-	color: #111827;
 }
+
 .claim-header p {
-	max-width: 620px;
+	max-width: 670px;
 	margin: 0 auto;
+	color: #5f7282;
 	font-size: 15px;
 	line-height: 1.7;
-	color: #6b7280;
 }
 .claim-card {
 	background: #ffffff;
-	border: 1px solid #e5e7eb;
-	border-radius: 16px;
-	padding: 32px;
-	box-shadow: 0 10px 30px rgba(17, 24, 39, 0.06);
+	border: 1px solid #cfe8f7;
+	border-radius: 18px;
+	padding: 34px;
+	box-shadow: 0 10px 28px rgba(11, 17, 23, 0.08);
 }
+
 .business-details-section {
-	margin-bottom: 26px;
+	margin-bottom: 30px;
 }
-.business-details-section h2 {
+
+.section-title-row {
 	margin-bottom: 18px;
-	font-size: 22px;
-	color: #111827;
 }
+
+.business-details-section h2 {
+	margin-bottom: 6px;
+	color: #0b1117;
+	font-size: 23px;
+	font-weight: 700;
+}
+
+.section-subtitle {
+	color: #5f7282;
+	font-size: 14px;
+	line-height: 1.5;
+}
+
 .business-details {
-	border: 1px solid #e5e7eb;
-	border-radius: 10px;
-	background: #f9fafb;
 	overflow: hidden;
+	border: 1px solid #cfe8f7;
+	border-radius: 12px;
+	background: #f8fcff;
 }
+
 .business-detail-item {
-	display: flex;
-	align-items: flex-start;
-	justify-content: space-between;
+	display: grid;
+	grid-template-columns: 170px 1fr;
 	gap: 20px;
-	padding: 15px 16px;
-	border-bottom: 1px solid #e5e7eb;
+	padding: 16px 18px;
+	border-bottom: 1px solid #dceef8;
 }
+
 .business-detail-item:last-child {
 	border-bottom: none;
 }
+
 .business-detail-item strong {
-	flex: 0 0 150px;
+	color: #17212b;
 	font-size: 14px;
-	color: #374151;
+	font-weight: 700;
 }
+
 .business-detail-item span {
-	flex: 1;
+	min-width: 0;
+	color: #5f7282;
 	font-size: 14px;
-	line-height: 1.5;
-	color: #4b5563;
-	text-align: right;
+	line-height: 1.55;
 	word-break: break-word;
 }
+
 .business-detail-item a {
-	color: #008f68;
+	color: #46a8df;
 	text-decoration: none;
 }
+
 .business-detail-item a:hover {
+	color: #0b1117;
 	text-decoration: underline;
 }
-.form-group {
-	margin-bottom: 20px;
+.loading-text {
+	padding: 24px;
+	color: #5f7282;
+	text-align: center;
+	font-size: 14px;
 }
+.form-group {
+	margin-bottom: 22px;
+}
+
 .form-group label {
 	display: block;
 	margin-bottom: 8px;
+	color: #17212b;
 	font-size: 14px;
 	font-weight: 700;
-	color: #374151;
 }
+
 .form-group input {
 	width: 100%;
-	height: 48px;
+	height: 49px;
 	padding: 12px 14px;
-	border: 1px solid #d1d5db;
-	border-radius: 8px;
-	background: #f9fafb;
-	color: #374151;
+	border: 1px solid #bcdbea;
+	border-radius: 9px;
+	background: #ffffff;
+	color: #253746;
 	font-size: 15px;
 	outline: none;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
 .form-group input:focus {
-	border-color: #00b67a;
-	box-shadow: 0 0 0 3px rgba(0, 182, 122, 0.12);
+	border-color: #46a8df;
+	box-shadow: 0 0 0 3px rgba(70, 168, 223, 0.16);
 }
+
+.form-group input[readonly] {
+	background: #f5fbff;
+}
+
+.form-group small {
+	display: block;
+	margin-top: 7px;
+	color: #71808c;
+	font-size: 12px;
+	line-height: 1.5;
+}
+
 .claim-information {
-	margin: 22px 0;
+	display: flex;
+	align-items: flex-start;
+	gap: 14px;
+	margin: 24px 0;
 	padding: 18px;
-	border: 1px solid #dbeafe;
-	border-radius: 10px;
-	background: #f8fbff;
+	border: 1px solid #cfe8f7;
+	border-radius: 12px;
+	background: #f5fbff;
 }
+
+.information-icon {
+	width: 34px;
+	height: 34px;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background: #a9defa;
+	color: #0b1117;
+	font-size: 15px;
+	font-weight: 700;
+}
+
+.information-content {
+	min-width: 0;
+}
+
 .claim-information h3 {
-	margin-bottom: 10px;
+	margin-bottom: 7px;
+	color: #0b1117;
 	font-size: 16px;
-	color: #111827;
+	font-weight: 700;
 }
+
 .claim-information p {
-	margin-bottom: 8px;
-	font-size: 14px;
+	margin-bottom: 6px;
+	color: #5f7282;
+	font-size: 13px;
 	line-height: 1.6;
-	color: #6b7280;
 }
+
 .claim-information p:last-child {
 	margin-bottom: 0;
 }
+
 .claim-message {
 	min-height: 24px;
-	margin: 16px 0;
+	margin: 15px 0;
+	color: #253746;
 	font-size: 14px;
 	line-height: 1.6;
 	text-align: center;
 }
+
 .success-message {
-	color: #059669;
+	color: #1f6b48;
 }
+
 .error-message {
-	color: #dc2626;
+	color: #a63c34;
 }
+.claim-message .success-message {
+	display: block;
+	padding: 18px;
+	border: 1px solid #cfe8f7;
+	border-radius: 11px;
+	background: #f5fbff;
+}
+
+.claim-message .success-message strong {
+	display: block;
+	margin-bottom: 6px;
+	color: #0b1117;
+	font-size: 16px;
+}
+
+.claim-message .success-message p {
+	margin: 0;
+	color: #5f7282;
+	font-size: 14px;
+}
+
+/* =========================================================
+   SUBMIT BUTTON
+========================================================= */
 .claim-submit-button {
 	width: 100%;
-	height: 50px;
-	border: none;
-	border-radius: 8px;
-	background: #00b67a;
-	color: #ffffff;
+	min-height: 50px;
+	padding: 12px 18px;
+	border: 1px solid #46a8df;
+	border-radius: 10px;
+	background: #a9defa;
+	color: #0b1117;
 	font-size: 15px;
 	font-weight: 700;
 	cursor: pointer;
-	transition: background 0.2s ease, transform 0.1s ease, opacity 0.2s ease;
+	transition: background 0.2s ease, transform 0.1s ease;
 }
+
 .claim-submit-button:hover {
-	background: #009f6b;
+	background: #46a8df;
+	color: #ffffff;
 }
+
 .claim-submit-button:active {
 	transform: translateY(1px);
 }
+
 .claim-submit-button:disabled {
-	opacity: 0.65;
+	opacity: 0.6;
 	cursor: not-allowed;
 }
+
+/* =========================================================
+   SUCCESS ACTIONS
+========================================================= */
 .claim-success-actions {
 	display: flex;
 	justify-content: center;
@@ -239,156 +357,263 @@ body {
 	gap: 10px;
 	margin-top: 16px;
 }
+
 .dashboard-button, .profile-button {
 	display: inline-block;
 	padding: 11px 18px;
-	border-radius: 7px;
-	text-decoration: none;
+	border-radius: 9px;
 	font-size: 14px;
 	font-weight: 700;
+	text-decoration: none;
 }
+
 .dashboard-button {
-	background: #00b67a;
+	background: #a9defa;
+	color: #0b1117;
+	border: 1px solid #46a8df;
+}
+
+.dashboard-button:hover {
+	background: #46a8df;
 	color: #ffffff;
 }
-.dashboard-button:hover {
-	background: #009f6b;
-}
+
 .profile-button {
 	background: #ffffff;
-	color: #008f68;
-	border: 1px solid #00b67a;
+	color: #153b50;
+	border: 1px solid #46a8df;
 }
+
 .profile-button:hover {
-	background: #e8f8f2;
+	background: #eaf7ff;
 }
+
+/* =========================================================
+   FOOTER LINKS
+========================================================= */
 .claim-footer-links {
 	display: flex;
 	justify-content: center;
 	align-items: center;
 	flex-wrap: wrap;
 	gap: 10px;
-	margin-top: 24px;
+	margin-top: 25px;
 }
+
 .claim-footer-links a {
-	color: #008f68;
+	color: #46a8df;
 	font-size: 14px;
 	font-weight: 600;
 	text-decoration: none;
 }
+
 .claim-footer-links a:hover {
+	color: #0b1117;
 	text-decoration: underline;
 }
 
 .claim-footer-links span {
-	color: #9ca3af;
+	color: #9aabb7;
 }
+
+/* =========================================================
+   CLAIM PROCESS
+========================================================= */
 .claim-process {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 14px;
-	margin-top: 24px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+	margin-top: 22px;
 }
+
 .process-step {
 	display: flex;
 	align-items: flex-start;
-	gap: 12px;
-	padding: 18px;
+	gap: 13px;
+	min-height: 125px;
+	padding: 20px;
+	border: 1px solid #cfe8f7;
+	border-radius: 14px;
 	background: #ffffff;
-	border: 1px solid #e5e7eb;
-	border-radius: 12px;
+	box-shadow: 0 8px 22px rgba(11, 17, 23, 0.05);
 }
+
 .process-number {
+	width: 34px;
+	height: 34px;
 	flex-shrink: 0;
-	width: 32px;
-	height: 32px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	border: 1px solid #46a8df;
 	border-radius: 50%;
-	background: #e8f8f2;
-	color: #008f68;
+	background: #a9defa;
+	color: #0b1117;
 	font-size: 13px;
 	font-weight: 700;
 }
+
+.process-content {
+	min-width: 0;
+}
+
 .process-step strong {
 	display: block;
-	margin-bottom: 5px;
-	font-size: 14px;
-	color: #111827;
+	margin-bottom: 6px;
+	color: #0b1117;
+	font-size: 15px;
+	font-weight: 700;
 }
+
 .process-step p {
+	color: #5f7282;
 	font-size: 13px;
-	line-height: 1.5;
-	color: #6b7280;
+	line-height: 1.55;
 }
+
+/* =========================================================
+   FOOTER
+========================================================= */
 .site-footer {
-	padding: 22px 20px;
-	border-top: 1px solid #e5e7eb;
-	background: #ffffff;
+	width: 100%;
+	margin-top: 25px;
+	background: #0b1117;
+	color: #ffffff;
+}
+
+.footer-content {
+	width: 100%;
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 48px 24px;
+	display: grid;
+	grid-template-columns: 1.7fr repeat(3, 1fr);
+	gap: 30px;
+}
+
+.footer-brand h2 {
+	margin-bottom: 12px;
+	color: #ffffff;
+	font-size: 24px;
+}
+
+.footer-brand h2 span {
+	color: #46a8df;
+}
+
+.footer-brand p {
+	max-width: 350px;
+	color: #b9c8d3;
+	font-size: 13px;
+	line-height: 1.7;
+}
+
+.footer-column {
+	display: flex;
+	flex-direction: column;
+	gap: 9px;
+}
+
+.footer-column h3 {
+	margin-bottom: 5px;
+	color: #ffffff;
+	font-size: 14px;
+}
+
+.footer-column a {
+	color: #b9c8d3;
+	font-size: 13px;
+	text-decoration: none;
+}
+
+.footer-column a:hover {
+	color: #a9defa;
+}
+
+.footer-bottom {
+	border-top: 1px solid #24313d;
+	padding: 18px 24px;
 	text-align: center;
 }
-.site-footer p {
-	font-size: 13px;
-	color: #6b7280;
+
+.footer-bottom p {
+	color: #93a6b4;
+	font-size: 12px;
 }
+
+/* =========================================================
+   RESPONSIVE - 900px
+========================================================= */
+@media ( max-width : 900px) {
+	.footer-content {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+/* =========================================================
+   RESPONSIVE - 768px
+========================================================= */
 @media ( max-width : 768px) {
-	.navbar-container {
+	.navbar-inner {
 		min-height: 65px;
 		padding: 0 16px;
 	}
-	.brand-logo {
+	.logo {
 		font-size: 20px;
 	}
-	.navbar-links {
-		gap: 14px;
+	.nav-links {
+		gap: 15px;
 	}
-	.navbar-links a {
+	.nav-links a {
 		font-size: 13px;
 	}
 	.claim-page {
-		padding: 35px 15px 50px;
+		padding: 38px 15px 60px;
 	}
 	.claim-header h1 {
-		font-size: 30px;
+		font-size: 31px;
 	}
 	.claim-card {
-		padding: 24px 20px;
+		padding: 26px 22px;
 	}
 	.claim-process {
 		grid-template-columns: 1fr;
 	}
 }
 
-@media ( max-width : 520px) {
-	.navbar-container {
+/* =========================================================
+   RESPONSIVE - 560px
+========================================================= */
+@media ( max-width : 560px) {
+	.navbar-inner {
 		flex-direction: column;
 		justify-content: center;
 		gap: 10px;
 		padding: 14px 16px;
 	}
-	.navbar-links {
+	.nav-links {
 		flex-wrap: wrap;
 		justify-content: center;
 	}
 	.claim-page {
-		padding-top: 25px;
+		padding-top: 28px;
 	}
 	.claim-header h1 {
-		font-size: 27px;
+		font-size: 28px;
+	}
+	.claim-header p {
+		font-size: 14px;
 	}
 	.claim-card {
 		padding: 20px 16px;
+		border-radius: 14px;
 	}
 	.business-detail-item {
-		flex-direction: column;
+		grid-template-columns: 1fr;
 		gap: 6px;
 	}
-	.business-detail-item strong {
-		flex: none;
-	}
-	.business-detail-item span {
-		text-align: left;
+	.claim-information {
+		padding: 15px;
 	}
 	.claim-success-actions {
 		flex-direction: column;
@@ -396,5 +621,30 @@ body {
 	.dashboard-button, .profile-button {
 		width: 100%;
 		text-align: center;
+	}
+	.footer-content {
+		grid-template-columns: 1fr;
+		padding: 38px 20px;
+	}
+}
+
+/* =========================================================
+   RESPONSIVE - 400px
+========================================================= */
+@media ( max-width : 400px) {
+	.nav-links {
+		gap: 11px;
+	}
+	.nav-links a {
+		font-size: 12px;
+	}
+	.claim-header h1 {
+		font-size: 25px;
+	}
+	.claim-card {
+		padding: 18px 14px;
+	}
+	.process-step {
+		padding: 16px;
 	}
 }

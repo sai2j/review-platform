@@ -12,15 +12,21 @@ const AUDIT_LOG_API = "/review-platform/audit-logs";
 
 
 // ==============================
+
 // ADMIN DASHBOARD METRICS
+
 // ==============================
 
 function loadDashboardMetrics() {
 
     Promise.all([
+
         fetch(USER_API),
+
         fetch(WEBSITE_API),
+
         fetch(REVIEW_API)
+
     ])
 
         .then(function(responses) {
@@ -28,44 +34,142 @@ function loadDashboardMetrics() {
             responses.forEach(function(response) {
 
                 if (!response.ok) {
+
                     throw new Error("Dashboard API Error");
+
                 }
 
             });
 
             return Promise.all(
+
                 responses.map(function(response) {
+
                     return response.json();
+
                 })
+
             );
 
         })
 
         .then(function(data) {
 
-            const users = data[0];
+            // USER API can return an array or Page content
 
-            const websites = data[1];
+            const users =
 
-            const reviews = data[2];
+                Array.isArray(data[0])
 
-            const pendingReviews = reviews.filter(function(review) {
+                    ? data[0]
 
-                return (review.status || "PENDING")
-                    .toUpperCase() === "PENDING";
+                    : (
 
-            });
+                        data[0] &&
 
-            document.getElementById("totalUsers").textContent =
+                        Array.isArray(data[0].content)
+
+                            ? data[0].content
+
+                            : []
+
+                    );
+
+
+            // WEBSITE API can return an array or Page content
+
+            const websites =
+
+                Array.isArray(data[1])
+
+                    ? data[1]
+
+                    : (
+
+                        data[1] &&
+
+                        Array.isArray(data[1].content)
+
+                            ? data[1].content
+
+                            : []
+
+                    );
+
+
+            // REVIEW API returns a Page
+
+            // so use data.content when required
+
+            const reviews =
+
+                Array.isArray(data[2])
+
+                    ? data[2]
+
+                    : (
+
+                        data[2] &&
+
+                        Array.isArray(data[2].content)
+
+                            ? data[2].content
+
+                            : []
+
+                    );
+
+
+            const pendingReviews =
+
+                reviews.filter(function(review) {
+
+                    return (
+
+                        review.status || "PENDING"
+
+                    )
+
+                        .toUpperCase() ===
+
+                        "PENDING";
+
+                });
+
+
+            document.getElementById(
+
+                "totalUsers"
+
+            ).textContent =
+
                 users.length;
 
-            document.getElementById("totalWebsites").textContent =
+
+            document.getElementById(
+
+                "totalWebsites"
+
+            ).textContent =
+
                 websites.length;
 
-            document.getElementById("totalReviews").textContent =
+
+            document.getElementById(
+
+                "totalReviews"
+
+            ).textContent =
+
                 reviews.length;
 
-            document.getElementById("pendingReviews").textContent =
+
+            document.getElementById(
+
+                "pendingReviews"
+
+            ).textContent =
+
                 pendingReviews.length;
 
         })
@@ -75,31 +179,74 @@ function loadDashboardMetrics() {
             console.error(error);
 
             const totalUsers =
-                document.getElementById("totalUsers");
+
+                document.getElementById(
+
+                    "totalUsers"
+
+                );
+
 
             const totalWebsites =
-                document.getElementById("totalWebsites");
+
+                document.getElementById(
+
+                    "totalWebsites"
+
+                );
+
 
             const totalReviews =
-                document.getElementById("totalReviews");
+
+                document.getElementById(
+
+                    "totalReviews"
+
+                );
+
 
             const pendingReviews =
-                document.getElementById("pendingReviews");
+
+                document.getElementById(
+
+                    "pendingReviews"
+
+                );
+
 
             if (totalUsers) {
-                totalUsers.textContent = "Error";
+
+                totalUsers.textContent =
+
+                    "Error";
+
             }
+
 
             if (totalWebsites) {
-                totalWebsites.textContent = "Error";
+
+                totalWebsites.textContent =
+
+                    "Error";
+
             }
+
 
             if (totalReviews) {
-                totalReviews.textContent = "Error";
+
+                totalReviews.textContent =
+
+                    "Error";
+
             }
 
+
             if (pendingReviews) {
-                pendingReviews.textContent = "Error";
+
+                pendingReviews.textContent =
+
+                    "Error";
+
             }
 
         });
@@ -108,17 +255,29 @@ function loadDashboardMetrics() {
 
 
 // ==============================
+
 // LOAD REVIEW MODERATION QUEUE
+
 // ==============================
 
 function loadModerationQueue() {
 
-    fetch(REVIEW_API + "/pending")
+    fetch(
+
+        REVIEW_API + "/pending"
+
+    )
 
         .then(function(response) {
 
             if (!response.ok) {
-                throw new Error("Pending Review API Error");
+
+                throw new Error(
+
+                    "Pending Review API Error"
+
+                );
+
             }
 
             return response.json();
@@ -127,7 +286,11 @@ function loadModerationQueue() {
 
         .then(function(reviews) {
 
-            displayModerationQueue(reviews);
+            displayModerationQueue(
+
+                reviews
+
+            );
 
         })
 
@@ -136,13 +299,22 @@ function loadModerationQueue() {
             console.error(error);
 
             const moderationList =
-                document.getElementById("moderationList");
+
+                document.getElementById(
+
+                    "moderationList"
+
+                );
+
 
             if (moderationList) {
 
                 moderationList.innerHTML =
+
                     `<p class="error-message">
+
                         Unable to load pending reviews.
+
                     </p>`;
 
             }
@@ -153,27 +325,46 @@ function loadModerationQueue() {
 
 
 // ==============================
+
 // DISPLAY REVIEW MODERATION QUEUE
+
 // ==============================
 
-function displayModerationQueue(reviews) {
+function displayModerationQueue(
+
+    reviews
+
+) {
 
     const moderationList =
-        document.getElementById("moderationList");
+
+        document.getElementById(
+
+            "moderationList"
+
+        );
+
 
     if (!moderationList) {
+
         return;
+
     }
 
+
     moderationList.innerHTML = "";
+
 
     if (reviews.length === 0) {
 
         moderationList.innerHTML =
+
             `<p>No pending reviews.</p>`;
 
         return;
+
     }
+
 
     reviews.forEach(function(review) {
 
@@ -182,48 +373,111 @@ function displayModerationQueue(reviews) {
             <div class="report-card">
 
                 <p>
+
                     <strong>Review ID:</strong>
+
                     ${review.id}
+
                 </p>
 
+
                 <p>
+
                     <strong>User ID:</strong>
+
                     ${review.userId}
+
                 </p>
 
+
                 <p>
+
                     <strong>Website ID:</strong>
+
                     ${review.websiteId}
+
                 </p>
 
+
                 <p>
+
                     <strong>Rating:</strong>
+
                     ${review.rating}
+
                 </p>
 
+
                 <p>
+
                     <strong>Comment:</strong>
-                    ${escapeAdminHtml(review.comment || "")}
+
+                    ${escapeAdminHtml(
+
+                        review.comment || ""
+
+                    )}
+
                 </p>
+
 
                 <p>
+
                     <strong>Status:</strong>
-                    ${escapeAdminHtml(review.status || "PENDING")}
+
+                    ${escapeAdminHtml(
+
+                        review.status ||
+
+                        "PENDING"
+
+                    )}
+
                 </p>
 
+
                 <button
-                    onclick="updateReviewStatus(${review.id}, 'APPROVED')">
+
+                    onclick="updateReviewStatus(
+
+                        ${review.id},
+
+                        'APPROVED'
+
+                    )">
+
                     Approve
+
                 </button>
 
+
                 <button
-                    onclick="updateReviewStatus(${review.id}, 'REJECTED')">
+
+                    onclick="updateReviewStatus(
+
+                        ${review.id},
+
+                        'REJECTED'
+
+                    )">
+
                     Reject
+
                 </button>
 
+
                 <button
-                    onclick="updateReviewStatus(${review.id}, 'HIDDEN')">
+
+                    onclick="updateReviewStatus(
+
+                        ${review.id},
+
+                        'HIDDEN'
+
+                    )">
+
                     Hide
+
                 </button>
 
             </div>
@@ -236,17 +490,29 @@ function displayModerationQueue(reviews) {
 
 
 // ==============================
+
 // LOAD HIDDEN REVIEWS
+
 // ==============================
 
 function loadHiddenReviews() {
 
-    fetch(REVIEW_API)
+    fetch(
+
+        REVIEW_API + "/hidden"
+
+    )
 
         .then(function(response) {
 
             if (!response.ok) {
-                throw new Error("Review API Error");
+
+                throw new Error(
+
+                    "Review API Error"
+
+                );
+
             }
 
             return response.json();
@@ -255,14 +521,28 @@ function loadHiddenReviews() {
 
         .then(function(reviews) {
 
-            const hiddenReviews = reviews.filter(function(review) {
+            const hiddenReviews =
 
-                return (review.status || "")
-                    .toUpperCase() === "HIDDEN";
+                reviews.filter(function(review) {
 
-            });
+                    return (
 
-            displayHiddenReviews(hiddenReviews);
+                        review.status || ""
+
+                    )
+
+                        .toUpperCase() ===
+
+                        "HIDDEN";
+
+                });
+
+
+            displayHiddenReviews(
+
+                hiddenReviews
+
+            );
 
         })
 
@@ -271,13 +551,22 @@ function loadHiddenReviews() {
             console.error(error);
 
             const hiddenReviewList =
-                document.getElementById("hiddenReviewList");
+
+                document.getElementById(
+
+                    "hiddenReviewList"
+
+                );
+
 
             if (hiddenReviewList) {
 
                 hiddenReviewList.innerHTML =
+
                     `<p class="error-message">
+
                         Unable to load hidden reviews.
+
                     </p>`;
 
             }
@@ -288,27 +577,46 @@ function loadHiddenReviews() {
 
 
 // ==============================
+
 // DISPLAY HIDDEN REVIEWS
+
 // ==============================
 
-function displayHiddenReviews(reviews) {
+function displayHiddenReviews(
+
+    reviews
+
+) {
 
     const hiddenReviewList =
-        document.getElementById("hiddenReviewList");
+
+        document.getElementById(
+
+            "hiddenReviewList"
+
+        );
+
 
     if (!hiddenReviewList) {
+
         return;
+
     }
 
+
     hiddenReviewList.innerHTML = "";
+
 
     if (reviews.length === 0) {
 
         hiddenReviewList.innerHTML =
+
             `<p>No hidden reviews.</p>`;
 
         return;
+
     }
+
 
     reviews.forEach(function(review) {
 
@@ -317,38 +625,79 @@ function displayHiddenReviews(reviews) {
             <div class="report-card">
 
                 <p>
+
                     <strong>Review ID:</strong>
+
                     ${review.id}
+
                 </p>
 
+
                 <p>
+
                     <strong>User ID:</strong>
+
                     ${review.userId}
+
                 </p>
 
+
                 <p>
+
                     <strong>Website ID:</strong>
+
                     ${review.websiteId}
+
                 </p>
 
+
                 <p>
+
                     <strong>Rating:</strong>
+
                     ${review.rating}
+
                 </p>
 
+
                 <p>
+
                     <strong>Comment:</strong>
-                    ${escapeAdminHtml(review.comment || "")}
+
+                    ${escapeAdminHtml(
+
+                        review.comment || ""
+
+                    )}
+
                 </p>
 
+
                 <p>
+
                     <strong>Status:</strong>
-                    ${escapeAdminHtml(review.status || "HIDDEN")}
+
+                    ${escapeAdminHtml(
+
+                        review.status ||
+
+                        "HIDDEN"
+
+                    )}
+
                 </p>
+
 
                 <button
-                    onclick="restoreReview(${review.id})">
+
+                    onclick="restoreReview(
+
+                        ${review.id}
+
+                    )">
+
                     Restore
+
                 </button>
 
             </div>
@@ -361,23 +710,44 @@ function displayHiddenReviews(reviews) {
 
 
 // ==============================
+
 // RESTORE REVIEW
+
 // ==============================
 
-function restoreReview(reviewId) {
+function restoreReview(
 
-    if (!confirm("Restore this review?")) {
+    reviewId
+
+) {
+
+    if (!confirm(
+
+        "Restore this review?"
+
+    )) {
+
         return;
+
     }
 
+
     fetch(
+
         REVIEW_API +
+
         "/" +
+
         reviewId +
+
         "/status?status=APPROVED",
+
         {
+
             method: "PUT"
+
         }
+
     )
 
         .then(function(response) {
@@ -385,7 +755,9 @@ function restoreReview(reviewId) {
             if (!response.ok) {
 
                 throw new Error(
+
                     "Review restore failed"
+
                 );
 
             }
@@ -396,7 +768,12 @@ function restoreReview(reviewId) {
 
         .then(function(data) {
 
-            alert("Review restored successfully.");
+            alert(
+
+                "Review restored successfully."
+
+            );
+
 
             loadHiddenReviews();
 
@@ -413,7 +790,9 @@ function restoreReview(reviewId) {
             console.error(error);
 
             alert(
+
                 "Review could not be restored."
+
             );
 
         });
@@ -422,44 +801,80 @@ function restoreReview(reviewId) {
 
 
 // ==============================
+
 // UPDATE REVIEW STATUS
+
 // ==============================
 
-function updateReviewStatus(reviewId, status) {
+function updateReviewStatus(
+
+    reviewId,
+
+    status
+
+) {
 
     let message = "";
 
+
     if (status === "APPROVED") {
 
-        message = "Approve this review?";
+        message =
 
-    } else if (status === "REJECTED") {
-
-        message = "Reject this review?";
-
-    } else if (status === "HIDDEN") {
-
-        message = "Hide this review?";
-
-    } else if (status === "PENDING") {
-
-        message = "Restore this review to pending?";
+            "Approve this review?";
 
     }
+
+    else if (status === "REJECTED") {
+
+        message =
+
+            "Reject this review?";
+
+    }
+
+    else if (status === "HIDDEN") {
+
+        message =
+
+            "Hide this review?";
+
+    }
+
+    else if (status === "PENDING") {
+
+        message =
+
+            "Restore this review to pending?";
+
+    }
+
 
     if (!confirm(message)) {
+
         return;
+
     }
 
+
     fetch(
+
         REVIEW_API +
+
         "/" +
+
         reviewId +
+
         "/status?status=" +
+
         status,
+
         {
+
             method: "PUT"
+
         }
+
     )
 
         .then(function(response) {
@@ -467,7 +882,9 @@ function updateReviewStatus(reviewId, status) {
             if (!response.ok) {
 
                 throw new Error(
+
                     "Review status update failed"
+
                 );
 
             }
@@ -479,8 +896,13 @@ function updateReviewStatus(reviewId, status) {
         .then(function(data) {
 
             alert(
-                "Review status updated to " + status
+
+                "Review status updated to " +
+
+                status
+
             );
+
 
             loadModerationQueue();
 
@@ -497,7 +919,9 @@ function updateReviewStatus(reviewId, status) {
             console.error(error);
 
             alert(
+
                 "Review status could not be updated."
+
             );
 
         });
@@ -506,17 +930,29 @@ function updateReviewStatus(reviewId, status) {
 
 
 // ==============================
+
 // LOAD REPORTS
+
 // ==============================
 
 function loadReports() {
 
-    fetch(REPORT_API)
+    fetch(
+
+        REPORT_API
+
+    )
 
         .then(function(response) {
 
             if (!response.ok) {
-                throw new Error("Report API Error");
+
+                throw new Error(
+
+                    "Report API Error"
+
+                );
+
             }
 
             return response.json();
@@ -525,7 +961,11 @@ function loadReports() {
 
         .then(function(reports) {
 
-            displayReports(reports);
+            displayReports(
+
+                reports
+
+            );
 
         })
 
@@ -533,9 +973,16 @@ function loadReports() {
 
             console.error(error);
 
-            document.getElementById("reportList").innerHTML =
+            document.getElementById(
+
+                "reportList"
+
+            ).innerHTML =
+
                 `<p class="error-message">
+
                     Unable to load reports.
+
                 </p>`;
 
         });
@@ -544,73 +991,144 @@ function loadReports() {
 
 
 // ==============================
+
 // DISPLAY REPORTS
+
 // ==============================
 
-function displayReports(reports) {
+function displayReports(
+
+    reports
+
+) {
 
     const reportList =
-        document.getElementById("reportList");
+
+        document.getElementById(
+
+            "reportList"
+
+        );
+
 
     reportList.innerHTML = "";
+
 
     if (reports.length === 0) {
 
         reportList.innerHTML =
+
             `<p>No reported reviews.</p>`;
 
         return;
+
     }
+
 
     reports.forEach(function(report) {
 
-        const status = report.status || "PENDING";
+        const status =
+
+            report.status ||
+
+            "PENDING";
+
 
         reportList.innerHTML += `
 
             <div class="report-card">
 
                 <p>
+
                     <strong>Report ID:</strong>
+
                     ${report.id}
+
                 </p>
 
+
                 <p>
+
                     <strong>Review ID:</strong>
+
                     ${report.reviewId}
+
                 </p>
 
+
                 <p>
+
                     <strong>User ID:</strong>
+
                     ${report.userId}
+
                 </p>
 
+
                 <p>
+
                     <strong>Reason:</strong>
-                    ${escapeAdminHtml(report.reason || "")}
+
+                    ${escapeAdminHtml(
+
+                        report.reason || ""
+
+                    )}
+
                 </p>
+
 
                 <p>
+
                     <strong>Status:</strong>
-                    ${escapeAdminHtml(status)}
+
+                    ${escapeAdminHtml(
+
+                        status
+
+                    )}
+
                 </p>
 
-                <button
-                    onclick="markReportReviewed(${report.id})">
-                    Mark Reviewed
-                </button>
 
                 <button
-                    onclick="rejectReport(${report.id})">
-                    Reject Report
-                </button>
 
-                <button
-                    onclick="deleteReportedReview(
-                        ${report.reviewId},
+                    onclick="markReportReviewed(
+
                         ${report.id}
+
                     )">
+
+                    Mark Reviewed
+
+                </button>
+
+
+                <button
+
+                    onclick="rejectReport(
+
+                        ${report.id}
+
+                    )">
+
+                    Reject Report
+
+                </button>
+
+
+                <button
+
+                    onclick="deleteReportedReview(
+
+                        ${report.reviewId},
+
+                        ${report.id}
+
+                    )">
+
                     Delete Review
+
                 </button>
 
             </div>
@@ -623,23 +1141,44 @@ function displayReports(reports) {
 
 
 // ==============================
+
 // MARK REPORT AS REVIEWED
+
 // ==============================
 
-function markReportReviewed(reportId) {
+function markReportReviewed(
 
-    if (!confirm("Mark this report as reviewed?")) {
+    reportId
+
+) {
+
+    if (!confirm(
+
+        "Mark this report as reviewed?"
+
+    )) {
+
         return;
+
     }
 
+
     fetch(
+
         REPORT_API +
+
         "/" +
+
         reportId +
+
         "/status?status=REVIEWED",
+
         {
+
             method: "PUT"
+
         }
+
     )
 
         .then(function(response) {
@@ -647,7 +1186,9 @@ function markReportReviewed(reportId) {
             if (!response.ok) {
 
                 throw new Error(
+
                     "Report status update failed"
+
                 );
 
             }
@@ -658,7 +1199,12 @@ function markReportReviewed(reportId) {
 
         .then(function(data) {
 
-            alert("Report marked as reviewed.");
+            alert(
+
+                "Report marked as reviewed."
+
+            );
+
 
             loadReports();
 
@@ -669,7 +1215,9 @@ function markReportReviewed(reportId) {
             console.error(error);
 
             alert(
+
                 "Report status could not be updated."
+
             );
 
         });
@@ -678,23 +1226,44 @@ function markReportReviewed(reportId) {
 
 
 // ==============================
+
 // REJECT REPORT
+
 // ==============================
 
-function rejectReport(reportId) {
+function rejectReport(
 
-    if (!confirm("Reject this report?")) {
+    reportId
+
+) {
+
+    if (!confirm(
+
+        "Reject this report?"
+
+    )) {
+
         return;
+
     }
 
+
     fetch(
+
         REPORT_API +
+
         "/" +
+
         reportId +
+
         "/status?status=REJECTED",
+
         {
+
             method: "PUT"
+
         }
+
     )
 
         .then(function(response) {
@@ -702,7 +1271,9 @@ function rejectReport(reportId) {
             if (!response.ok) {
 
                 throw new Error(
+
                     "Report rejection failed"
+
                 );
 
             }
@@ -713,7 +1284,12 @@ function rejectReport(reportId) {
 
         .then(function(data) {
 
-            alert("Report rejected.");
+            alert(
+
+                "Report rejected."
+
+            );
+
 
             loadReports();
 
@@ -724,7 +1300,9 @@ function rejectReport(reportId) {
             console.error(error);
 
             alert(
+
                 "Report could not be rejected."
+
             );
 
         });
@@ -733,20 +1311,44 @@ function rejectReport(reportId) {
 
 
 // ==============================
+
 // DELETE REPORTED REVIEW
+
 // ==============================
 
-function deleteReportedReview(reviewId, reportId) {
+function deleteReportedReview(
 
-    if (!confirm("Delete this reported review?")) {
+    reviewId,
+
+    reportId
+
+) {
+
+    if (!confirm(
+
+        "Delete this reported review?"
+
+    )) {
+
         return;
+
     }
 
+
     fetch(
-        REPORT_API + "/" + reportId,
+
+        REPORT_API +
+
+        "/" +
+
+        reportId,
+
         {
+
             method: "DELETE"
+
         }
+
     )
 
         .then(function(response) {
@@ -754,16 +1356,28 @@ function deleteReportedReview(reviewId, reportId) {
             if (!response.ok) {
 
                 throw new Error(
+
                     "Report delete failed"
+
                 );
 
             }
+
 
             return fetch(
-                REVIEW_API + "/" + reviewId,
+
+                REVIEW_API +
+
+                "/" +
+
+                reviewId,
+
                 {
+
                     method: "DELETE"
+
                 }
+
             );
 
         })
@@ -773,14 +1387,20 @@ function deleteReportedReview(reviewId, reportId) {
             if (!response.ok) {
 
                 throw new Error(
+
                     "Review delete failed"
+
                 );
 
             }
 
+
             alert(
+
                 "Review deleted successfully!"
+
             );
+
 
             loadReports();
 
@@ -797,7 +1417,9 @@ function deleteReportedReview(reviewId, reportId) {
             console.error(error);
 
             alert(
+
                 "Review could not be deleted."
+
             );
 
         });
@@ -806,19 +1428,27 @@ function deleteReportedReview(reviewId, reportId) {
 
 
 // ==============================
+
 // LOAD BUSINESS CLAIMS
+
 // ==============================
 
 function loadBusinessClaims() {
 
-    fetch(CLAIM_API)
+    fetch(
+
+        CLAIM_API
+
+    )
 
         .then(function(response) {
 
             if (!response.ok) {
 
                 throw new Error(
+
                     "Business Claim API Error"
+
                 );
 
             }
@@ -829,7 +1459,11 @@ function loadBusinessClaims() {
 
         .then(function(claims) {
 
-            displayBusinessClaims(claims);
+            displayBusinessClaims(
+
+                claims
+
+            );
 
         })
 
@@ -837,9 +1471,16 @@ function loadBusinessClaims() {
 
             console.error(error);
 
-            document.getElementById("claimList").innerHTML =
+            document.getElementById(
+
+                "claimList"
+
+            ).innerHTML =
+
                 `<p class="error-message">
+
                     Unable to load business claims.
+
                 </p>`;
 
         });
@@ -848,23 +1489,39 @@ function loadBusinessClaims() {
 
 
 // ==============================
+
 // DISPLAY BUSINESS CLAIMS
+
 // ==============================
 
-function displayBusinessClaims(claims) {
+function displayBusinessClaims(
+
+    claims
+
+) {
 
     const claimList =
-        document.getElementById("claimList");
+
+        document.getElementById(
+
+            "claimList"
+
+        );
+
 
     claimList.innerHTML = "";
+
 
     if (claims.length === 0) {
 
         claimList.innerHTML =
+
             `<p>No business claims found.</p>`;
 
         return;
+
     }
+
 
     claims.forEach(function(claim) {
 
@@ -873,40 +1530,81 @@ function displayBusinessClaims(claims) {
             <div class="claim-card">
 
                 <p>
+
                     <strong>Claim ID:</strong>
+
                     ${claim.id}
+
                 </p>
 
+
                 <p>
+
                     <strong>Business ID:</strong>
+
                     ${claim.businessId}
+
                 </p>
 
+
                 <p>
+
                     <strong>User ID:</strong>
+
                     ${claim.userId}
+
                 </p>
+
 
                 <p>
+
                     <strong>Status:</strong>
+
                     ${escapeAdminHtml(
+
                         claim.status || ""
+
                     )}
+
                 </p>
 
+
                 <button
-                    onclick="approveClaim(${claim.id})">
+
+                    onclick="approveClaim(
+
+                        ${claim.id}
+
+                    )">
+
                     Approve
+
                 </button>
 
+
                 <button
-                    onclick="rejectClaim(${claim.id})">
+
+                    onclick="rejectClaim(
+
+                        ${claim.id}
+
+                    )">
+
                     Reject
+
                 </button>
 
+
                 <button
-                    onclick="deleteBusinessClaim(${claim.id})">
+
+                    onclick="deleteBusinessClaim(
+
+                        ${claim.id}
+
+                    )">
+
                     Delete Claim
+
                 </button>
 
             </div>
@@ -919,23 +1617,44 @@ function displayBusinessClaims(claims) {
 
 
 // ==============================
+
 // APPROVE BUSINESS CLAIM
+
 // ==============================
 
-function approveClaim(claimId) {
+function approveClaim(
 
-    if (!confirm("Approve this business claim?")) {
+    claimId
+
+) {
+
+    if (!confirm(
+
+        "Approve this business claim?"
+
+    )) {
+
         return;
+
     }
 
+
     fetch(
+
         CLAIM_API +
+
         "/" +
+
         claimId +
+
         "/status?status=APPROVED",
+
         {
+
             method: "PUT"
+
         }
+
     )
 
         .then(function(response) {
@@ -943,7 +1662,9 @@ function approveClaim(claimId) {
             if (!response.ok) {
 
                 throw new Error(
+
                     "Claim approval failed"
+
                 );
 
             }
@@ -955,8 +1676,11 @@ function approveClaim(claimId) {
         .then(function(data) {
 
             alert(
+
                 "Business claim approved successfully!"
+
             );
+
 
             loadBusinessClaims();
 
@@ -967,7 +1691,9 @@ function approveClaim(claimId) {
             console.error(error);
 
             alert(
+
                 "Business claim could not be approved."
+
             );
 
         });
@@ -976,23 +1702,44 @@ function approveClaim(claimId) {
 
 
 // ==============================
+
 // REJECT BUSINESS CLAIM
+
 // ==============================
 
-function rejectClaim(claimId) {
+function rejectClaim(
 
-    if (!confirm("Reject this business claim?")) {
+    claimId
+
+) {
+
+    if (!confirm(
+
+        "Reject this business claim?"
+
+    )) {
+
         return;
+
     }
 
+
     fetch(
+
         CLAIM_API +
+
         "/" +
+
         claimId +
+
         "/status?status=REJECTED",
+
         {
+
             method: "PUT"
+
         }
+
     )
 
         .then(function(response) {
@@ -1000,7 +1747,9 @@ function rejectClaim(claimId) {
             if (!response.ok) {
 
                 throw new Error(
+
                     "Claim rejection failed"
+
                 );
 
             }
@@ -1011,7 +1760,12 @@ function rejectClaim(claimId) {
 
         .then(function(data) {
 
-            alert("Business claim rejected!");
+            alert(
+
+                "Business claim rejected!"
+
+            );
+
 
             loadBusinessClaims();
 
@@ -1022,7 +1776,9 @@ function rejectClaim(claimId) {
             console.error(error);
 
             alert(
+
                 "Business claim could not be rejected."
+
             );
 
         });
@@ -1031,20 +1787,42 @@ function rejectClaim(claimId) {
 
 
 // ==============================
+
 // DELETE BUSINESS CLAIM
+
 // ==============================
 
-function deleteBusinessClaim(claimId) {
+function deleteBusinessClaim(
 
-    if (!confirm("Delete this business claim?")) {
+    claimId
+
+) {
+
+    if (!confirm(
+
+        "Delete this business claim?"
+
+    )) {
+
         return;
+
     }
 
+
     fetch(
-        CLAIM_API + "/" + claimId,
+
+        CLAIM_API +
+
+        "/" +
+
+        claimId,
+
         {
+
             method: "DELETE"
+
         }
+
     )
 
         .then(function(response) {
@@ -1052,14 +1830,20 @@ function deleteBusinessClaim(claimId) {
             if (!response.ok) {
 
                 throw new Error(
+
                     "Claim delete failed"
+
                 );
 
             }
 
+
             alert(
+
                 "Business claim deleted successfully!"
+
             );
+
 
             loadBusinessClaims();
 
@@ -1070,7 +1854,9 @@ function deleteBusinessClaim(claimId) {
             console.error(error);
 
             alert(
+
                 "Business claim could not be deleted."
+
             );
 
         });
@@ -1079,17 +1865,29 @@ function deleteBusinessClaim(claimId) {
 
 
 // ==============================
+
 // LOAD USERS
+
 // ==============================
 
 function loadUsers() {
 
-    fetch(USER_API)
+    fetch(
+
+        USER_API
+
+    )
 
         .then(function(response) {
 
             if (!response.ok) {
-                throw new Error("User API Error");
+
+                throw new Error(
+
+                    "User API Error"
+
+                );
+
             }
 
             return response.json();
@@ -1098,7 +1896,11 @@ function loadUsers() {
 
         .then(function(users) {
 
-            displayUsers(users);
+            displayUsers(
+
+                users
+
+            );
 
         })
 
@@ -1107,13 +1909,22 @@ function loadUsers() {
             console.error(error);
 
             const userList =
-                document.getElementById("userList");
+
+                document.getElementById(
+
+                    "userList"
+
+                );
+
 
             if (userList) {
 
                 userList.innerHTML =
+
                     `<p class="error-message">
+
                         Unable to load users.
+
                     </p>`;
 
             }
@@ -1124,27 +1935,46 @@ function loadUsers() {
 
 
 // ==============================
+
 // DISPLAY USERS
+
 // ==============================
 
-function displayUsers(users) {
+function displayUsers(
+
+    users
+
+) {
 
     const userList =
-        document.getElementById("userList");
+
+        document.getElementById(
+
+            "userList"
+
+        );
+
 
     if (!userList) {
+
         return;
+
     }
 
+
     userList.innerHTML = "";
+
 
     if (users.length === 0) {
 
         userList.innerHTML =
+
             `<p>No users found.</p>`;
 
         return;
+
     }
+
 
     users.forEach(function(user) {
 
@@ -1153,34 +1983,63 @@ function displayUsers(users) {
             <div class="user-card">
 
                 <p>
+
                     <strong>User ID:</strong>
+
                     ${user.id}
+
                 </p>
 
+
                 <p>
+
                     <strong>Name:</strong>
+
                     ${escapeAdminHtml(
+
                         user.name || ""
+
                     )}
+
                 </p>
 
+
                 <p>
+
                     <strong>Email:</strong>
+
                     ${escapeAdminHtml(
+
                         user.email || ""
+
                     )}
+
                 </p>
 
+
                 <p>
+
                     <strong>Role:</strong>
+
                     ${escapeAdminHtml(
+
                         user.role || "USER"
+
                     )}
+
                 </p>
+
 
                 <button
-                    onclick="deleteUser(${user.id})">
+
+                    onclick="deleteUser(
+
+                        ${user.id}
+
+                    )">
+
                     Delete User
+
                 </button>
 
             </div>
@@ -1193,20 +2052,42 @@ function displayUsers(users) {
 
 
 // ==============================
+
 // DELETE USER
+
 // ==============================
 
-function deleteUser(userId) {
+function deleteUser(
 
-    if (!confirm("Delete this user?")) {
+    userId
+
+) {
+
+    if (!confirm(
+
+        "Delete this user?"
+
+    )) {
+
         return;
+
     }
 
+
     fetch(
-        USER_API + "/" + userId,
+
+        USER_API +
+
+        "/" +
+
+        userId,
+
         {
+
             method: "DELETE"
+
         }
+
     )
 
         .then(function(response) {
@@ -1214,7 +2095,9 @@ function deleteUser(userId) {
             if (!response.ok) {
 
                 throw new Error(
+
                     "User delete failed"
+
                 );
 
             }
@@ -1225,7 +2108,12 @@ function deleteUser(userId) {
 
         .then(function(data) {
 
-            alert("User deleted successfully!");
+            alert(
+
+                "User deleted successfully!"
+
+            );
+
 
             loadUsers();
 
@@ -1238,7 +2126,9 @@ function deleteUser(userId) {
             console.error(error);
 
             alert(
+
                 "User could not be deleted."
+
             );
 
         });
@@ -1247,40 +2137,97 @@ function deleteUser(userId) {
 
 
 // ==============================
+
 // ESCAPE ADMIN HTML
+
 // ==============================
 
-function escapeAdminHtml(value) {
+function escapeAdminHtml(
 
-    if (value === null || value === undefined) {
+    value
+
+) {
+
+    if (
+
+        value === null ||
+
+        value === undefined
+
+    ) {
+
         return "";
+
     }
+
 
     return String(value)
 
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
+        .replace(
+
+            /&/g,
+
+            "&amp;"
+
+        )
+
+        .replace(
+
+            /</g,
+
+            "&lt;"
+
+        )
+
+        .replace(
+
+            />/g,
+
+            "&gt;"
+
+        )
+
+        .replace(
+
+            /"/g,
+
+            "&quot;"
+
+        )
+
+        .replace(
+
+            /'/g,
+
+            "&#039;"
+
+        );
 
 }
 
 
 // ==============================
+
 // LOAD WEBSITES
+
 // ==============================
 
 function loadWebsites() {
 
-    fetch(WEBSITE_API)
+    fetch(
+
+        WEBSITE_API
+
+    )
 
         .then(function(response) {
 
             if (!response.ok) {
 
                 throw new Error(
+
                     "Website API Error"
+
                 );
 
             }
@@ -1291,9 +2238,18 @@ function loadWebsites() {
 
         .then(function(websites) {
 
-            displayWebsites(websites);
+            displayWebsites(
 
-            loadSeoWebsiteOptions(websites);
+                websites
+
+            );
+
+
+            loadSeoWebsiteOptions(
+
+                websites
+
+            );
 
         })
 
@@ -1302,13 +2258,22 @@ function loadWebsites() {
             console.error(error);
 
             const websiteList =
-                document.getElementById("websiteList");
+
+                document.getElementById(
+
+                    "websiteList"
+
+                );
+
 
             if (websiteList) {
 
                 websiteList.innerHTML =
+
                     `<p class="error-message">
+
                         Unable to load websites.
+
                     </p>`;
 
             }
@@ -1319,27 +2284,46 @@ function loadWebsites() {
 
 
 // ==============================
+
 // DISPLAY WEBSITES
+
 // ==============================
 
-function displayWebsites(websites) {
+function displayWebsites(
+
+    websites
+
+) {
 
     const websiteList =
-        document.getElementById("websiteList");
+
+        document.getElementById(
+
+            "websiteList"
+
+        );
+
 
     if (!websiteList) {
+
         return;
+
     }
 
+
     websiteList.innerHTML = "";
+
 
     if (websites.length === 0) {
 
         websiteList.innerHTML =
+
             `<p>No websites found.</p>`;
 
         return;
+
     }
+
 
     websites.forEach(function(website) {
 
@@ -1348,34 +2332,63 @@ function displayWebsites(websites) {
             <div class="website-card">
 
                 <p>
+
                     <strong>Website ID:</strong>
+
                     ${website.id}
+
                 </p>
 
+
                 <p>
+
                     <strong>Name:</strong>
+
                     ${escapeAdminHtml(
+
                         website.name || ""
+
                     )}
+
                 </p>
 
+
                 <p>
+
                     <strong>URL:</strong>
+
                     ${escapeAdminHtml(
+
                         website.url || ""
+
                     )}
+
                 </p>
 
+
                 <p>
+
                     <strong>Description:</strong>
+
                     ${escapeAdminHtml(
+
                         website.description || ""
+
                     )}
+
                 </p>
+
 
                 <button
-                    onclick="deleteWebsite(${website.id})">
+
+                    onclick="deleteWebsite(
+
+                        ${website.id}
+
+                    )">
+
                     Delete Website
+
                 </button>
 
             </div>
@@ -1388,20 +2401,42 @@ function displayWebsites(websites) {
 
 
 // ==============================
+
 // DELETE WEBSITE
+
 // ==============================
 
-function deleteWebsite(websiteId) {
+function deleteWebsite(
 
-    if (!confirm("Delete this website?")) {
+    websiteId
+
+) {
+
+    if (!confirm(
+
+        "Delete this website?"
+
+    )) {
+
         return;
+
     }
 
+
     fetch(
-        WEBSITE_API + "/" + websiteId,
+
+        WEBSITE_API +
+
+        "/" +
+
+        websiteId,
+
         {
+
             method: "DELETE"
+
         }
+
     )
 
         .then(function(response) {
@@ -1409,7 +2444,9 @@ function deleteWebsite(websiteId) {
             if (!response.ok) {
 
                 throw new Error(
+
                     "Website delete failed"
+
                 );
 
             }
@@ -1421,8 +2458,11 @@ function deleteWebsite(websiteId) {
         .then(function(data) {
 
             alert(
+
                 "Website deleted successfully!"
+
             );
+
 
             loadWebsites();
 
@@ -1435,7 +2475,9 @@ function deleteWebsite(websiteId) {
             console.error(error);
 
             alert(
+
                 "Website could not be deleted."
+
             );
 
         });
@@ -1444,43 +2486,91 @@ function deleteWebsite(websiteId) {
 
 
 // ==============================
+
 // SEO WEBSITE OPTIONS
+
 // ==============================
 
-function loadSeoWebsiteOptions(websites) {
+function loadSeoWebsiteOptions(
+
+    websites
+
+) {
 
     const seoWebsite =
-        document.getElementById("seoWebsite");
+
+        document.getElementById(
+
+            "seoWebsite"
+
+        );
+
 
     if (!seoWebsite) {
+
         return;
+
     }
 
+
     seoWebsite.innerHTML =
+
         `<option value="">
+
             Select a website
+
         </option>`;
+
 
     websites.forEach(function(website) {
 
         const option =
-            document.createElement("option");
 
-        option.value = website.id;
+            document.createElement(
+
+                "option"
+
+            );
+
+
+        option.value =
+
+            website.id;
+
 
         option.textContent =
-            website.name || website.url;
+
+            website.name ||
+
+            website.url;
+
 
         option.dataset.seoTitle =
-            website.seoTitle || "";
+
+            website.seoTitle ||
+
+            "";
+
 
         option.dataset.seoDescription =
-            website.seoDescription || "";
+
+            website.seoDescription ||
+
+            "";
+
 
         option.dataset.canonicalUrl =
-            website.canonicalUrl || "";
 
-        seoWebsite.appendChild(option);
+            website.canonicalUrl ||
+
+            "";
+
+
+        seoWebsite.appendChild(
+
+            option
+
+        );
 
     });
 
@@ -1488,31 +2578,72 @@ function loadSeoWebsiteOptions(websites) {
 
 
 // ==============================
+
 // LOAD SELECTED SEO DATA
+
 // ==============================
 
 function loadSelectedSeoData() {
 
     const seoWebsite =
-        document.getElementById("seoWebsite");
+
+        document.getElementById(
+
+            "seoWebsite"
+
+        );
+
 
     if (!seoWebsite) {
+
         return;
+
     }
 
+
     const selectedOption =
-        seoWebsite.options[seoWebsite.selectedIndex];
+
+        seoWebsite.options[
+
+            seoWebsite.selectedIndex
+
+        ];
+
 
     const seoTitle =
-        document.getElementById("seoTitle");
+
+        document.getElementById(
+
+            "seoTitle"
+
+        );
+
 
     const seoDescription =
-        document.getElementById("seoDescription");
+
+        document.getElementById(
+
+            "seoDescription"
+
+        );
+
 
     const canonicalUrl =
-        document.getElementById("canonicalUrl");
 
-    if (!selectedOption || !selectedOption.value) {
+        document.getElementById(
+
+            "canonicalUrl"
+
+        );
+
+
+    if (
+
+        !selectedOption ||
+
+        !selectedOption.value
+
+    ) {
 
         seoTitle.value = "";
 
@@ -1521,84 +2652,182 @@ function loadSelectedSeoData() {
         canonicalUrl.value = "";
 
         return;
+
     }
 
+
     seoTitle.value =
-        selectedOption.dataset.seoTitle || "";
+
+        selectedOption.dataset.seoTitle ||
+
+        "";
+
 
     seoDescription.value =
-        selectedOption.dataset.seoDescription || "";
+
+        selectedOption.dataset.seoDescription ||
+
+        "";
+
 
     canonicalUrl.value =
-        selectedOption.dataset.canonicalUrl || "";
+
+        selectedOption.dataset.canonicalUrl ||
+
+        "";
 
 }
 
 
 // ==============================
+
 // UPDATE SEO SETTINGS
+
 // ==============================
 
 function updateSeo() {
 
     const seoWebsite =
-        document.getElementById("seoWebsite");
+
+        document.getElementById(
+
+            "seoWebsite"
+
+        );
+
 
     const seoTitle =
-        document.getElementById("seoTitle").value;
+
+        document.getElementById(
+
+            "seoTitle"
+
+        ).value;
+
 
     const seoDescription =
-        document.getElementById("seoDescription").value;
+
+        document.getElementById(
+
+            "seoDescription"
+
+        ).value;
+
 
     const canonicalUrl =
-        document.getElementById("canonicalUrl").value;
+
+        document.getElementById(
+
+            "canonicalUrl"
+
+        ).value;
+
 
     const seoMessage =
-        document.getElementById("seoMessage");
+
+        document.getElementById(
+
+            "seoMessage"
+
+        );
+
 
     if (!seoWebsite.value) {
 
         seoMessage.textContent =
+
             "Please select a website.";
 
+
         seoMessage.className =
+
             "message error-message";
 
+
         return;
+
     }
+
 
     const websiteId =
+
         seoWebsite.value;
 
-    const params = new URLSearchParams();
 
-    if (seoTitle.trim() !== "") {
-        params.append("seoTitle", seoTitle);
+    const params =
+
+        new URLSearchParams();
+
+
+    if (
+
+        seoTitle.trim() !== ""
+
+    ) {
+
+        params.append(
+
+            "seoTitle",
+
+            seoTitle
+
+        );
+
     }
 
-    if (seoDescription.trim() !== "") {
+
+    if (
+
+        seoDescription.trim() !== ""
+
+    ) {
+
         params.append(
+
             "seoDescription",
+
             seoDescription
+
         );
+
     }
 
-    if (canonicalUrl.trim() !== "") {
+
+    if (
+
+        canonicalUrl.trim() !== ""
+
+    ) {
+
         params.append(
+
             "canonicalUrl",
+
             canonicalUrl
+
         );
+
     }
+
 
     fetch(
+
         WEBSITE_API +
+
         "/" +
+
         websiteId +
+
         "/seo?" +
+
         params.toString(),
+
         {
+
             method: "PUT"
+
         }
+
     )
 
         .then(function(response) {
@@ -1606,7 +2835,9 @@ function updateSeo() {
             if (!response.ok) {
 
                 throw new Error(
+
                     "SEO update failed"
+
                 );
 
             }
@@ -1618,24 +2849,43 @@ function updateSeo() {
         .then(function(website) {
 
             seoMessage.textContent =
+
                 "SEO settings updated successfully.";
 
+
             seoMessage.className =
+
                 "message success-message";
 
+
             const selectedOption =
+
                 seoWebsite.options[
+
                     seoWebsite.selectedIndex
+
                 ];
 
+
             selectedOption.dataset.seoTitle =
-                website.seoTitle || "";
+
+                website.seoTitle ||
+
+                "";
+
 
             selectedOption.dataset.seoDescription =
-                website.seoDescription || "";
+
+                website.seoDescription ||
+
+                "";
+
 
             selectedOption.dataset.canonicalUrl =
-                website.canonicalUrl || "";
+
+                website.canonicalUrl ||
+
+                "";
 
         })
 
@@ -1643,10 +2893,14 @@ function updateSeo() {
 
             console.error(error);
 
+
             seoMessage.textContent =
+
                 "SEO settings could not be updated.";
 
+
             seoMessage.className =
+
                 "message error-message";
 
         });
@@ -1655,19 +2909,27 @@ function updateSeo() {
 
 
 // ==============================
+
 // LOAD AUDIT LOGS
+
 // ==============================
 
 function loadAuditLogs() {
 
-    fetch(AUDIT_LOG_API)
+    fetch(
+
+        AUDIT_LOG_API
+
+    )
 
         .then(function(response) {
 
             if (!response.ok) {
 
                 throw new Error(
+
                     "Audit Log API Error"
+
                 );
 
             }
@@ -1678,7 +2940,11 @@ function loadAuditLogs() {
 
         .then(function(logs) {
 
-            displayAuditLogs(logs);
+            displayAuditLogs(
+
+                logs
+
+            );
 
         })
 
@@ -1687,13 +2953,22 @@ function loadAuditLogs() {
             console.error(error);
 
             const auditLogList =
-                document.getElementById("auditLogList");
+
+                document.getElementById(
+
+                    "auditLogList"
+
+                );
+
 
             if (auditLogList) {
 
                 auditLogList.innerHTML =
+
                     `<p class="error-message">
+
                         Unable to load audit logs.
+
                     </p>`;
 
             }
@@ -1704,27 +2979,46 @@ function loadAuditLogs() {
 
 
 // ==============================
+
 // DISPLAY AUDIT LOGS
+
 // ==============================
 
-function displayAuditLogs(logs) {
+function displayAuditLogs(
+
+    logs
+
+) {
 
     const auditLogList =
-        document.getElementById("auditLogList");
+
+        document.getElementById(
+
+            "auditLogList"
+
+        );
+
 
     if (!auditLogList) {
+
         return;
+
     }
 
+
     auditLogList.innerHTML = "";
+
 
     if (logs.length === 0) {
 
         auditLogList.innerHTML =
+
             `<p>No audit logs found.</p>`;
 
         return;
+
     }
+
 
     logs.forEach(function(log) {
 
@@ -1733,38 +3027,81 @@ function displayAuditLogs(logs) {
             <div class="report-card">
 
                 <p>
+
                     <strong>Log ID:</strong>
+
                     ${log.id}
+
                 </p>
 
+
                 <p>
+
                     <strong>Action:</strong>
-                    ${escapeAdminHtml(log.action || "")}
+
+                    ${escapeAdminHtml(
+
+                        log.action || ""
+
+                    )}
+
                 </p>
 
+
                 <p>
+
                     <strong>Entity Type:</strong>
-                    ${escapeAdminHtml(log.entityType || "")}
+
+                    ${escapeAdminHtml(
+
+                        log.entityType || ""
+
+                    )}
+
                 </p>
 
+
                 <p>
+
                     <strong>Entity ID:</strong>
+
                     ${log.entityId}
+
                 </p>
 
+
                 <p>
+
                     <strong>Performed By:</strong>
+
                     ${log.performedBy}
+
                 </p>
 
+
                 <p>
+
                     <strong>Details:</strong>
-                    ${escapeAdminHtml(log.details || "")}
+
+                    ${escapeAdminHtml(
+
+                        log.details || ""
+
+                    )}
+
                 </p>
 
+
                 <p>
+
                     <strong>Date & Time:</strong>
-                    ${escapeAdminHtml(log.createdAt || "")}
+
+                    ${escapeAdminHtml(
+
+                        log.createdAt || ""
+
+                    )}
+
                 </p>
 
             </div>
@@ -1777,11 +3114,15 @@ function displayAuditLogs(logs) {
 
 
 // ==============================
+
 // PAGE LOAD
+
 // ==============================
 
 document.addEventListener(
+
     "DOMContentLoaded",
+
     function() {
 
         loadDashboardMetrics();
@@ -1800,17 +3141,28 @@ document.addEventListener(
 
         loadAuditLogs();
 
+
         const seoWebsite =
-            document.getElementById("seoWebsite");
+
+            document.getElementById(
+
+                "seoWebsite"
+
+            );
+
 
         if (seoWebsite) {
 
             seoWebsite.addEventListener(
+
                 "change",
+
                 loadSelectedSeoData
+
             );
 
         }
 
     }
+
 );

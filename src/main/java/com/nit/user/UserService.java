@@ -26,20 +26,47 @@ public class UserService {
 	}
 
 	public User registerUser(String email, String password) {
-		if (userRepository.existsByEmail(email)) {
+
+		String normalizedEmail = email == null
+				? ""
+				: email.trim().toLowerCase();
+
+		if (normalizedEmail.isBlank()) {
+			throw new RuntimeException("Email is required");
+		}
+
+		if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
 			throw new RuntimeException("Email already registered");
 		}
+
 		User user = new User();
-		user.setEmail(email);
+
+		user.setEmail(normalizedEmail);
 		user.setPassword(passwordEncoder.encode(password));
 		user.setRole("USER");
+		user.setStatus("ACTIVE");
+
 		return userRepository.save(user);
 	}
 
 	public User saveUser(User user) {
-		if (user.getPassword() != null) {
-			user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+		if (user.getEmail() != null) {
+			user.setEmail(
+					user.getEmail()
+							.trim()
+							.toLowerCase()
+			);
 		}
+
+		if (user.getPassword() != null) {
+			user.setPassword(
+					passwordEncoder.encode(
+							user.getPassword()
+					)
+			);
+		}
+
 		return userRepository.save(user);
 	}
 
@@ -52,7 +79,14 @@ public class UserService {
 	}
 
 	public User getUserByEmail(String email) {
-		return userRepository.findByEmail(email);
+
+		String normalizedEmail = email == null
+				? ""
+				: email.trim().toLowerCase();
+
+		return userRepository.findByEmailIgnoreCase(
+				normalizedEmail
+		);
 	}
 
 	public boolean isAdmin(Long userId) {
@@ -64,15 +98,23 @@ public class UserService {
 	}
 
 	public void deleteOwnAccount() {
-		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-		if (authentication == null || !authentication.isAuthenticated()) {
-			throw new AccessDeniedException("You must be logged in");
+		Authentication authentication =
+				SecurityContextHolder
+						.getContext()
+						.getAuthentication();
+
+		if (authentication == null
+				|| !authentication.isAuthenticated()) {
+
+			throw new AccessDeniedException(
+					"You must be logged in"
+			);
 		}
 
 		String email = authentication.getName();
 
-		User user = userRepository.findByEmail(email);
+		User user = userRepository.findByEmailIgnoreCase(email);
 
 		if (user == null) {
 			throw new RuntimeException("User not found");
@@ -80,15 +122,29 @@ public class UserService {
 
 		Long userId = user.getId();
 
-		user.setEmail("deleted-user-" + userId + "@deleted.local");
-		user.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+		user.setEmail(
+				"deleted-user-"
+						+ userId
+						+ "@deleted.local"
+		);
+
+		user.setPassword(
+				passwordEncoder.encode(
+						UUID.randomUUID().toString()
+				)
+		);
+
 		user.setStatus("RESTRICTED");
 
 		userRepository.save(user);
 	}
 
 	public User updateUserStatus(Long id, String status) {
-		User user = userRepository.findById(id).orElse(null);
+
+		User user =
+				userRepository
+						.findById(id)
+						.orElse(null);
 
 		if (user == null) {
 			throw new RuntimeException("User not found");
@@ -100,8 +156,12 @@ public class UserService {
 
 		status = status.toUpperCase();
 
-		if (!status.equals("ACTIVE") && !status.equals("RESTRICTED")) {
-			throw new RuntimeException("Status must be ACTIVE or RESTRICTED");
+		if (!status.equals("ACTIVE")
+				&& !status.equals("RESTRICTED")) {
+
+			throw new RuntimeException(
+					"Status must be ACTIVE or RESTRICTED"
+			);
 		}
 
 		user.setStatus(status);
@@ -110,23 +170,38 @@ public class UserService {
 	}
 
 	// ADMIN: Update an existing user's password
-	public User updateUserPassword(Long id, String newPassword) {
+	public User updateUserPassword(
+			Long id,
+			String newPassword) {
 
-		User user = userRepository.findById(id).orElse(null);
+		User user =
+				userRepository
+						.findById(id)
+						.orElse(null);
 
 		if (user == null) {
 			throw new RuntimeException("User not found");
 		}
 
-		if (newPassword == null || newPassword.isBlank()) {
-			throw new RuntimeException("Password is required");
+		if (newPassword == null
+				|| newPassword.isBlank()) {
+
+			throw new RuntimeException(
+					"Password is required"
+			);
 		}
 
-		if (newPassword.length() < 8 || newPassword.length() > 100) {
-			throw new RuntimeException("Password must be between 8 and 100 characters");
+		if (newPassword.length() < 8
+				|| newPassword.length() > 100) {
+
+			throw new RuntimeException(
+					"Password must be between 8 and 100 characters"
+			);
 		}
 
-		user.setPassword(passwordEncoder.encode(newPassword));
+		user.setPassword(
+				passwordEncoder.encode(newPassword)
+		);
 
 		return userRepository.save(user);
 	}

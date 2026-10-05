@@ -3,304 +3,630 @@
 
 <head>
 
-	<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-	<meta name="viewport"
-		content="width=device-width, initial-scale=1.0">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-	<meta name="robots"
-		content="noindex, follow">
+    <meta
+        name="robots"
+        content="noindex, follow"
+    >
 
-	<title>Claim Business - Review Platform</title>
+    <title>
+        Claim Business - Review Platform
+    </title>
 
-	<link rel="stylesheet"
-		href="css/business-claim.css">
+    <link
+        rel="stylesheet"
+        href="css/business-claim.css"
+    >
+
+    <link
+        rel="stylesheet"
+        href="css/theme.css"
+    >
 
 </head>
-
 
 <body>
 
 
-	<header class="top-navbar">
+    <!-- =====================================================
+         NAVBAR
+    ====================================================== -->
 
-		<div class="navbar-container">
+    <nav class="navbar">
 
-			<a href="index.html"
-				class="brand-logo">
+        <div class="navbar-inner">
 
-				<span class="brand-star">
-					★
-				</span>
 
-				<span>
-					Review<span class="brand-highlight">Platform</span>
-				</span>
+            <!-- BRAND -->
 
-			</a>
+            <a
+                href="index.html"
+                class="logo"
+            >
 
+                Review
+                <span>
+                    Platform
+                </span>
 
-			<nav class="navbar-links">
+            </a>
 
-				<a href="index.html">
-					Home
-				</a>
 
-				<a href="business-signup.html">
-					For Businesses
-				</a>
+            <!-- NAVIGATION -->
 
-				<a href="login.html">
-					Log in
-				</a>
+            <div class="nav-links">
 
-			</nav>
+                <a href="index.html">
+                    Home
+                </a>
 
-		</div>
+                <a href="business-signup.html">
+                    For Businesses
+                </a>
 
-	</header>
+                <a href="login.html">
+                    Login
+                </a>
 
+            </div>
 
-	<main class="claim-page">
+        </div>
 
-		<section class="claim-container">
+    </nav>
 
 
-			<div class="claim-header">
 
-				<div class="claim-badge">
-					BUSINESS PROFILE
-				</div>
+    <!-- =====================================================
+         MAIN PAGE
+    ====================================================== -->
 
+    <main class="claim-page">
 
-				<h1>
-					Claim Your Business
-				</h1>
 
+        <section class="claim-container">
 
-				<p>
-					Claim this business profile to manage your business
-					information and respond to customer reviews.
-				</p>
 
-			</div>
+            <!-- =================================================
+                 HEADER
+            ================================================== -->
 
+            <div class="claim-header">
 
-			<div class="claim-card">
+                <div class="claim-badge">
 
+                    BUSINESS PROFILE
 
-				<div class="business-details-section">
+                </div>
 
-					<h2>
-						Business Details
-					</h2>
 
+                <h1>
 
-					<div
-						id="businessDetails"
-						class="business-details">
+                    Claim Your Business
 
-						<p>
-							Loading business information...
-						</p>
+                </h1>
 
-					</div>
 
-				</div>
+                <p>
 
+                    Claim this business profile to manage
+                    your business information and respond
+                    to customer reviews.
 
-				<form id="claimForm">
+                </p>
 
+            </div>
 
-					<!--
-						Business ID is automatically received
-						from the Business Profile page.
-						User does not need to enter it.
-					-->
 
-					<input
-						type="hidden"
-						id="businessId"
-						required>
 
+            <!-- =================================================
+                 MAIN CLAIM CARD
+            ================================================== -->
 
-					<div class="form-group">
+            <div class="claim-card">
 
-						<label for="loggedInUser">
-							Logged-in Account
-						</label>
 
+                <!-- =================================================
+                     BUSINESS DETAILS
+                ================================================== -->
 
-						<input
-							type="text"
-							id="loggedInUser"
-							readonly
-							placeholder="Loading user...">
+                <section class="business-details-section">
 
-					</div>
+                    <div class="section-title-row">
 
+                        <div>
 
-					<div class="claim-information">
+                            <h2>
+                                Business Details
+                            </h2>
 
-						<h3>
-							Before you submit
-						</h3>
+                            <p class="section-subtitle">
 
+                                Review the business information
+                                before submitting your claim.
 
-						<p>
-							By submitting this request, you are asking
-							to manage this business profile.
-						</p>
+                            </p>
 
+                        </div>
 
-						<p>
-							Your claim will remain pending until it is
-							reviewed and approved.
-						</p>
+                    </div>
 
-					</div>
 
+                    <div
+                        id="businessDetails"
+                        class="business-details"
+                    >
 
-					<div
-						id="message"
-						class="claim-message">
-					</div>
+                        <p class="loading-text">
 
+                            Loading business information...
 
-					<button
-						type="submit"
-						class="claim-submit-button">
+                        </p>
 
-						Claim This Business
+                    </div>
 
-					</button>
+                </section>
 
 
-				</form>
 
+                <!-- =================================================
+                     CLAIM FORM
+                ================================================== -->
 
-				<div class="claim-footer-links">
+                <form id="claimForm">
 
-					<a href="index.html">
-						← Back to Home
-					</a>
 
-					<span>
-						|
-					</span>
+                    <!-- Hidden Business ID -->
 
-					<a href="business-signup.html">
-						Create New Business Profile
-					</a>
+                    <input
+                        type="hidden"
+                        id="businessId"
+                        required
+                    >
 
-				</div>
 
 
-			</div>
+                    <!-- Logged-in account -->
 
+                    <div class="form-group">
 
-			<div class="claim-process">
+                        <label for="loggedInUser">
 
-				<div class="process-step">
+                            Logged-in Account
 
-					<span class="process-number">
-						1
-					</span>
+                        </label>
 
-					<div>
 
-						<strong>
-							Submit claim
-						</strong>
+                        <input
+                            type="text"
+                            id="loggedInUser"
+                            readonly
+                            placeholder="Loading user..."
+                        >
 
-						<p>
-							Send your ownership request.
-						</p>
 
-					</div>
+                        <small>
 
-				</div>
+                            Your currently logged-in account
+                            will be used for this claim.
 
+                        </small>
 
-				<div class="process-step">
+                    </div>
 
-					<span class="process-number">
-						2
-					</span>
 
-					<div>
 
-						<strong>
-							Admin review
-						</strong>
+                    <!-- =================================================
+                         INFORMATION BOX
+                    ================================================== -->
 
-						<p>
-							Your request is reviewed by the admin.
-						</p>
+                    <div class="claim-information">
 
-					</div>
+                        <div class="information-icon">
 
-				</div>
+                            ✓
 
+                        </div>
 
-				<div class="process-step">
 
-					<span class="process-number">
-						3
-					</span>
+                        <div class="information-content">
 
-					<div>
+                            <h3>
 
-						<strong>
-							Verify business
-						</strong>
+                                Before you submit
 
-						<p>
-							Complete business verification after approval.
-						</p>
+                            </h3>
 
-					</div>
 
-				</div>
+                            <p>
 
+                                You are requesting ownership
+                                of this business profile.
 
-				<div class="process-step">
+                            </p>
 
-					<span class="process-number">
-						4
-					</span>
 
-					<div>
+                            <p>
 
-						<strong>
-							Business Dashboard
-						</strong>
+                                Your claim will remain pending
+                                until it is reviewed and approved
+                                by the admin.
 
-						<p>
-							Manage your business profile and responses.
-						</p>
+                            </p>
 
-					</div>
+                        </div>
 
-				</div>
+                    </div>
 
-			</div>
 
-		</section>
 
-	</main>
+                    <!-- =================================================
+                         MESSAGE
+                    ================================================== -->
 
+                    <div
+                        id="message"
+                        class="claim-message"
+                    >
 
-	<footer class="site-footer">
+                    </div>
 
-		<p>
-			© 2026 Review Platform. All rights reserved.
-		</p>
 
-	</footer>
 
+                    <!-- =================================================
+                         SUBMIT BUTTON
+                    ================================================== -->
 
-	<script src="js/business-claim.js"></script>
+                    <button
+                        type="submit"
+                        class="claim-submit-button"
+                    >
+
+                        Claim This Business
+
+                    </button>
+
+
+                </form>
+
+
+
+                <!-- =================================================
+                     FOOTER LINKS
+                ================================================== -->
+
+                <div class="claim-footer-links">
+
+                    <a href="index.html">
+
+                        ← Back to Home
+
+                    </a>
+
+
+                    <span>
+                        |
+                    </span>
+
+
+                    <a href="business-signup.html">
+
+                        Create New Business Profile
+
+                    </a>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 CLAIM PROCESS
+            ================================================== -->
+
+            <section class="claim-process">
+
+
+                <!-- STEP 1 -->
+
+                <div class="process-step">
+
+                    <span class="process-number">
+
+                        1
+
+                    </span>
+
+
+                    <div class="process-content">
+
+                        <strong>
+
+                            Submit claim
+
+                        </strong>
+
+
+                        <p>
+
+                            Send your ownership request
+                            for this business profile.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- STEP 2 -->
+
+                <div class="process-step">
+
+                    <span class="process-number">
+
+                        2
+
+                    </span>
+
+
+                    <div class="process-content">
+
+                        <strong>
+
+                            Admin review
+
+                        </strong>
+
+
+                        <p>
+
+                            Your claim is reviewed
+                            by the admin.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- STEP 3 -->
+
+                <div class="process-step">
+
+                    <span class="process-number">
+
+                        3
+
+                    </span>
+
+
+                    <div class="process-content">
+
+                        <strong>
+
+                            Verify business
+
+                        </strong>
+
+
+                        <p>
+
+                            Complete the required
+                            business verification.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+
+                <!-- STEP 4 -->
+
+                <div class="process-step">
+
+                    <span class="process-number">
+
+                        4
+
+                    </span>
+
+
+                    <div class="process-content">
+
+                        <strong>
+
+                            Business Dashboard
+
+                        </strong>
+
+
+                        <p>
+
+                            Manage your business profile
+                            and customer responses.
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+        </section>
+
+    </main>
+
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <footer class="site-footer">
+
+        <div class="footer-content">
+
+
+            <div class="footer-brand">
+
+                <h2>
+
+                    Review
+                    <span>
+                        Platform
+                    </span>
+
+                </h2>
+
+
+                <p>
+
+                    Read reviews, share experiences,
+                    and discover websites you can trust.
+
+                </p>
+
+            </div>
+
+
+
+            <div class="footer-column">
+
+                <h3>
+
+                    Review Platform
+
+                </h3>
+
+
+                <a href="index.html">
+
+                    Home
+
+                </a>
+
+
+                <a href="index.html#websites">
+
+                    Browse Websites
+
+                </a>
+
+
+                <a href="index.html#categoryList">
+
+                    Categories
+
+                </a>
+
+            </div>
+
+
+
+            <div class="footer-column">
+
+                <h3>
+
+                    Community
+
+                </h3>
+
+
+                <a href="login.html">
+
+                    Login
+
+                </a>
+
+
+                <a href="register.html">
+
+                    Register
+
+                </a>
+
+
+                <a href="index.html#websiteList">
+
+                    Reviews
+
+                </a>
+
+            </div>
+
+
+
+            <div class="footer-column">
+
+                <h3>
+
+                    For Businesses
+
+                </h3>
+
+
+                <a href="business-signup.html">
+
+                    Create Business Profile
+
+                </a>
+
+
+                <a href="business-claim.html">
+
+                    Claim Your Business
+
+                </a>
+
+
+                <a href="business-dashboard.html">
+
+                    Business Dashboard
+
+                </a>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="footer-bottom">
+
+            <p>
+
+                © 2026 Review Platform.
+                All rights reserved.
+
+            </p>
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
+
+    <script src="js/business-claim.js"></script>
 
 </body>
 

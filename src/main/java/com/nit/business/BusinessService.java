@@ -126,26 +126,26 @@ public class BusinessService {
 
 	public Business createEmailVerificationToken(Long businessId, String email) {
 		Business business = businessRepository.findById(businessId).orElse(null);
+
 		if (business == null) {
 			throw new RuntimeException("Business not found");
 		}
+
 		if (email == null || email.isBlank()) {
 			throw new RuntimeException("Business email is required");
 		}
+
 		if (business.getOfficialUrl() == null || business.getOfficialUrl().isBlank()) {
 			throw new RuntimeException("Official website URL is required");
 		}
 
-		String emailDomain = getEmailDomain(email);
-		String websiteDomain = normalizeDomain(business.getOfficialUrl());
-		if (!emailDomain.equals(websiteDomain)) {
-			throw new RuntimeException("Business email domain must match official website domain");
-		}
 		String token = UUID.randomUUID().toString();
-		business.setBusinessEmail(email);
+
+		business.setBusinessEmail(email.trim());
 		business.setEmailVerified(false);
 		business.setEmailVerificationToken(token);
 		business.setEmailVerificationExpiry(LocalDateTime.now().plusHours(24));
+
 		return businessRepository.save(business);
 	}
 

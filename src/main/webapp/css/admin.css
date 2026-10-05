@@ -1,25 +1,51 @@
+* {
+	box-sizing: border-box;
+}
+html {
+	scroll-behavior: smooth;
+}
 body {
 	margin: 0;
-	font-family: Arial, sans-serif;
-	background: #f4f6f9;
+	font-family: Arial, Helvetica, sans-serif;
+	background: #eaf7ff;
+	color: #111827;
+	line-height: 1.5;
 }
 .admin-container {
 	width: 900px;
 	max-width: 90%;
-	margin: 50px auto;
+	margin: 40px auto 60px;
 	padding: 30px;
-	background: white;
-	border-radius: 10px;
-	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+	background: #ffffff;
+	border: 1px solid #cfe8f7;
+	border-radius: 14px;
+	box-shadow: 0 10px 28px rgba(11, 17, 23, 0.08);
 }
-h1 {
+.admin-container h1 {
 	text-align: center;
-	margin-bottom: 10px;
+	margin: 0 0 10px;
+	color: #0b1117;
+	font-size: 32px;
 }
+.admin-container h2 {
+	margin: 25px 0 15px;
+	color: #0b1117;
+	font-size: 22px;
+}
+.admin-container h3 {
+	color: #0b1117;
+}
+
 .admin-subtitle {
 	text-align: center;
-	color: #666;
+	color: #5f7282;
 	font-size: 18px;
+	margin: 0 0 20px;
+}
+.admin-container hr {
+	border: 0;
+	border-top: 1px solid #dfeef6;
+	margin: 25px 0;
 }
 .dashboard-cards {
 	display: grid;
@@ -27,202 +53,191 @@ h1 {
 	gap: 15px;
 	margin: 25px 0;
 }
+
 .dashboard-card {
 	padding: 20px;
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	background: #fafafa;
+	border: 1px solid #cfe8f7;
+	border-radius: 10px;
+	background: #eaf7ff;
 	text-align: center;
+	transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s
+		ease;
 }
+
+.dashboard-card:hover {
+	transform: translateY(-2px);
+	background: #ffffff;
+	box-shadow: 0 8px 20px rgba(11, 17, 23, 0.07);
+}
+
 .dashboard-card h3 {
-	margin: 0 0 12px 0;
+	margin: 0 0 12px;
 	font-size: 17px;
+	color: #5f7282;
 }
+
 .dashboard-card p {
 	margin: 0;
 	font-size: 30px;
 	font-weight: bold;
+	color: #0b1117;
 }
-.report-card {
+.report-card, .user-card, .claim-card, .website-card {
 	padding: 20px;
 	margin-bottom: 20px;
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	background: #fafafa;
+	border: 1px solid #cfe8f7;
+	border-radius: 10px;
+	background: #eaf7ff;
+	transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s
+		ease;
 }
-.report-card p {
+
+.report-card:hover, .user-card:hover, .claim-card:hover, .website-card:hover
+	{
+	transform: translateY(-1px);
+	background: #ffffff;
+	box-shadow: 0 8px 20px rgba(11, 17, 23, 0.07);
+}
+
+.report-card p, .user-card p, .claim-card p, .website-card p {
 	margin: 8px 0;
+	line-height: 1.6;
 }
-.report-reason {
-	font-weight: bold;
-	color: #dc3545;
+
+.report-card strong, .user-card strong, .claim-card strong,
+	.website-card strong {
+	color: #0b1117;
 }
-.delete-button {
+.report-card button, .user-card button, .claim-card button,
+	.website-card button {
 	margin-top: 12px;
-	padding: 9px 18px;
-	background: #dc3545;
-	color: white;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-}
-.delete-button:hover {
-	background: #bb2d3b;
-}
-.message {
-	margin-top: 10px;
-	font-weight: bold;
-}
-.success-message {
-	color: green;
-}
-.error-message {
-	color: #dc3545;
-}
-.no-reports {
-	text-align: center;
-	color: #666;
-	padding: 30px;
-}
-.admin-container a {
-	color: #0d6efd;
-	text-decoration: none;
-}
-.admin-container a:hover {
-	text-decoration: underline;
-}
-.user-card {
-	padding: 20px;
-	margin-bottom: 20px;
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	background: #fafafa;
-}
-.user-card p {
-	margin: 8px 0;
-}
-.user-card strong {
-	color: #333;
-}
-.user-card button {
-	margin-top: 12px;
-	padding: 9px 18px;
-	background: #dc3545;
-	color: white;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-}
-.user-card button:hover {
-	background: #bb2d3b;
-}
-.claim-card {
-	padding: 20px;
-	margin-bottom: 20px;
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	background: #fafafa;
-}
-.claim-card p {
-	margin: 8px 0;
-}
-.claim-card button {
-	margin-top: 10px;
 	margin-right: 8px;
 	padding: 9px 16px;
 	border: none;
-	border-radius: 5px;
+	border-radius: 22px;
+	background: #a9defa;
+	color: #0b1117;
 	cursor: pointer;
-	color: white;
-	background: #0d6efd;
+	font-size: 14px;
+	font-weight: 600;
+	transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
-.claim-card button:hover {
-	opacity: 0.9;
-}
-.website-card {
-	padding: 20px;
-	margin-bottom: 20px;
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	background: #fafafa;
-}
-.website-card p {
-	margin: 8px 0;
-}
-.website-card button {
-	margin-top: 12px;
-	padding: 9px 18px;
-	background: #dc3545;
-	color: white;
-	border: none;
-	border-radius: 5px;
-	cursor: pointer;
-}
-.website-card button:hover {
-	background: #bb2d3b;
+
+.report-card button:hover, .user-card button:hover, .claim-card button:hover,
+	.website-card button:hover {
+	background: #46a8df;
+	color: #ffffff;
+	transform: translateY(-1px);
 }
 .seo-card {
 	padding: 20px;
 	margin-bottom: 20px;
-	border: 1px solid #ddd;
-	border-radius: 8px;
-	background: #fafafa;
+	border: 1px solid #cfe8f7;
+	border-radius: 10px;
+	background: #eaf7ff;
 }
+
 .seo-card label {
 	display: block;
 	margin-top: 12px;
 	margin-bottom: 6px;
 	font-weight: bold;
-	color: #333;
+	color: #111827;
 }
+
 .seo-card select, .seo-card input, .seo-card textarea {
 	width: 100%;
-	box-sizing: border-box;
 	padding: 10px;
-	border: 1px solid #ccc;
-	border-radius: 5px;
-	font-family: Arial, sans-serif;
+	border: 1px solid #cfe8f7;
+	border-radius: 8px;
+	background: #ffffff;
+	color: #111827;
+	font-family: Arial, Helvetica, sans-serif;
 	font-size: 14px;
+	outline: none;
 }
+
 .seo-card select:focus, .seo-card input:focus, .seo-card textarea:focus
 	{
-	outline: none;
-	border-color: #0d6efd;
+	border-color: #46a8df;
+	box-shadow: 0 0 0 3px rgba(70, 168, 223, 0.15);
 }
+
 .seo-card textarea {
 	resize: vertical;
 }
+
 .seo-save-button {
 	margin-top: 15px;
 	padding: 10px 18px;
-	background: #0d6efd;
-	color: white;
+	background: #0b1117;
+	color: #ffffff;
 	border: none;
-	border-radius: 5px;
+	border-radius: 22px;
 	cursor: pointer;
+	font-size: 14px;
+	font-weight: 600;
+	transition: background 0.2s ease, transform 0.2s ease;
 }
+
 .seo-save-button:hover {
-	background: #0b5ed7;
+	background: #17212b;
+	transform: translateY(-1px);
 }
+.message {
+	margin-top: 10px;
+	line-height: 1.5;
+	font-weight: 600;
+}
+
+.success-message {
+	color: #246b8f;
+}
+
+.error-message {
+	color: #374151;
+}
+#moderationList>p, #hiddenReviewList>p, #claimList>p, #userList>p,
+	#websiteList>p, #reportList>p, #auditLogList>p {
+	color: #5f7282;
+}
+.admin-container a {
+	color: #298dcc;
+	text-decoration: none;
+	font-weight: 600;
+}
+
+.admin-container a:hover {
+	color: #0b1117;
+	text-decoration: underline;
+}
+
 @media ( max-width : 800px) {
 	.dashboard-cards {
 		grid-template-columns: repeat(2, 1fr);
 	}
 }
+
 @media ( max-width : 600px) {
 	.admin-container {
 		width: auto;
-		max-width: 90%;
-		margin: 20px auto;
+		max-width: 94%;
+		margin: 20px auto 40px;
 		padding: 20px;
+	}
+	.admin-container h1 {
+		font-size: 28px;
+	}
+	.admin-container h2 {
+		font-size: 20px;
 	}
 	.dashboard-cards {
 		grid-template-columns: 1fr;
 	}
-	.user-card, .claim-card, .report-card, .website-card, .seo-card {
+	.report-card, .user-card, .claim-card, .website-card, .seo-card {
 		padding: 15px;
 	}
-	.user-card button, .claim-card button, .report-card button,
+	.report-card button, .user-card button, .claim-card button,
 		.website-card button, .seo-save-button {
 		width: 100%;
 		margin-top: 8px;

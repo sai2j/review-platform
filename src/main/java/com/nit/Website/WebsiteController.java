@@ -1,3 +1,4 @@
+
 package com.nit.Website;
 
 import java.util.List;
@@ -13,10 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nit.dto.ReviewRequestDTO;
 import com.nit.dto.ReviewResponseDTO;
+import com.nit.dto.WebsitePageResponseDTO;
 import com.nit.dto.WebsiteResponseDTO;
-import com.nit.review.ReviewService;
 
 import jakarta.validation.Valid;
 
@@ -24,68 +24,107 @@ import jakarta.validation.Valid;
 @RequestMapping({ "/websites", "/api/v1/websites" })
 public class WebsiteController {
 
-	private final WebsiteService websiteService;
-	private final ReviewService reviewService;
+    private final WebsiteService websiteService;
 
-	public WebsiteController(WebsiteService websiteService, ReviewService reviewService) {
-		this.websiteService = websiteService;
-		this.reviewService = reviewService;
-	}
+    public WebsiteController(WebsiteService websiteService) {
+        this.websiteService = websiteService;
+    }
 
-	@PostMapping
-	public Website createWebsite(@Valid @RequestBody Website website) {
-		return websiteService.saveWebsite(website);
-	}
+    @PostMapping
+    public WebsiteResponseDTO createWebsite(
+            @Valid @RequestBody Website website) {
+        Website savedWebsite = websiteService.saveWebsite(website);
+        return websiteService.getWebsiteById(savedWebsite.getId());
+    }
 
-	@GetMapping
-	public List<WebsiteResponseDTO> getAllWebsites() {
-		return websiteService.getAllWebsites();
-	}
+    @GetMapping
+    public List<WebsiteResponseDTO> getAllWebsites() {
+        return websiteService.getAllWebsites();
+    }
 
-	@GetMapping("/search")
-	public List<WebsiteResponseDTO> searchWebsites(@RequestParam String q) {
-		return websiteService.searchWebsites(q);
-	}
+    @GetMapping("/page")
+    public WebsitePageResponseDTO getWebsitesPage(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return websiteService.getWebsitesPage(page, size);
+    }
 
-	@GetMapping("/domain/{domain}")
-	public WebsiteResponseDTO getWebsiteByDomain(@PathVariable String domain) {
-		return websiteService.getWebsiteByDomain(domain);
-	}
+    // Existing search endpoint preserved
+    @GetMapping("/search")
+    public List<WebsiteResponseDTO> searchWebsites(
+            @RequestParam(required = false) String q) {
+        return websiteService.searchWebsites(q);
+    }
 
-	@GetMapping("/{id}")
-	public WebsiteResponseDTO getwebsiteById(@PathVariable Long id) {
-		return websiteService.getWebsiteById(id);
-	}
+    // NEW: Paginated search endpoint
+    @GetMapping("/search/page")
+    public WebsitePageResponseDTO searchWebsitesPage(
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return websiteService.searchWebsitesPage(q, page, size);
+    }
 
-	@GetMapping("/{id}/related")
-	public List<WebsiteResponseDTO> getRelatedWebsites(@PathVariable Long id) {
-		return websiteService.getRelatedWebsites(id);
-	}
+    // Existing filter endpoint preserved
+    @GetMapping("/filter")
+    public List<WebsiteResponseDTO> filterWebsites(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String country) {
+        return websiteService.filterWebsites(category, country);
+    }
 
-	@GetMapping("/{id}/reviews")
-	public List<ReviewResponseDTO> getWebsiteReviews(@PathVariable Long id) {
-		return websiteService.getWebsiteReviews(id);
-	}
+    // NEW: Paginated filter endpoint
+    @GetMapping("/filter/page")
+    public WebsitePageResponseDTO filterWebsitesPage(
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) String country,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return websiteService.filterWebsitesPage(
+                category, country, page, size);
+    }
 
-	@PostMapping("/{id}/reviews")
-	public ReviewResponseDTO createReviewForWebsite(@PathVariable Long id,
-			@Valid @RequestBody ReviewRequestDTO request) {
-		request.setWebsiteId(id);
-		return reviewService.saveReview(request);
-	}
+    @GetMapping("/domain/{domain}")
+    public WebsiteResponseDTO getWebsiteByDomain(
+            @PathVariable String domain) {
+        return websiteService.getWebsiteByDomain(domain);
+    }
 
-	@PreAuthorize("hasRole('ADMIN')")
-	@PutMapping("/{id}/seo")
-	public Website updateSeo(@PathVariable Long id, @RequestParam(required = false) String seoTitle,
-			@RequestParam(required = false) String seoDescription,
-			@RequestParam(required = false) String canonicalUrl) {
-		return websiteService.updateSeo(id, seoTitle, seoDescription, canonicalUrl);
-	}
+    @GetMapping("/{id}/related")
+    public List<WebsiteResponseDTO> getRelatedWebsites(
+            @PathVariable Long id) {
+        return websiteService.getRelatedWebsites(id);
+    }
 
-	@PreAuthorize("hasRole('ADMIN')")
-	@DeleteMapping("/{id}")
-	public String deleteWebsite(@PathVariable Long id) {
-		websiteService.deleteWebsite(id);
-		return " website delete sucessfully";
-	}
+    @GetMapping("/{id}/reviews")
+    public List<ReviewResponseDTO> getWebsiteReviews(
+            @PathVariable Long id) {
+        return websiteService.getWebsiteReviews(id);
+    }
+
+    @GetMapping("/{id}")
+    public WebsiteResponseDTO getWebsiteById(
+            @PathVariable Long id) {
+        return websiteService.getWebsiteById(id);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/seo")
+    public WebsiteResponseDTO updateSeo(
+            @PathVariable Long id,
+            @RequestParam(required = false) String seoTitle,
+            @RequestParam(required = false) String seoDescription,
+            @RequestParam(required = false) String canonicalUrl) {
+
+        Website updatedWebsite = websiteService.updateSeo(
+                id, seoTitle, seoDescription, canonicalUrl);
+
+        return websiteService.getWebsiteById(updatedWebsite.getId());
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    public void deleteWebsite(@PathVariable Long id) {
+        websiteService.deleteWebsite(id);
+    }
 }

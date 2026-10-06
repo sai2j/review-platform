@@ -1,3 +1,4 @@
+
 package com.nit.Website;
 
 import jakarta.persistence.Entity;
@@ -11,84 +12,111 @@ import jakarta.validation.constraints.NotBlank;
 @Table(name = "websites")
 public class Website {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE)
-	private Long id;
-	@NotBlank(message = "Website name is required")
-	private String name;
-	@NotBlank(message = "Website URL is required")
-	private String url;
-	private String description;
-	private String canonicalDomain;
-	private String seoTitle;
-	private String seoDescription;
-	private String canonicalUrl;
-	public Website() {
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    private Long id;
 
-	public Website(String name, String url, String description) {
-		this.name = name;
-		this.url = url;
-		this.description = description;
-	}
+    @NotBlank(message = "Website name is required")
+    private String name;
 
-	public Long getId() {
-		return id;
-	}
+    @NotBlank(message = "Website URL is required")
+    private String url;
 
-	public String getName() {
-		return name;
-	}
+    private String description;
+    private String canonicalDomain;
+    private String seoTitle;
+    private String seoDescription;
+    private String canonicalUrl;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    // New fields
+    private String category;
+    private String country;
 
-	public String getUrl() {
-		return url;
-	}
+    public Website() {
+    }
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    public Website(String name, String url, String description) {
+        this.name = name;
+        this.url = url;
+        this.description = description;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getCanonicalDomain() {
-		return canonicalDomain;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setCanonicalDomain(String canonicalDomain) {
-		this.canonicalDomain = canonicalDomain;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	public String getSeoTitle() {
-		return seoTitle;
-	}
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	public void setSeoTitle(String seoTitle) {
-		this.seoTitle = seoTitle;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public String getSeoDescription() {
-		return seoDescription;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setSeoDescription(String seoDescription) {
-		this.seoDescription = seoDescription;
-	}
+    public String getCanonicalDomain() {
+        return canonicalDomain;
+    }
 
-	public String getCanonicalUrl() {
-		return canonicalUrl;
-	}
+    public void setCanonicalDomain(String canonicalDomain) {
+        this.canonicalDomain = canonicalDomain;
+    }
 
-	public void setCanonicalUrl(String canonicalUrl) {
-		this.canonicalUrl = canonicalUrl;
-	}
+    public String getSeoTitle() {
+        return seoTitle;
+    }
+
+    public void setSeoTitle(String seoTitle) {
+        this.seoTitle = seoTitle;
+    }
+
+    public String getSeoDescription() {
+        return seoDescription;
+    }
+
+    public void setSeoDescription(String seoDescription) {
+        this.seoDescription = seoDescription;
+    }
+
+    public String getCanonicalUrl() {
+        return canonicalUrl;
+    }
+
+    public void setCanonicalUrl(String canonicalUrl) {
+        this.canonicalUrl = canonicalUrl;
+    }
+
+    // Category getter and setter
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    // Country getter and setter
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
 }
+

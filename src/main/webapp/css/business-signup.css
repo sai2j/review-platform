@@ -1,0 +1,1263 @@
+/* =========================================================
+   BUSINESS SIGNUP PAGE
+   Review Platform Theme
+   Colors: Black / White / Light Blue
+========================================================= */
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+
+    box-sizing: border-box;
+
+    margin: 0;
+
+    padding: 0;
+
+}
+
+
+html {
+
+    scroll-behavior: smooth;
+
+}
+
+
+body {
+
+    margin: 0;
+
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+
+    background:
+        #eaf7ff;
+
+    color:
+        #111827;
+
+    min-height:
+        100vh;
+
+}
+
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.top-navbar {
+
+    width: 100%;
+
+    background:
+        #0b1117;
+
+    border-bottom:
+        1px solid
+        #24313d;
+
+    position:
+        sticky;
+
+    top:
+        0;
+
+    z-index:
+        1000;
+
+}
+
+
+.navbar-container {
+
+    width:
+        100%;
+
+    max-width:
+        1200px;
+
+    min-height:
+        72px;
+
+    margin:
+        0 auto;
+
+    padding:
+        0 24px;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        20px;
+
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.brand-logo {
+
+    text-decoration:
+        none;
+
+    color:
+        #ffffff;
+
+    font-size:
+        24px;
+
+    font-weight:
+        700;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+}
+
+
+/*
+ * Brand star is intentionally hidden.
+ * Review Platform branding uses only text.
+ */
+
+.brand-star {
+
+    display:
+        none;
+
+}
+
+
+.brand-highlight {
+
+    color:
+        #46a8df;
+
+    margin-left:
+        5px;
+
+}
+
+
+/* =========================================================
+   NAV LINKS
+========================================================= */
+
+.navbar-links {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        24px;
+
+}
+
+
+.navbar-links a {
+
+    text-decoration:
+        none;
+
+    color:
+        #ffffff;
+
+    font-size:
+        15px;
+
+    font-weight:
+        600;
+
+    transition:
+        color
+        0.2s
+        ease;
+
+}
+
+
+.navbar-links a:hover {
+
+    color:
+        #a9defa;
+
+}
+
+
+/* =========================================================
+   MAIN PAGE
+========================================================= */
+
+.business-signup-page {
+
+    width:
+        100%;
+
+    min-height:
+        calc(
+            100vh - 72px
+        );
+
+    padding:
+        55px
+        20px
+        70px;
+
+    background:
+        #eaf7ff;
+
+}
+
+
+/* =========================================================
+   MAIN SECTION
+========================================================= */
+
+.business-signup-section {
+
+    width:
+        100%;
+
+    max-width:
+        920px;
+
+    margin:
+        0 auto;
+
+}
+
+
+/* =========================================================
+   INTRO
+========================================================= */
+
+.business-signup-intro {
+
+    text-align:
+        center;
+
+    margin-bottom:
+        32px;
+
+}
+
+
+.business-badge {
+
+    display:
+        inline-block;
+
+    margin-bottom:
+        15px;
+
+    padding:
+        7px
+        14px;
+
+    border:
+        1px
+        solid
+        #cfe8f7;
+
+    border-radius:
+        20px;
+
+    background:
+        #f4fbff;
+
+    color:
+        #153b50;
+
+    font-size:
+        12px;
+
+    font-weight:
+        700;
+
+    letter-spacing:
+        0.8px;
+
+}
+
+
+.business-signup-intro h1 {
+
+    margin:
+        0
+        0
+        13px;
+
+    color:
+        #0b1117;
+
+    font-size:
+        38px;
+
+    line-height:
+        1.2;
+
+    font-weight:
+        700;
+
+}
+
+
+.business-signup-intro p {
+
+    max-width:
+        650px;
+
+    margin:
+        0 auto;
+
+    color:
+        #5f7282;
+
+    font-size:
+        15px;
+
+    line-height:
+        1.7;
+
+}
+
+
+/* =========================================================
+   SIGNUP CARD
+========================================================= */
+
+.business-signup-card {
+
+    width:
+        100%;
+
+    padding:
+        34px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px
+        solid
+        #cfe8f7;
+
+    border-radius:
+        18px;
+
+    box-shadow:
+        0
+        10px
+        28px
+        rgba(
+            11,
+            17,
+            23,
+            0.08
+        );
+
+}
+
+
+/* =========================================================
+   CARD HEADING
+========================================================= */
+
+.business-signup-card h2 {
+
+    margin:
+        0
+        0
+        28px;
+
+    color:
+        #0b1117;
+
+    font-size:
+        23px;
+
+    font-weight:
+        700;
+
+}
+
+
+/* =========================================================
+   FORM GROUP
+========================================================= */
+
+.form-group {
+
+    margin-bottom:
+        22px;
+
+}
+
+
+.form-group label {
+
+    display:
+        block;
+
+    margin-bottom:
+        8px;
+
+    color:
+        #17212b;
+
+    font-size:
+        14px;
+
+    font-weight:
+        700;
+
+}
+
+
+/* =========================================================
+   INPUT + TEXTAREA
+========================================================= */
+
+.form-group input,
+.form-group textarea {
+
+    width:
+        100%;
+
+    padding:
+        13px
+        14px;
+
+    border:
+        1px
+        solid
+        #bcdbea;
+
+    border-radius:
+        9px;
+
+    background:
+        #ffffff;
+
+    color:
+        #111827;
+
+    font-size:
+        15px;
+
+    outline:
+        none;
+
+    transition:
+        border-color
+        0.2s
+        ease,
+        box-shadow
+        0.2s
+        ease;
+
+}
+
+
+.form-group input {
+
+    height:
+        49px;
+
+}
+
+
+.form-group textarea {
+
+    min-height:
+        145px;
+
+    resize:
+        vertical;
+
+    line-height:
+        1.5;
+
+}
+
+
+/* =========================================================
+   INPUT FOCUS
+========================================================= */
+
+.form-group input:focus,
+.form-group textarea:focus {
+
+    border-color:
+        #46a8df;
+
+    box-shadow:
+        0
+        0
+        0
+        3px
+        rgba(
+            70,
+            168,
+            223,
+            0.16
+        );
+
+}
+
+
+/* =========================================================
+   PLACEHOLDER
+========================================================= */
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+
+    color:
+        #9aaab5;
+
+}
+
+
+/* =========================================================
+   SMALL HELP TEXT
+========================================================= */
+
+.form-group small {
+
+    display:
+        block;
+
+    margin-top:
+        7px;
+
+    color:
+        #71808c;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.5;
+
+}
+
+
+/* =========================================================
+   MESSAGE
+========================================================= */
+
+.business-signup-message {
+
+    min-height:
+        24px;
+
+    margin:
+        4px
+        0
+        18px;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.6;
+
+}
+
+
+.business-signup-message.error {
+
+    color:
+        #a63c34;
+
+}
+
+
+.business-signup-message.success {
+
+    color:
+        #1f6b48;
+
+}
+
+
+.business-signup-message.loading {
+
+    color:
+        #5f7282;
+
+}
+
+
+/* =========================================================
+   CREATE BUSINESS BUTTON
+========================================================= */
+
+.create-business-button {
+
+    width:
+        100%;
+
+    height:
+        50px;
+
+    border:
+        1px
+        solid
+        #46a8df;
+
+    border-radius:
+        10px;
+
+    background:
+        #a9defa;
+
+    color:
+        #0b1117;
+
+    font-size:
+        15px;
+
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
+
+    transition:
+        background
+        0.2s
+        ease,
+        transform
+        0.1s
+        ease,
+        opacity
+        0.2s
+        ease;
+
+}
+
+
+.create-business-button:hover {
+
+    background:
+        #46a8df;
+
+    color:
+        #ffffff;
+
+}
+
+
+.create-business-button:active {
+
+    transform:
+        translateY(
+            1px
+        );
+
+}
+
+
+.create-business-button:disabled {
+
+    opacity:
+        0.65;
+
+    cursor:
+        not-allowed;
+
+}
+
+
+/* =========================================================
+   CANCEL BUTTON
+========================================================= */
+
+.cancel-button {
+
+    display:
+        block;
+
+    width:
+        100%;
+
+    margin-top:
+        12px;
+
+    padding:
+        14px;
+
+    border:
+        1px
+        solid
+        #bcdbea;
+
+    border-radius:
+        10px;
+
+    background:
+        #ffffff;
+
+    color:
+        #153b50;
+
+    text-align:
+        center;
+
+    text-decoration:
+        none;
+
+    font-size:
+        15px;
+
+    font-weight:
+        600;
+
+    transition:
+        background
+        0.2s
+        ease,
+        border-color
+        0.2s
+        ease;
+
+}
+
+
+.cancel-button:hover {
+
+    background:
+        #eaf7ff;
+
+    border-color:
+        #46a8df;
+
+    color:
+        #0b1117;
+
+}
+
+
+/* =========================================================
+   LOGIN INFO
+========================================================= */
+
+.login-info {
+
+    margin:
+        22px
+        0
+        0;
+
+    text-align:
+        center;
+
+    color:
+        #5f7282;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.6;
+
+}
+
+
+.login-info a {
+
+    color:
+        #46a8df;
+
+    font-weight:
+        700;
+
+    text-decoration:
+        none;
+
+}
+
+
+.login-info a:hover {
+
+    color:
+        #0b1117;
+
+    text-decoration:
+        underline;
+
+}
+
+
+/* =========================================================
+   WHAT HAPPENS NEXT
+========================================================= */
+
+.business-signup-note {
+
+    margin-top:
+        24px;
+
+    padding:
+        25px;
+
+    background:
+        #ffffff;
+
+    border:
+        1px
+        solid
+        #cfe8f7;
+
+    border-radius:
+        16px;
+
+    box-shadow:
+        0
+        8px
+        22px
+        rgba(
+            11,
+            17,
+            23,
+            0.05
+        );
+
+}
+
+
+.business-signup-note h3 {
+
+    margin:
+        0
+        0
+        20px;
+
+    color:
+        #0b1117;
+
+    font-size:
+        19px;
+
+    font-weight:
+        700;
+
+}
+
+
+/* =========================================================
+   NEXT STEP
+========================================================= */
+
+.next-step {
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    gap:
+        13px;
+
+    margin-bottom:
+        15px;
+
+    padding:
+        8px
+        0;
+
+    color:
+        #4f6574;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.5;
+
+}
+
+
+.next-step:last-child {
+
+    margin-bottom:
+        0;
+
+}
+
+
+/* =========================================================
+   STEP NUMBER
+========================================================= */
+
+.step-number {
+
+    width:
+        32px;
+
+    height:
+        32px;
+
+    flex-shrink:
+        0;
+
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    border:
+        1px
+        solid
+        #46a8df;
+
+    border-radius:
+        50%;
+
+    background:
+        #a9defa;
+
+    color:
+        #0b1117;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.site-footer {
+
+    width:
+        100%;
+
+    margin-top:
+        0;
+
+    padding:
+        22px
+        20px;
+
+    border-top:
+        1px
+        solid
+        #24313d;
+
+    background:
+        #0b1117;
+
+    text-align:
+        center;
+
+}
+
+
+.site-footer p {
+
+    margin:
+        0;
+
+    color:
+        #93a6b4;
+
+    font-size:
+        13px;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - 768px
+========================================================= */
+
+@media (max-width: 768px) {
+
+
+    .navbar-container {
+
+        min-height:
+            65px;
+
+        padding:
+            14px
+            16px;
+
+    }
+
+
+    .brand-logo {
+
+        font-size:
+            20px;
+
+    }
+
+
+    .navbar-links {
+
+        gap:
+            14px;
+
+    }
+
+
+    .navbar-links a {
+
+        font-size:
+            13px;
+
+    }
+
+
+    .business-signup-page {
+
+        padding:
+            38px
+            15px
+            55px;
+
+    }
+
+
+    .business-signup-intro h1 {
+
+        font-size:
+            31px;
+
+    }
+
+
+    .business-signup-intro p {
+
+        font-size:
+            14px;
+
+    }
+
+
+    .business-signup-card {
+
+        padding:
+            26px
+            22px;
+
+    }
+
+
+    .business-signup-note {
+
+        padding:
+            21px;
+
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - 560px
+========================================================= */
+
+@media (max-width: 560px) {
+
+
+    .navbar-container {
+
+        flex-direction:
+            column;
+
+        justify-content:
+            center;
+
+        gap:
+            10px;
+
+    }
+
+
+    .navbar-links {
+
+        flex-wrap:
+            wrap;
+
+        justify-content:
+            center;
+
+    }
+
+
+    .business-signup-page {
+
+        padding-top:
+            28px;
+
+    }
+
+
+    .business-signup-intro h1 {
+
+        font-size:
+            28px;
+
+    }
+
+
+    .business-signup-intro p {
+
+        font-size:
+            14px;
+
+    }
+
+
+    .business-signup-card {
+
+        padding:
+            21px
+            16px;
+
+        border-radius:
+            14px;
+
+    }
+
+
+    .business-signup-card h2 {
+
+        margin-bottom:
+            23px;
+
+        font-size:
+            21px;
+
+    }
+
+
+    .form-group input {
+
+        height:
+            47px;
+
+    }
+
+
+    .form-group textarea {
+
+        min-height:
+            130px;
+
+    }
+
+
+    .business-signup-note {
+
+        padding:
+            19px
+            16px;
+
+    }
+
+
+    .business-signup-note h3 {
+
+        font-size:
+            17px;
+
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE - 400px
+========================================================= */
+
+@media (max-width: 400px) {
+
+
+    .navbar-links {
+
+        gap:
+            11px;
+
+    }
+
+
+    .navbar-links a {
+
+        font-size:
+            12px;
+
+    }
+
+
+    .business-signup-intro h1 {
+
+        font-size:
+            25px;
+
+    }
+
+
+    .business-signup-card {
+
+        padding:
+            18px
+            14px;
+
+    }
+
+
+    .business-signup-note {
+
+        padding:
+            17px
+            14px;
+
+    }
+
+
+    .next-step {
+
+        align-items:
+            flex-start;
+
+    }
+
+}

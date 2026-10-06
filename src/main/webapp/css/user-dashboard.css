@@ -1,0 +1,494 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #eaf7ff;
+    color: #111827;
+    line-height: 1.5;
+}
+
+/* =========================
+   MAIN DASHBOARD
+   ========================= */
+
+.dashboard-container {
+    width: min(1100px, 92%);
+    margin: 40px auto;
+}
+
+/* =========================
+   HEADER
+   ========================= */
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.dashboard-header h1 {
+    margin: 0 0 8px;
+    color: #0b1117;
+    font-size: 34px;
+}
+
+.dashboard-header p {
+    margin: 0;
+    color: #5f7282;
+}
+
+.dashboard-header button {
+    border: none;
+    padding: 11px 20px;
+    border-radius: 24px;
+    background: #0b1117;
+    color: #ffffff;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.dashboard-header button:hover {
+    background: #17212b;
+    transform: translateY(-1px);
+}
+
+/* =========================
+   DASHBOARD NAVIGATION
+   ========================= */
+
+.dashboard-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 25px;
+    padding: 15px;
+    background: #ffffff;
+    border: 1px solid #cfe8f7;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(11, 17, 23, 0.07);
+}
+
+.dashboard-nav button {
+    border: 1px solid #46a8df;
+    padding: 10px 16px;
+    border-radius: 24px;
+    background: #a9defa;
+    color: #0b1117;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.dashboard-nav button:hover {
+    background: #46a8df;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* =========================
+   COMMON BUTTONS
+   ========================= */
+
+.dashboard-actions button,
+.claim-box button,
+.verification-form button,
+.verified-box button {
+    border: none;
+    padding: 11px 18px;
+    border-radius: 24px;
+    background: #a9defa;
+    color: #0b1117;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.dashboard-actions button:hover,
+.claim-box button:hover,
+.verification-form button:hover,
+.verified-box button:hover {
+    background: #46a8df;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* =========================
+   DASHBOARD SECTIONS
+   ========================= */
+
+.dashboard-section {
+    background: #ffffff;
+    padding: 25px;
+    margin-bottom: 25px;
+    border: 1px solid #cfe8f7;
+    border-radius: 14px;
+    box-shadow: 0 8px 24px rgba(11, 17, 23, 0.07);
+}
+
+.dashboard-section h2 {
+    margin-top: 0;
+    color: #0b1117;
+    font-size: 26px;
+}
+
+.dashboard-section > p {
+    color: #5f7282;
+}
+
+/* =========================
+   BUSINESS CARD
+   ========================= */
+
+.business-card {
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #cfe8f7;
+    border-radius: 10px;
+    background: #ffffff;
+}
+
+.business-card h3 {
+    margin-top: 0;
+    color: #0b1117;
+}
+
+.business-card p {
+    line-height: 1.6;
+    color: #4f6372;
+}
+
+.business-card strong {
+    color: #111827;
+}
+
+/* =========================
+   BUSINESS ACTIONS
+   ========================= */
+
+.dashboard-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #dfeef6;
+}
+
+.dashboard-actions button:first-child {
+    background: #0b1117;
+    color: #ffffff;
+}
+
+.dashboard-actions button:first-child:hover {
+    background: #17212b;
+    color: #ffffff;
+}
+
+/* =========================
+   STATUS
+   ========================= */
+
+.status {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.status-verified {
+    background: #a9defa;
+    color: #0b1117;
+}
+
+.status-pending {
+    background: #eaf7ff;
+    color: #246b8f;
+    border: 1px solid #cfe8f7;
+}
+
+/* =========================
+   VERIFICATION
+   ========================= */
+
+.verification-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid #dfeef6;
+}
+
+.verification-item:last-child {
+    border-bottom: none;
+}
+
+.verification-item strong {
+    color: #111827;
+}
+
+.verification-item p {
+    margin-bottom: 0;
+    color: #5f7282;
+}
+
+/* =========================
+   VERIFICATION BADGES
+   ========================= */
+
+.badge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 15px;
+    font-size: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.badge.verified {
+    background: #a9defa;
+    color: #0b1117;
+}
+
+.badge.not-verified {
+    background: #eaf7ff;
+    color: #246b8f;
+    border: 1px solid #cfe8f7;
+}
+
+/* =========================
+   VERIFICATION FORM
+   ========================= */
+
+.verification-form {
+    padding: 20px 0;
+}
+
+.verification-form label {
+    display: block;
+    margin-bottom: 8px;
+    color: #111827;
+    font-weight: bold;
+}
+
+.verification-form input {
+    width: 100%;
+    padding: 11px;
+    margin-bottom: 12px;
+    border: 1px solid #cfe8f7;
+    border-radius: 8px;
+    font-size: 14px;
+    background: #ffffff;
+    color: #111827;
+    outline: none;
+}
+
+.verification-form input::placeholder {
+    color: #8093a1;
+}
+
+.verification-form input:focus {
+    border-color: #46a8df;
+    box-shadow: 0 0 0 3px rgba(70, 168, 223, 0.15);
+}
+
+.help-text {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #5f7282;
+}
+
+.help-text strong {
+    color: #0b1117;
+}
+
+/* =========================
+   VERIFIED BOX
+   ========================= */
+
+.verified-box {
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    background: #eaf7ff;
+    border: 1px solid #a9defa;
+}
+
+.verified-box h3 {
+    color: #0b1117;
+    margin-top: 0;
+}
+
+.verified-box p {
+    color: #5f7282;
+    line-height: 1.6;
+}
+
+.verified-box button {
+    background: #0b1117;
+    color: #ffffff;
+}
+
+.verified-box button:hover {
+    background: #17212b;
+}
+
+/* =========================
+   CLAIM BUSINESS
+   ========================= */
+
+.claim-box {
+    max-width: 500px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.claim-box button {
+    flex: 1;
+    min-width: 170px;
+}
+
+.claim-box button:first-child {
+    background: #a9defa;
+    color: #0b1117;
+}
+
+.claim-box button:first-child:hover {
+    background: #46a8df;
+    color: #ffffff;
+}
+
+.claim-box button:last-child {
+    background: #0b1117;
+    color: #ffffff;
+}
+
+.claim-box button:last-child:hover {
+    background: #17212b;
+}
+
+/* =========================
+   MESSAGES
+   ========================= */
+
+.message {
+    margin-top: 15px;
+    line-height: 1.5;
+}
+
+.success-message {
+    color: #246b8f;
+    font-weight: bold;
+}
+
+.error-message {
+    color: #374151;
+    font-weight: bold;
+}
+
+/* =========================
+   LINKS
+   ========================= */
+
+.dashboard-container a {
+    color: #298dcc;
+    text-decoration: none;
+}
+
+.dashboard-container a:hover {
+    color: #0b1117;
+    text-decoration: underline;
+}
+
+/* =========================
+   RESPONSIVE
+   ========================= */
+
+@media (max-width: 700px) {
+
+    .dashboard-container {
+        width: 94%;
+        margin: 25px auto;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .dashboard-header h1 {
+        font-size: 29px;
+    }
+
+    .dashboard-header button {
+        width: 100%;
+    }
+
+    .dashboard-nav {
+        flex-direction: column;
+    }
+
+    .dashboard-nav button {
+        width: 100%;
+    }
+
+    .dashboard-section {
+        padding: 20px;
+    }
+
+    .dashboard-section h2 {
+        font-size: 23px;
+    }
+
+    .verification-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .dashboard-actions {
+        flex-direction: column;
+    }
+
+    .dashboard-actions button {
+        width: 100%;
+    }
+
+    .verification-form button {
+        width: 100%;
+    }
+
+    .claim-box {
+        flex-direction: column;
+        max-width: 100%;
+    }
+
+    .claim-box button {
+        width: 100%;
+    }
+
+    .verified-box button {
+        width: 100%;
+    }
+}

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, follow">
+<title>User Dashboard - Review Platform</title>
+<link rel="stylesheet" href="css/user-dashboard.css">
+</head>
+<body>
+	<div class="dashboard-container">
+		<header class="dashboard-header">
+			<div>
+				<h1>User Dashboard</h1>
+				<p id="userInfo">Loading user...</p>
+			</div>
+			<button type="button" onclick="logoutUser()">Logout</button>
+		</header>
+		<div class="dashboard-nav">
+			<button type="button" onclick="goToHome()">Home</button>
+			<button type="button" onclick="goToWriteReview()">Write a
+				Review</button>
+			<button type="button" onclick="goToWebsites()">Browse
+				Websites</button>
+			<button type="button" onclick="scrollToBusiness()">My
+				Business</button>
+			<button type="button" onclick="scrollToClaim()">Claim
+				Business</button>
+			<button type="button" onclick="openBusinessDashboard()">
+				Business Dashboard</button>
+
+		</div>
+		<section class="dashboard-section" id="myBusinessSection">
+			<h2>My Business</h2>
+			<div id="businessMessage" class="message">Loading business
+				information...</div>
+			<div id="businessInfo" class="business-card" style="display: none;">
+				<h3>Business Information</h3>
+				<p>
+					<strong> Business ID: </strong> <span id="businessId"> </span>
+
+				</p>
+				<p>
+					<strong> Business Name: </strong> <span id="businessName"> </span>
+				</p>
+				<p>
+					<strong> Official URL: </strong> <span id="officialUrl"> </span>
+				</p>
+				<p>
+					<strong> Business Status: </strong> <span id="businessStatus"
+						class="status"> </span>
+				</p>
+				<div class="dashboard-actions">
+					<button type="button" onclick="openBusinessDashboard()">
+						Open Business Dashboard</button>
+					<button type="button" onclick="scrollToVerification()">
+						Verify Business</button>
+				</div>
+			</div>
+			<div id="verificationSection" class="business-card"
+				style="display: none;">
+				<h3>Business Verification</h3>
+				<div class="verification-item">
+					<div>
+						<strong> Email Verification </strong>
+						<p id="emailVerificationStatus">Checking...</p>
+					</div>
+					<span id="emailBadge" class="badge"> </span>
+				</div>
+				<div id="emailVerificationForm" class="verification-form">
+					<label for="businessEmail"> Business Email </label> <input
+						type="email" id="businessEmail" placeholder="owner@example.com">
+					<button type="button" onclick="sendEmailVerification()">
+						Send Verification Email</button>
+					<p class="help-text">Your business email domain must match the
+						official website domain.</p>
+				</div>
+				<div class="verification-item">
+					<div>
+						<strong> Meta Tag Verification </strong>
+						<p>
+							Current status: <span id="metaStatus"> Checking... </span>
+						</p>
+					</div>
+					<span id="metaBadge" class="badge"> </span>
+				</div>
+				<div class="verification-item">
+					<div>
+						<strong> DNS Verification </strong>
+						<p>
+							Current status: <span id="dnsStatus"> Checking... </span>
+						</p>
+					</div>
+					<span id="dnsBadge" class="badge"> </span>
+				</div>
+				<div id="verifiedMessage" class="verified-box"
+					style="display: none;">
+					<h3>Business Verified</h3>
+					<p>Your business verification is complete.</p>
+					<button type="button" onclick="openBusinessDashboard()">
+						Open Business Dashboard</button>
+				</div>
+			</div>
+		</section>
+		<section class="dashboard-section" id="claimBusinessSection">
+			<h2>Claim a Business</h2>
+			<p>Find a business profile and claim it directly from the
+				business profile page.</p>
+			<div class="claim-box">
+				<button type="button" onclick="goToWebsites()">Browse
+					Websites</button>
+				<button type="button" onclick="goToHome()">Find a Business
+				</button>
+			</div>
+			<p class="help-text">
+				Open a business profile and use <strong> Claim This
+					Business </strong> to submit your ownership request.
+			</p>
+		</section>
+		<div id="dashboardMessage" class="message"></div>
+	</div>
+	<script src="js/user-dashboard.js"></script>
+</body>
+</html>

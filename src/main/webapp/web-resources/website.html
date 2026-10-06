@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <!-- SEO TITLE -->
+    <title th:text="${pageTitle}">
+        Website Reviews | Review Platform
+    </title>
+
+    <!-- META DESCRIPTION -->
+    <meta name="description"
+          th:content="${pageDescription}">
+
+    <!-- CANONICAL -->
+    <link rel="canonical"
+          th:href="${canonicalUrl}">
+
+    <!-- ROBOTS -->
+    <meta name="robots"
+          th:content="${thinPage ? 'noindex, follow' : 'index, follow'}">
+
+    <!-- OPEN GRAPH -->
+    <meta property="og:title"
+          th:content="${pageTitle}">
+
+    <meta property="og:description"
+          th:content="${pageDescription}">
+
+    <meta property="og:type"
+          content="website">
+
+    <meta property="og:url"
+          th:content="${canonicalUrl}">
+
+    <!-- BASIC STYLING -->
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f6f8;
+            color: #222;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: #ffffff;
+            border-bottom: 1px solid #ddd;
+            padding: 18px 0;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #222;
+            text-decoration: none;
+        }
+
+        .breadcrumb {
+            margin-top: 25px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .breadcrumb a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .website-card {
+            background: #ffffff;
+            margin-top: 20px;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .website-url {
+            color: #2563eb;
+            margin-bottom: 15px;
+        }
+
+        .description {
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .rating-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+
+        .rating {
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .review-count {
+            color: #666;
+            margin-left: 8px;
+        }
+
+        .reviews-section {
+            margin-top: 25px;
+        }
+
+        .review-card {
+            background: #ffffff;
+            padding: 20px;
+            margin-top: 15px;
+            border-radius: 8px;
+            border: 1px solid #e2e2e2;
+        }
+
+        .stars {
+            color: #f59e0b;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .review-comment {
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        .review-date {
+            color: #777;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        .verified {
+            color: #16803c;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .no-reviews {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 8px;
+            color: #666;
+        }
+
+        .button {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 18px;
+            background: #2563eb;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+
+        .button:hover {
+            background: #1d4ed8;
+        }
+
+        footer {
+            margin-top: 50px;
+            padding: 25px 0;
+            text-align: center;
+            color: #777;
+            font-size: 14px;
+        }
+
+    </style>
+
+    <!-- STRUCTURED DATA -->
+    <script type="application/ld+json"
+            th:inline="javascript">
+
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": /*[[${pageTitle}]]*/,
+            "description": /*[[${pageDescription}]]*/,
+            "url": /*[[${canonicalUrl}]]*/
+        }
+
+    </script>
+
+    <!-- BREADCRUMB STRUCTURED DATA -->
+    <script type="application/ld+json"
+            th:inline="javascript">
+
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": /*[[${currentUrl}]]*/
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": /*[[${website.name}]]*/,
+                    "item": /*[[${canonicalUrl}]]*/
+                }
+            ]
+        }
+
+    </script>
+
+</head>
+
+<body>
+
+<header>
+
+    <div class="container">
+
+        <a href="/review-platform/index.html"
+           class="logo">
+            Review Platform
+        </a>
+
+    </div>
+
+</header>
+
+<main class="container">
+
+    <!-- BREADCRUMB -->
+
+    <div class="breadcrumb">
+
+        <a href="/review-platform/index.html">
+            Home
+        </a>
+
+        <span> / </span>
+
+        <span th:text="${website.name}">
+            Website
+        </span>
+
+    </div>
+
+
+    <!-- WEBSITE INFORMATION -->
+
+    <section class="website-card">
+
+        <h1 th:text="${website.name}">
+            Website Name
+        </h1>
+
+        <div class="website-url"
+             th:text="${website.url}">
+            https://example.com
+        </div>
+
+        <p class="description"
+           th:if="${website.description != null and !website.description.isBlank()}"
+           th:text="${website.description}">
+            Website description
+        </p>
+
+
+        <!-- RATING -->
+
+        <div class="rating-box">
+
+            <span class="rating"
+                  th:text="${averageRating}">
+                0.0
+            </span>
+
+            <span>
+                / 5
+            </span>
+
+            <span class="review-count">
+
+                (
+                <span th:text="${reviewCount}">
+                    0
+                </span>
+
+                reviews)
+
+            </span>
+
+        </div>
+
+
+        <!-- OPEN INTERACTIVE REVIEW PAGE -->
+
+        <a class="button"
+           th:href="@{/review.html(websiteId=${website.id})}">
+
+            View & Write Reviews
+
+        </a>
+
+    </section>
+
+
+    <!-- REVIEWS -->
+
+    <section class="reviews-section">
+
+        <h2>
+            Customer Reviews
+        </h2>
+
+
+        <!-- REVIEW LIST -->
+
+        <div th:if="${!reviews.isEmpty()}">
+
+            <article class="review-card"
+                     th:each="review : ${reviews}">
+
+                <!-- RATING -->
+
+                <div class="stars">
+
+                    <span th:each="star : ${#numbers.sequence(1, 5)}"
+                          th:text="${star <= review.rating ? '★' : '☆'}">
+                        ★
+                    </span>
+
+                </div>
+
+
+                <!-- VERIFIED -->
+
+                <div class="verified"
+                     th:if="${review.verificationStatus != null and review.verificationStatus.equalsIgnoreCase('VERIFIED')}">
+
+                    Verified Review
+
+                </div>
+
+
+                <!-- COMMENT -->
+
+                <div class="review-comment"
+                     th:if="${review.comment != null}"
+                     th:text="${review.comment}">
+
+                    Review comment
+
+                </div>
+
+
+                <!-- DATE -->
+
+                <div class="review-date"
+                     th:if="${review.createdAt != null}"
+                     th:text="${#temporals.format(review.createdAt, 'dd MMM yyyy')}">
+
+                    01 Jan 2026
+
+                </div>
+
+            </article>
+
+        </div>
+
+
+        <!-- NO REVIEWS -->
+
+        <div class="no-reviews"
+             th:if="${reviews.isEmpty()}">
+
+            No approved reviews are available yet.
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<footer>
+
+    © Review Platform
+
+</footer>
+
+</body>
+
+</html>

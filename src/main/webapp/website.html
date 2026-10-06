@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title th:text="${pageTitle}">Website Reviews | Review Platform
+</title>
+<meta name="description" th:content="${pageDescription}">
+<meta name="robots"
+	th:content="${thinPage ? 'noindex,follow' : 'index,follow'}">
+<link rel="canonical" th:href="${canonicalUrl}">
+<meta property="og:title" th:content="${pageTitle}">
+<meta property="og:description" th:content="${pageDescription}">
+<meta property="og:type" content="website">
+<meta property="og:url" th:content="${canonicalUrl}">
+<style>
+body {
+	font-family: Arial, sans-serif;
+	background: #f5f5f5;
+	margin: 0;
+	padding: 0;
+	color: #222;
+}
+.container {
+	max-width: 1000px;
+	margin: 40px auto;
+	padding: 20px;
+}
+.website-card {
+	background: white;
+	padding: 25px;
+	border-radius: 10px;
+	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+	margin-bottom: 25px;
+}
+h1 {
+	margin-top: 0;
+}
+.website-url {
+	color: #2563eb;
+	text-decoration: none;
+}
+.rating {
+	font-size: 22px;
+	font-weight: bold;
+	margin: 15px 0;
+}
+.review-card {
+	background: white;
+	padding: 20px;
+	margin-bottom: 15px;
+	border-radius: 8px;
+	box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+}
+.stars {
+	color: #f59e0b;
+	font-size: 20px;
+}
+.review-comment {
+	margin-top: 10px;
+	line-height: 1.6;
+}
+.write-review {
+	display: inline-block;
+	margin-top: 15px;
+	padding: 10px 18px;
+	background: #2563eb;
+	color: white;
+	text-decoration: none;
+	border-radius: 6px;
+}
+.no-reviews {
+	background: white;
+	padding: 20px;
+	border-radius: 8px;
+}
+.breadcrumb {
+	margin-bottom: 20px;
+	font-size: 14px;
+}
+.breadcrumb a {
+	color: #2563eb;
+	text-decoration: none;
+}
+</style>
+<script type="application/ld+json" th:inline="javascript">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": [[${pageTitle}]],
+            "description": [[${pageDescription}]],
+            "url": [[${canonicalUrl}]]
+        }
+    </script>
+<script type="application/ld+json" th:inline="javascript">
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": [[${currentUrl}]]
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": [[${website.name}]],
+                    "item": [[${canonicalUrl}]]
+                }
+            ]
+        }
+    </script>
+</head>
+<body>
+	<div class="container">
+		<div class="breadcrumb">
+			<a th:href="@{/index.html}">Home</a> / <span
+				th:text="${website.name}"> Website </span>
+		</div>
+		<div class="website-card">
+			<h1 th:text="${website.name}">Website Name</h1>
+			<p th:if="${website.description != null}"
+				th:text="${website.description}">Website description</p>
+			<p th:if="${website.url != null}">
+				<strong>Website:</strong> <a class="website-url"
+					th:href="${website.url}" th:text="${website.url}" target="_blank"
+					rel="noopener noreferrer"> Website URL </a>
+			</p>
+			<div class="rating">
+				⭐ <span th:text="${averageRating != null ? averageRating : 0}">
+					0 </span> / 5 <span> ( <span
+					th:text="${reviewCount != null ? reviewCount : 0}"> 0 </span>
+					reviews)
+				</span>
+			</div>
+			<a class="write-review"
+				th:href="@{/review.html(websiteId=${website.id})}"> Read &amp;
+				Write Reviews </a>
+		</div>
+		<h2>Customer Reviews</h2>
+		<div th:if="${#lists.isEmpty(reviews)}" class="no-reviews">
+			<p>No approved reviews are available for this website yet.</p>
+		</div>
+		<div th:each="review : ${reviews}" class="review-card">
+			<div class="stars">
+				<span th:if="${review.rating >= 1}">★</span> <span
+					th:if="${review.rating >= 2}">★</span> <span
+					th:if="${review.rating >= 3}">★</span> <span
+					th:if="${review.rating >= 4}">★</span> <span
+					th:if="${review.rating >= 5}">★</span>
+			</div>
+			<div class="review-comment" th:text="${review.comment}">Review
+				comment</div>
+		</div>
+	</div>
+</body>
+</html>

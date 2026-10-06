@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, follow">
+
+    <title>Create Business Profile - Review Platform</title>
+
+    <link rel="stylesheet" href="css/business-signup.css">
+</head>
+
+<body>
+
+<header class="top-navbar">
+
+    <div class="navbar-container">
+
+        <a href="index.html" class="brand-logo">
+            <span class="brand-star"></span>
+            <span>Review<span class="brand-highlight">Platform</span></span>
+        </a>
+
+        <nav class="navbar-links">
+            <a href="index.html">Home</a>
+            <a href="login.html">Log in</a>
+        </nav>
+
+    </div>
+
+</header>
+
+<main class="business-signup-page">
+
+    <section class="business-signup-section">
+
+        <div class="business-signup-intro">
+
+            <div class="business-badge">FOR BUSINESSES</div>
+
+            <h1>Create your business profile</h1>
+
+            <p>
+                Add your business to Review Platform and start managing your
+                business profile and customer reviews.
+            </p>
+
+        </div>
+
+        <div class="business-signup-card">
+
+            <h2>Business details</h2>
+
+            <form id="businessSignupForm">
+
+                <div class="form-group">
+
+                    <label for="businessName">Business Name</label>
+
+                    <input
+                        type="text"
+                        id="businessName"
+                        name="businessName"
+                        placeholder="Enter your business name"
+                        maxlength="200"
+                        required>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="officialUrl">Business Website</label>
+
+                    <input
+                        type="url"
+                        id="officialUrl"
+                        name="officialUrl"
+                        placeholder="https://example.com"
+                        maxlength="500"
+                        required>
+
+                    <small>Enter your official business website URL.</small>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="category">Business Category</label>
+
+                    <select id="category" name="category" required>
+
+                        <option value="">Select a category</option>
+                        <option value="Bank">Bank</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Travel">Travel</option>
+                        <option value="Food">Food</option>
+                        <option value="Technology">Technology</option>
+                        <option value="Education">Education</option>
+                        <option value="Health">Health</option>
+                        <option value="Finance">Finance</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Automotive">Automotive</option>
+                        <option value="Other">Other</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="country">Country</label>
+
+                    <select id="country" name="country" required>
+
+                        <option value="">Select a country</option>
+                        <option value="India">India</option>
+                        <option value="United States">United States</option>
+                        <option value="United Kingdom">United Kingdom</option>
+                        <option value="Canada">Canada</option>
+                        <option value="Australia">Australia</option>
+                        <option value="Germany">Germany</option>
+                        <option value="France">France</option>
+                        <option value="United Arab Emirates">United Arab Emirates</option>
+                        <option value="Singapore">Singapore</option>
+                        <option value="Japan">Japan</option>
+                        <option value="China">China</option>
+                        <option value="Pakistan">Pakistan</option>
+                        <option value="Nepal">Nepal</option>
+                        <option value="Bangladesh">Bangladesh</option>
+                        <option value="Other">Other</option>
+
+                    </select>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="businessEmail">Business Email</label>
+
+                    <input
+                        type="email"
+                        id="businessEmail"
+                        name="businessEmail"
+                        placeholder="owner@example.com"
+                        maxlength="255">
+
+                    <small>Use your official business email for verification.</small>
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="description">Business Description</label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        placeholder="Tell customers about your business..."
+                        maxlength="2000"
+                        rows="6"></textarea>
+
+                    <small>Maximum 2000 characters.</small>
+
+                </div>
+
+                <div
+                    id="businessSignupMessage"
+                    class="business-signup-message">
+                </div>
+
+                <button
+                    type="submit"
+                    id="createBusinessButton"
+                    class="create-business-button">
+
+                    Create Business Profile
+
+                </button>
+
+                <a href="index.html" class="cancel-button">Cancel</a>
+
+            </form>
+
+            <p class="login-info">
+                Already have an account?
+                <a href="login.html">Log in</a>
+            </p>
+
+        </div>
+
+        <div class="business-signup-note">
+
+            <h3>What happens next?</h3>
+
+            <div class="next-step">
+                <span class="step-number">1</span>
+                <span>Create your business profile</span>
+            </div>
+
+            <div class="next-step">
+                <span class="step-number">2</span>
+                <span>Manage your claim and verification</span>
+            </div>
+
+            <div class="next-step">
+                <span class="step-number">3</span>
+                <span>Access your business dashboard</span>
+            </div>
+
+        </div>
+
+    </section>
+
+</main>
+
+<footer class="site-footer">
+
+    <p>© 2026 Review Platform. All rights reserved.</p>
+
+</footer>
+
+<script src="js/business-signup.js"></script>
+
+</body>
+
+</html>
+

@@ -3,197 +3,227 @@ package com.nit.dto;
 
 public class WebsiteResponseDTO {
 
-	private Long id;
-	private String name;
-	private String url;
-	private String description;
-	private String canonicalDomain;
-	private String seoTitle;
-	private String seoDescription;
-	private String canonicalUrl;
-	private boolean claimed;
-	private boolean verified;
-	private double averageRating;
-	private int reviewCount;
-	private int fiveStarCount;
-	private int fourStarCount;
-	private int threeStarCount;
-	private int twoStarCount;
-	private int oneStarCount;
+    private Long id;
+    private String name;
+    private String url;
+    private String description;
+    private String canonicalDomain;
+    private String seoTitle;
+    private String seoDescription;
+    private String canonicalUrl;
 
-	public WebsiteResponseDTO() {
-	}
+    // New fields
+    private String category;
+    private String country;
 
-	public WebsiteResponseDTO(Long id, String name, String url, String description, String canonicalDomain,
-			String seoTitle, String seoDescription, String canonicalUrl) {
+    private boolean claimed;
+    private boolean verified;
+    private double averageRating;
+    private int reviewCount;
+    private int fiveStarCount;
+    private int fourStarCount;
+    private int threeStarCount;
+    private int twoStarCount;
+    private int oneStarCount;
 
-		this.id = id;
-		this.name = name;
-		this.url = url;
-		this.description = description;
-		this.canonicalDomain = canonicalDomain;
-		this.seoTitle = seoTitle;
-		this.seoDescription = seoDescription;
-		this.canonicalUrl = canonicalUrl;
-	}
+    public WebsiteResponseDTO() {
+    }
 
-	public WebsiteResponseDTO(Long id, String name, String url, String description, String canonicalDomain,
-			String seoTitle, String seoDescription, String canonicalUrl, boolean claimed, boolean verified,
-			double averageRating, int reviewCount, int fiveStarCount, int fourStarCount, int threeStarCount,
-			int twoStarCount, int oneStarCount) {
+    public WebsiteResponseDTO(Long id, String name, String url, String description,
+            String canonicalDomain, String seoTitle, String seoDescription,
+            String canonicalUrl) {
 
-		this.id = id;
-		this.name = name;
-		this.url = url;
-		this.description = description;
-		this.canonicalDomain = canonicalDomain;
-		this.seoTitle = seoTitle;
-		this.seoDescription = seoDescription;
-		this.canonicalUrl = canonicalUrl;
-		this.claimed = claimed;
-		this.verified = verified;
-		this.averageRating = averageRating;
-		this.reviewCount = reviewCount;
-		this.fiveStarCount = fiveStarCount;
-		this.fourStarCount = fourStarCount;
-		this.threeStarCount = threeStarCount;
-		this.twoStarCount = twoStarCount;
-		this.oneStarCount = oneStarCount;
-	}
+        this.id = id;
+        this.name = name;
+        this.url = url;
+        this.description = description;
+        this.canonicalDomain = canonicalDomain;
+        this.seoTitle = seoTitle;
+        this.seoDescription = seoDescription;
+        this.canonicalUrl = canonicalUrl;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public WebsiteResponseDTO(Long id, String name, String url, String description,
+            String canonicalDomain, String seoTitle, String seoDescription,
+            String canonicalUrl, boolean claimed, boolean verified,
+            double averageRating, int reviewCount, int fiveStarCount,
+            int fourStarCount, int threeStarCount, int twoStarCount,
+            int oneStarCount) {
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+        this.id = id;
+        this.name = name;
+        this.url = url;
+        this.description = description;
+        this.canonicalDomain = canonicalDomain;
+        this.seoTitle = seoTitle;
+        this.seoDescription = seoDescription;
+        this.canonicalUrl = canonicalUrl;
+        this.claimed = claimed;
+        this.verified = verified;
+        this.averageRating = averageRating;
+        this.reviewCount = reviewCount;
+        this.fiveStarCount = fiveStarCount;
+        this.fourStarCount = fourStarCount;
+        this.threeStarCount = threeStarCount;
+        this.twoStarCount = twoStarCount;
+        this.oneStarCount = oneStarCount;
+    }
 
-	public String getName() {
-		return name;
-	}
+    // Existing getters and setters
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public String getUrl() {
-		return url;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setUrl(String url) {
-		this.url = url;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getDescription() {
-		return description;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public String getUrl() {
+        return url;
+    }
 
-	public String getCanonicalDomain() {
-		return canonicalDomain;
-	}
+    public void setUrl(String url) {
+        this.url = url;
+    }
 
-	public void setCanonicalDomain(String canonicalDomain) {
-		this.canonicalDomain = canonicalDomain;
-	}
+    public String getDescription() {
+        return description;
+    }
 
-	public String getSeoTitle() {
-		return seoTitle;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setSeoTitle(String seoTitle) {
-		this.seoTitle = seoTitle;
-	}
+    public String getCanonicalDomain() {
+        return canonicalDomain;
+    }
 
-	public String getSeoDescription() {
-		return seoDescription;
-	}
+    public void setCanonicalDomain(String canonicalDomain) {
+        this.canonicalDomain = canonicalDomain;
+    }
 
-	public void setSeoDescription(String seoDescription) {
-		this.seoDescription = seoDescription;
-	}
+    public String getSeoTitle() {
+        return seoTitle;
+    }
 
-	public String getCanonicalUrl() {
-		return canonicalUrl;
-	}
+    public void setSeoTitle(String seoTitle) {
+        this.seoTitle = seoTitle;
+    }
 
-	public void setCanonicalUrl(String canonicalUrl) {
-		this.canonicalUrl = canonicalUrl;
-	}
+    public String getSeoDescription() {
+        return seoDescription;
+    }
 
-	public boolean isClaimed() {
-		return claimed;
-	}
+    public void setSeoDescription(String seoDescription) {
+        this.seoDescription = seoDescription;
+    }
 
-	public void setClaimed(boolean claimed) {
-		this.claimed = claimed;
-	}
+    public String getCanonicalUrl() {
+        return canonicalUrl;
+    }
 
-	public boolean isVerified() {
-		return verified;
-	}
+    public void setCanonicalUrl(String canonicalUrl) {
+        this.canonicalUrl = canonicalUrl;
+    }
 
-	public void setVerified(boolean verified) {
-		this.verified = verified;
-	}
+    // New category getter and setter
 
-	public double getAverageRating() {
-		return averageRating;
-	}
+    public String getCategory() {
+        return category;
+    }
 
-	public void setAverageRating(double averageRating) {
-		this.averageRating = averageRating;
-	}
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
-	public int getReviewCount() {
-		return reviewCount;
-	}
+    // New country getter and setter
 
-	public void setReviewCount(int reviewCount) {
-		this.reviewCount = reviewCount;
-	}
+    public String getCountry() {
+        return country;
+    }
 
-	public int getFiveStarCount() {
-		return fiveStarCount;
-	}
+    public void setCountry(String country) {
+        this.country = country;
+    }
 
-	public void setFiveStarCount(int fiveStarCount) {
-		this.fiveStarCount = fiveStarCount;
-	}
+    public boolean isClaimed() {
+        return claimed;
+    }
 
-	public int getFourStarCount() {
-		return fourStarCount;
-	}
+    public void setClaimed(boolean claimed) {
+        this.claimed = claimed;
+    }
 
-	public void setFourStarCount(int fourStarCount) {
-		this.fourStarCount = fourStarCount;
-	}
+    public boolean isVerified() {
+        return verified;
+    }
 
-	public int getThreeStarCount() {
-		return threeStarCount;
-	}
+    public void setVerified(boolean verified) {
+        this.verified = verified;
+    }
 
-	public void setThreeStarCount(int threeStarCount) {
-		this.threeStarCount = threeStarCount;
-	}
+    public double getAverageRating() {
+        return averageRating;
+    }
 
-	public int getTwoStarCount() {
-		return twoStarCount;
-	}
+    public void setAverageRating(double averageRating) {
+        this.averageRating = averageRating;
+    }
 
-	public void setTwoStarCount(int twoStarCount) {
-		this.twoStarCount = twoStarCount;
-	}
+    public int getReviewCount() {
+        return reviewCount;
+    }
 
-	public int getOneStarCount() {
-		return oneStarCount;
-	}
+    public void setReviewCount(int reviewCount) {
+        this.reviewCount = reviewCount;
+    }
 
-	public void setOneStarCount(int oneStarCount) {
-		this.oneStarCount = oneStarCount;
-	}
+    public int getFiveStarCount() {
+        return fiveStarCount;
+    }
+
+    public void setFiveStarCount(int fiveStarCount) {
+        this.fiveStarCount = fiveStarCount;
+    }
+
+    public int getFourStarCount() {
+        return fourStarCount;
+    }
+
+    public void setFourStarCount(int fourStarCount) {
+        this.fourStarCount = fourStarCount;
+    }
+
+    public int getThreeStarCount() {
+        return threeStarCount;
+    }
+
+    public void setThreeStarCount(int threeStarCount) {
+        this.threeStarCount = threeStarCount;
+    }
+
+    public int getTwoStarCount() {
+        return twoStarCount;
+    }
+
+    public void setTwoStarCount(int twoStarCount) {
+        this.twoStarCount = twoStarCount;
+    }
+
+    public int getOneStarCount() {
+        return oneStarCount;
+    }
+
+    public void setOneStarCount(int oneStarCount) {
+        this.oneStarCount = oneStarCount;
+    }
 }

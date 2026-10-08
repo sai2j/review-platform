@@ -1,4 +1,3 @@
-
 package com.nit.user;
 
 import java.util.HashMap;
@@ -6,10 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import com.nit.business.BusinessclaimRepository;
+import com.nit.dto.PublicUserProfileDTO;
+import com.nit.dto.UserProfileDTO;
 import com.nit.dto.UserResponseDTO;
 import com.nit.security.BruteForceProtectionService;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,7 +28,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -54,17 +58,20 @@ public class UserController {
         this.businessClaimRepository = businessClaimRepository;
     }
 
+    // USER REGISTRATION
+
     @PostMapping("/register")
     public UserResponseDTO registerUser(
             @Valid @RequestBody User user) {
 
         User savedUser = userService.registerUser(
                 user.getEmail(),
-                user.getPassword()
-        );
+                user.getPassword());
 
         return toUserResponseDTO(savedUser);
     }
+
+    // USER LOGIN
 
     @PostMapping("/login")
     public ResponseEntity<Map<String, Object>> loginUser(
@@ -84,8 +91,7 @@ public class UserController {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put(
                     "error",
-                    "Too many failed login attempts. Please try again later."
-            );
+                    "Too many failed login attempts. Please try again later.");
 
             return ResponseEntity
                     .status(HttpStatus.TOO_MANY_REQUESTS)
@@ -96,12 +102,10 @@ public class UserController {
             Authentication authentication =
                     authenticationManager.authenticate(
                             new UsernamePasswordAuthenticationToken(
-                                    email,
-                                    password
-                            )
-                    );
+                                    email, password));
 
-            bruteForceProtectionService.recordSuccessfulLogin(protectionKey);
+            bruteForceProtectionService.recordSuccessfulLogin(
+                    protectionKey);
 
             request.getSession(true);
             request.changeSessionId();
@@ -112,14 +116,11 @@ public class UserController {
             securityContext.setAuthentication(authentication);
             SecurityContextHolder.setContext(securityContext);
 
-            HttpSessionSecurityContextRepository securityContextRepository =
+            HttpSessionSecurityContextRepository repository =
                     new HttpSessionSecurityContextRepository();
 
-            securityContextRepository.saveContext(
-                    securityContext,
-                    request,
-                    response
-            );
+            repository.saveContext(
+                    securityContext, request, response);
 
             User loggedInUser = userService.getUserByEmail(email);
 
@@ -131,7 +132,8 @@ public class UserController {
                     session.invalidate();
                 }
 
-                throw new RuntimeException("Authenticated user not found");
+                throw new RuntimeException(
+                        "Authenticated user not found");
             }
 
             boolean admin = userService.isAdmin(loggedInUser.getId());
@@ -144,7 +146,8 @@ public class UserController {
 
         } catch (Exception e) {
             SecurityContextHolder.clearContext();
-            bruteForceProtectionService.recordFailedAttempt(protectionKey);
+            bruteForceProtectionService.recordFailedAttempt(
+                    protectionKey);
 
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "Invalid email or password");
@@ -154,6 +157,8 @@ public class UserController {
                     .body(errorResponse);
         }
     }
+
+    // USER LOGOUT
 
     @PostMapping("/logout")
     public ResponseEntity<Map<String, String>> logoutUser(
@@ -171,6 +176,46 @@ public class UserController {
 
         return ResponseEntity.ok(result);
     }
+
+    // MY PROFILE
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/profile")
+    public UserProfileDTO getMyProfile() {
+        return userService.getMyProfile();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PutMapping("/profile")
+    public UserProfileDTO updateMyProfile(
+            @RequestBody UserProfileDTO profileDTO) {
+
+        return userService.updateMyProfile(profileDTO);
+    }
+
+    // UPLOAD OR REPLACE MY AVATAR
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping(
+            value = "/profile/avatar",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public UserProfileDTO uploadMyAvatar(
+            @RequestPart("file") MultipartFile file) {
+
+        return userService.uploadMyAvatar(file);
+    }
+
+    // PUBLIC USER PROFILE
+
+    @GetMapping("/public-profile/{id}")
+    public ResponseEntity<PublicUserProfileDTO> getPublicProfile(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                userService.getPublicProfile(id));
+    }
+
+    // DELETE MY ACCOUNT
 
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/me")
@@ -192,6 +237,8 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    // ADMIN: CREATE USER
+
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public UserResponseDTO createUser(
@@ -200,23 +247,26 @@ public class UserController {
         return toUserResponseDTO(userService.saveUser(user));
     }
 
+    // ADMIN: GET ALL USERS
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<UserResponseDTO> getAllUsers() {
-
         return userService.getAllUsers()
                 .stream()
                 .map(this::toUserResponseDTO)
                 .toList();
     }
 
+    // ADMIN: GET USER BY ID
+
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
-    public UserResponseDTO getUserById(
-            @PathVariable Long id) {
-
+    public UserResponseDTO getUserById(@PathVariable Long id) {
         return toUserResponseDTO(userService.getUserById(id));
     }
+
+    // ADMIN: UPDATE USER STATUS
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/status")
@@ -225,9 +275,10 @@ public class UserController {
             @RequestParam String status) {
 
         return toUserResponseDTO(
-                userService.updateUserStatus(id, status)
-        );
+                userService.updateUserStatus(id, status));
     }
+
+    // ADMIN: UPDATE USER PASSWORD
 
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/password")
@@ -236,9 +287,25 @@ public class UserController {
             @RequestParam String newPassword) {
 
         return toUserResponseDTO(
-                userService.updateUserPassword(id, newPassword)
-        );
+                userService.updateUserPassword(id, newPassword));
     }
+
+    // ADMIN: ASSIGN OR REMOVE MODERATOR ROLE
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}/moderator")
+    public ResponseEntity<UserResponseDTO> updateModeratorRole(
+            @PathVariable Long id,
+            @RequestParam boolean enabled) {
+
+        User updatedUser =
+                userService.updateModeratorRole(id, enabled);
+
+        return ResponseEntity.ok(
+                toUserResponseDTO(updatedUser));
+    }
+
+    // ADMIN: DELETE USER
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
@@ -246,6 +313,8 @@ public class UserController {
         userService.deleteUser(id);
         return "User deleted successfully";
     }
+
+    // RESPONSE DTO CONVERSION
 
     private UserResponseDTO toUserResponseDTO(User user) {
         if (user == null) {
@@ -257,7 +326,6 @@ public class UserController {
                 user.getName(),
                 user.getEmail(),
                 user.getRole(),
-                user.getStatus()
-        );
+                user.getStatus());
     }
 }

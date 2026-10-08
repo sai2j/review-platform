@@ -49,14 +49,12 @@ public class WebsiteController {
         return websiteService.getWebsitesPage(page, size);
     }
 
-    // Existing search endpoint preserved
     @GetMapping("/search")
     public List<WebsiteResponseDTO> searchWebsites(
             @RequestParam(required = false) String q) {
         return websiteService.searchWebsites(q);
     }
 
-    // NEW: Paginated search endpoint
     @GetMapping("/search/page")
     public WebsitePageResponseDTO searchWebsitesPage(
             @RequestParam(required = false) String q,
@@ -65,7 +63,6 @@ public class WebsiteController {
         return websiteService.searchWebsitesPage(q, page, size);
     }
 
-    // Existing filter endpoint preserved
     @GetMapping("/filter")
     public List<WebsiteResponseDTO> filterWebsites(
             @RequestParam(required = false) String category,
@@ -73,7 +70,6 @@ public class WebsiteController {
         return websiteService.filterWebsites(category, country);
     }
 
-    // NEW: Paginated filter endpoint
     @GetMapping("/filter/page")
     public WebsitePageResponseDTO filterWebsitesPage(
             @RequestParam(required = false) String category,
@@ -108,6 +104,28 @@ public class WebsiteController {
         return websiteService.getWebsiteById(id);
     }
 
+    // ============================================
+    // TASK 4: ADMIN - FIND DUPLICATE WEBSITES
+    // ============================================
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/duplicates")
+    public List<WebsiteResponseDTO> findDuplicateWebsites() {
+        return websiteService.findDuplicateWebsites();
+    }
+
+    // ============================================
+    // TASK 4: ADMIN - MERGE DUPLICATE WEBSITES
+    // ============================================
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{sourceId}/merge-into/{targetId}")
+    public WebsiteResponseDTO mergeWebsites(
+            @PathVariable Long sourceId,
+            @PathVariable Long targetId) {
+        return websiteService.mergeWebsites(sourceId, targetId);
+    }
+
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}/seo")
     public WebsiteResponseDTO updateSeo(
@@ -128,3 +146,4 @@ public class WebsiteController {
         websiteService.deleteWebsite(id);
     }
 }
+

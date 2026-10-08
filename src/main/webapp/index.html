@@ -3,36 +3,185 @@
 
 <head>
 
-	<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-	<meta
-		name="viewport"
-		content="width=device-width, initial-scale=1.0"
-	>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
-	<meta
-		name="review-platform-verification"
-		content="64fb5fa0-34b4-4088-9451-fbd02a20a2d1"
-	>
+    <meta
+        name="review-platform-verification"
+        content="64fb5fa0-34b4-4088-9451-fbd02a20a2d1"
+    >
 
-	<meta
-		name="robots"
-		content="index, follow"
-	>
+    <meta
+        name="robots"
+        content="index, follow"
+    >
 
-	<title>
-		Review Platform
-	</title>
+    <title>
+        Review Platform
+    </title>
 
-	<link
-		rel="stylesheet"
-		href="css/style.css"
-	>
+    <link
+        rel="stylesheet"
+        href="css/style.css"
+    >
 
-	<link
-		rel="stylesheet"
-		href="css/theme.css"
-	>
+    <link
+        rel="stylesheet"
+        href="css/theme.css"
+    >
+
+    <style>
+
+        /* =====================================================
+           NOTIFICATION UI
+        ===================================================== */
+
+        .notification-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .notification-button {
+            position: relative;
+            border: none;
+            background: transparent;
+            color: inherit;
+            padding: 8px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .notification-button:hover {
+            background: rgba(0, 0, 0, 0.06);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 17px;
+            height: 17px;
+            padding: 0 4px;
+            border-radius: 20px;
+            background: #ef4444;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 17px;
+            text-align: center;
+            display: none;
+        }
+
+        .notification-dropdown {
+            position: absolute;
+            top: calc(100% + 10px);
+            right: 0;
+            width: 360px;
+            max-width: calc(100vw - 30px);
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            display: none;
+            overflow: hidden;
+        }
+
+        .notification-dropdown.show {
+            display: block;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .notification-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .notification-mark-all {
+            border: none;
+            background: transparent;
+            color: #2563eb;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .notification-mark-all:hover {
+            text-decoration: underline;
+        }
+
+        .notification-list {
+            max-height: 380px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 13px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .notification-item:hover {
+            background: #f8fafc;
+        }
+
+        .notification-item.unread {
+            background: #eff6ff;
+        }
+
+        .notification-message {
+            margin: 0 0 5px;
+            font-size: 13px;
+            line-height: 1.45;
+            color: #1f2937;
+        }
+
+        .notification-time {
+            margin: 0;
+            font-size: 11px;
+            color: #6b7280;
+        }
+
+        .notification-empty {
+            padding: 28px 16px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 13px;
+        }
+
+        .notification-error {
+            padding: 20px 16px;
+            text-align: center;
+            color: #dc2626;
+            font-size: 13px;
+        }
+
+        @media (max-width: 600px) {
+
+            .notification-dropdown {
+                position: fixed;
+                top: 70px;
+                right: 10px;
+                width: calc(100vw - 20px);
+            }
+
+        }
+
+    </style>
 
 </head>
 
@@ -40,818 +189,1057 @@
 <body>
 
 
-	<!-- =====================================================
-	     NAVBAR
-	===================================================== -->
+    <!-- =====================================================
+         NAVBAR
+    ===================================================== -->
 
-	<nav class="navbar">
+    <nav class="navbar">
 
-		<div class="logo">
+        <div class="logo">
 
-			Review <span>Platform</span>
+            Review <span>Platform</span>
 
-		</div>
+        </div>
 
 
-		<div class="nav-links">
+        <div class="nav-links">
 
-			<a
-				href="index.html"
-				class="active"
-			>
-				Home
-			</a>
+            <a
+                href="index.html"
+                class="active"
+            >
+                Home
+            </a>
 
 
-			<a href="#websites">
-				Websites
-			</a>
+            <!--
+                IMPORTANT:
+                Websites now points to the website
+                ranking/list section.
+            -->
 
+            <a href="#websites">
+                Websites
+            </a>
 
-			<a
-				href="login.html"
-				id="homeLoginLink"
-			>
-				Login
-			</a>
 
+            <a
+                href="login.html"
+                id="homeLoginLink"
+            >
+                Login
+            </a>
 
-			<a
-				href="register.html"
-				id="homeRegisterLink"
-			>
-				Register
-			</a>
 
+            <a
+                href="register.html"
+                id="homeRegisterLink"
+            >
+                Register
+            </a>
 
-			<a
-				href="business-signup.html"
-				class="business-nav-button"
-			>
-				For Businesses
-			</a>
 
+            <a
+                href="business-signup.html"
+                class="business-nav-button"
+            >
+                For Businesses
+            </a>
 
-			<a
-				href="user-dashboard.html"
-				id="homeDashboardLink"
-				style="display: none;"
-			>
-				My Dashboard
-			</a>
 
+            <a
+                href="user-dashboard.html"
+                id="homeDashboardLink"
+                style="display: none;"
+            >
+                My Dashboard
+            </a>
 
-			<button
-				type="button"
-				id="homeLogoutButton"
-				style="
-					display: none;
-					border: none;
-					padding: 9px 14px;
-					border-radius: 6px;
-					background: #ef4444;
-					color: #ffffff;
-					font-size: 14px;
-					font-weight: 600;
-					cursor: pointer;
-				"
-			>
-				Logout
-			</button>
 
-		</div>
+            <!-- =================================================
+                 NOTIFICATIONS
+            ================================================= -->
 
-	</nav>
+            <div
+                class="notification-wrapper"
+                id="notificationWrapper"
+                style="display: none;"
+            >
 
+                <button
+                    type="button"
+                    id="notificationButton"
+                    class="notification-button"
+                    title="Notifications"
+                    aria-label="Notifications"
+                >
 
+                    🔔
 
-	<!-- =====================================================
-	     HERO SECTION
-	===================================================== -->
+                    <span
+                        id="notificationBadge"
+                        class="notification-badge"
+                    >
+                        0
+                    </span>
 
-	<section class="hero">
+                </button>
 
-		<div class="hero-content">
 
-			<h1>
+                <div
+                    id="notificationDropdown"
+                    class="notification-dropdown"
+                >
 
-				Discover
-				<span>
-					Trusted
-				</span>
-				Websites
+                    <div class="notification-header">
 
-			</h1>
+                        <h3>
+                            Notifications
+                        </h3>
 
+                        <button
+                            type="button"
+                            id="notificationMarkAll"
+                            class="notification-mark-all"
+                        >
+                            Mark all as read
+                        </button>
 
-			<p>
-				Read real reviews, share your experience and help others
-				make better decisions.
-			</p>
+                    </div>
 
 
-			<div class="search-box">
+                    <div
+                        id="notificationList"
+                        class="notification-list"
+                    >
 
-				<div class="search-icon">
-					&#128269;
-				</div>
+                        <div class="notification-empty">
+                            No notifications.
+                        </div>
 
+                    </div>
 
-				<input
-					type="text"
-					id="searchInput"
-					placeholder="Search website or category..."
-				>
+                </div>
 
+            </div>
 
-				<button
-					type="button"
-					id="searchButton"
-				>
-					Search
-				</button>
 
-			</div>
+            <button
+                type="button"
+                id="homeLogoutButton"
+                style="
+                    display: none;
+                    border: none;
+                    padding: 9px 14px;
+                    border-radius: 6px;
+                    background: #ef4444;
+                    color: #ffffff;
+                    font-size: 14px;
+                    font-weight: 600;
+                    cursor: pointer;
+                "
+            >
+                Logout
+            </button>
 
-		</div>
+        </div>
 
-	</section>
+    </nav>
 
 
+    <!-- =====================================================
+         HERO SECTION
+    ===================================================== -->
 
-	<!-- =====================================================
-	     SEARCH RESULTS
-	===================================================== -->
+    <section class="hero">
 
-	<section
-		class="search-results-section"
-		id="searchResultsSection"
-	>
+        <div class="hero-content">
 
-		<div
-			id="websiteList"
-			class="website-list"
-		>
-		</div>
+            <h1>
 
-	</section>
+                Discover
 
+                <span>
+                    Trusted
+                </span>
 
+                Websites
 
-	<!-- =====================================================
-	     CATEGORY SECTION
-	===================================================== -->
+            </h1>
 
-	<section class="category-section">
 
-		<div class="category-heading-row">
+            <p>
 
-			<h2>
-				What are you looking for?
-			</h2>
+                Read real reviews, share your experience and help others
+                make better decisions.
 
+            </p>
 
-			<button
-				type="button"
-				id="seeMoreCategories"
-				class="see-more-button"
-			>
-				See more
-			</button>
 
-		</div>
+            <div class="search-box">
 
+                <div class="search-icon">
+                    🔍
+                </div>
 
-		<div
-			class="category-list"
-			id="categoryList"
-		>
 
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Search website or category..."
+                >
 
-			<button
-				type="button"
-				class="category-item"
-				data-category="Bank"
-			>
 
-				<span class="category-icon">
-					&#127974;
-				</span>
+                <button
+                    type="button"
+                    id="searchButton"
+                >
+                    Search
+                </button>
 
-				<span>
-					Banks
-				</span>
+            </div>
 
-			</button>
+        </div>
 
+    </section>
 
 
-			<button
-				type="button"
-				class="category-item"
-				data-category="Shopping"
-			>
+    <!-- =====================================================
+         WEBSITE / RANKING SECTION
+    ===================================================== -->
 
-				<span class="category-icon">
-					&#128722;
-				</span>
+    <section
+        class="search-results-section"
+        id="websites"
+    >
 
-				<span>
-					Shopping
-				</span>
+        <div
+            id="websiteList"
+            class="website-list"
+        >
+        </div>
 
-			</button>
+    </section>
 
 
+    <!-- =====================================================
+         CATEGORY SECTION
+    ===================================================== -->
 
-			<button
-				type="button"
-				class="category-item"
-				data-category="Travel"
-			>
+    <section class="category-section">
 
-				<span class="category-icon">
-					&#9992;
-				</span>
+        <div class="category-heading-row">
 
-				<span>
-					Travel
-				</span>
+            <h2>
+                What are you looking for?
+            </h2>
 
-			</button>
 
+            <button
+                type="button"
+                id="seeMoreCategories"
+                class="see-more-button"
+            >
+                See more
+            </button>
 
+        </div>
 
-			<button
-				type="button"
-				class="category-item"
-				data-category="Food"
-			>
 
-				<span class="category-icon">
-					&#127860;
-				</span>
+        <div
+            class="category-list"
+            id="categoryList"
+        >
 
-				<span>
-					Food
-				</span>
+            <button
+                type="button"
+                class="category-item"
+                data-category="Bank"
+            >
 
-			</button>
+                <span class="category-icon">
+                    🏦
+                </span>
 
+                <span>
+                    Banks
+                </span>
 
+            </button>
 
-			<button
-				type="button"
-				class="category-item"
-				data-category="Technology"
-			>
 
-				<span class="category-icon">
-					&#128187;
-				</span>
+            <button
+                type="button"
+                class="category-item"
+                data-category="Shopping"
+            >
 
-				<span>
-					Technology
-				</span>
+                <span class="category-icon">
+                    🛒
+                </span>
 
-			</button>
+                <span>
+                    Shopping
+                </span>
 
+            </button>
 
 
-			<button
-				type="button"
-				class="category-item"
-				data-category="Education"
-			>
+            <button
+                type="button"
+                class="category-item"
+                data-category="Travel"
+            >
 
-				<span class="category-icon">
-					&#128218;
-				</span>
+                <span class="category-icon">
+                    ✈
+                </span>
 
-				<span>
-					Education
-				</span>
+                <span>
+                    Travel
+                </span>
 
-			</button>
+            </button>
 
 
-		</div>
+            <button
+                type="button"
+                class="category-item"
+                data-category="Food"
+            >
 
-	</section>
+                <span class="category-icon">
+                    🍴
+                </span>
 
+                <span>
+                    Food
+                </span>
 
+            </button>
 
-	<!-- =====================================================
-	     ABOUT REVIEW PLATFORM
-	===================================================== -->
 
-	<section class="about-platform-section">
+            <button
+                type="button"
+                class="category-item"
+                data-category="Technology"
+            >
 
-		<div class="about-platform-content">
+                <span class="category-icon">
+                    💻
+                </span>
 
+                <span>
+                    Technology
+                </span>
 
-			<div class="about-platform-left">
+            </button>
 
-				<h2>
-					We’re Review Platform
-				</h2>
 
+            <button
+                type="button"
+                class="category-item"
+                data-category="Education"
+            >
 
-				<p>
+                <span class="category-icon">
+                    📚
+                </span>
 
-					We’re a review platform that’s open to everyone.
-					Our goal is to help people discover trusted
-					companies, read genuine experiences, and make
-					better decisions with confidence.
+                <span>
+                    Education
+                </span>
 
-				</p>
+            </button>
 
+        </div>
 
-				<p>
+    </section>
 
-					At the same time, we help businesses understand
-					customer feedback and improve their services.
 
-				</p>
+    <!-- =====================================================
+         ABOUT REVIEW PLATFORM
+    ===================================================== -->
 
+    <section class="about-platform-section">
 
-				<a
-					href="#websiteList"
-					class="about-platform-button"
-				>
-					Explore reviews
-				</a>
+        <div class="about-platform-content">
 
-			</div>
+            <div class="about-platform-left">
 
+                <h2>
+                    We’re Review Platform
+                </h2>
 
 
-			<div class="about-platform-card">
+                <p>
 
-				<h3>
-					Discover. Review. Trust.
-				</h3>
+                    We’re a review platform that’s open to everyone.
+                    Our goal is to help people discover trusted
+                    companies, read genuine experiences, and make
+                    better decisions with confidence.
 
+                </p>
 
-				<p>
 
-					Search for companies, explore customer reviews,
-					share your own experience, and help others make
-					informed decisions.
+                <p>
 
-				</p>
+                    At the same time, we help businesses understand
+                    customer feedback and improve their services.
 
+                </p>
 
 
-				<div class="about-platform-points">
+                <a
+                    href="#websiteList"
+                    class="about-platform-button"
+                >
+                    Explore reviews
+                </a>
 
+            </div>
 
-					<div class="about-point">
 
-						<span class="about-point-icon">
-							✓
-						</span>
+            <div class="about-platform-card">
 
-						<span>
-							Discover companies
-						</span>
+                <h3>
+                    Discover. Review. Trust.
+                </h3>
 
-					</div>
 
+                <p>
 
+                    Search for companies, explore customer reviews,
+                    share your own experience, and help others make
+                    informed decisions.
 
-					<div class="about-point">
+                </p>
 
-						<span class="about-point-icon">
-							✓
-						</span>
 
-						<span>
-							Read customer reviews
-						</span>
+                <div class="about-platform-points">
 
-					</div>
+                    <div class="about-point">
 
+                        <span class="about-point-icon">
+                            ✓
+                        </span>
 
+                        <span>
+                            Discover companies
+                        </span>
 
-					<div class="about-point">
+                    </div>
 
-						<span class="about-point-icon">
-							✓
-						</span>
 
-						<span>
-							Share your experience
-						</span>
+                    <div class="about-point">
 
-					</div>
+                        <span class="about-point-icon">
+                            ✓
+                        </span>
 
+                        <span>
+                            Read customer reviews
+                        </span>
 
-				</div>
+                    </div>
 
-			</div>
 
-		</div>
+                    <div class="about-point">
 
-	</section>
+                        <span class="about-point-icon">
+                            ✓
+                        </span>
 
+                        <span>
+                            Share your experience
+                        </span>
 
+                    </div>
 
-	<!-- =====================================================
-	     RECENT REVIEWS
-	===================================================== -->
+                </div>
 
-	<section class="recent-reviews-section">
+            </div>
 
-		<div class="recent-reviews-heading">
+        </div>
 
-			<h2>
-				Recent reviews
-			</h2>
+    </section>
 
-		</div>
 
+    <!-- =====================================================
+         RECENT REVIEWS
+    ===================================================== -->
 
-		<div
-			id="recentReviewsList"
-			class="recent-reviews-list"
-		>
+    <section class="recent-reviews-section">
 
-			<p class="recent-reviews-loading">
-				Loading recent reviews...
-			</p>
+        <div class="recent-reviews-heading">
 
-		</div>
+            <h2>
+                Recent reviews
+            </h2>
 
-	</section>
+        </div>
 
 
+        <div
+            id="recentReviewsList"
+            class="recent-reviews-list"
+        >
 
-	<!-- =====================================================
-	     FOOTER
-	===================================================== -->
+            <p class="recent-reviews-loading">
+                Loading recent reviews...
+            </p>
 
-	<footer class="site-footer">
+        </div>
 
+    </section>
 
-		<div class="footer-content">
 
+    <!-- =====================================================
+         FOOTER
+    ===================================================== -->
 
-			<div class="footer-brand">
+    <footer class="site-footer">
 
-				<h2>
-					Review <span>Platform</span>
-				</h2>
+        <div class="footer-content">
 
+            <div class="footer-brand">
 
-				<p>
+                <h2>
+                    Review <span>Platform</span>
+                </h2>
 
-					Read reviews, share experiences, and discover
-					websites you can trust.
 
-				</p>
+                <p>
 
-			</div>
+                    Read reviews, share experiences, and discover
+                    websites you can trust.
 
+                </p>
 
+            </div>
 
-			<div class="footer-column">
 
-				<h3>
-					Review Platform
-				</h3>
+            <div class="footer-column">
 
+                <h3>
+                    Review Platform
+                </h3>
 
-				<a href="index.html">
-					Home
-				</a>
 
+                <a href="index.html">
+                    Home
+                </a>
 
-				<a href="#websites">
-					Browse Websites
-				</a>
 
+                <a href="#websites">
+                    Browse Websites
+                </a>
 
-				<a href="#websiteList">
-					Reviews
-				</a>
 
+                <a href="#websiteList">
+                    Reviews
+                </a>
 
-				<a href="#categoryList">
-					Categories
-				</a>
 
-			</div>
+                <a href="#categoryList">
+                    Categories
+                </a>
 
+            </div>
 
 
-			<div class="footer-column">
+            <div class="footer-column">
 
-				<h3>
-					Community
-				</h3>
+                <h3>
+                    Community
+                </h3>
 
 
-				<a href="#websites">
-					Write a Review
-				</a>
+                <a href="#websites">
+                    Write a Review
+                </a>
 
 
-				<a href="#recentReviewsList">
-					Recent Reviews
-				</a>
+                <a href="#recentReviewsList">
+                    Recent Reviews
+                </a>
 
 
-				<a href="register.html">
-					Register
-				</a>
+                <a href="register.html">
+                    Register
+                </a>
 
 
-				<a href="login.html">
-					Login
-				</a>
+                <a href="login.html">
+                    Login
+                </a>
 
-			</div>
+            </div>
 
 
+            <div class="footer-column">
 
-			<div class="footer-column">
+                <h3>
+                    For Businesses
+                </h3>
 
-				<h3>
-					For Businesses
-				</h3>
 
+                <a href="business-signup.html">
+                    Create Business Profile
+                </a>
 
-				<a href="business-signup.html">
-					Create Business Profile
-				</a>
 
+                <a href="business-claim.html">
+                    Claim Your Business
+                </a>
 
-				<a href="business-claim.html">
-					Claim Your Business
-				</a>
 
+                <a href="business-dashboard.html">
+                    Business Dashboard
+                </a>
 
-				<a href="business-dashboard.html">
-					Business Dashboard
-				</a>
 
+                <a href="business-response.html">
+                    Business Responses
+                </a>
 
-				<a href="business-response.html">
-					Business Responses
-				</a>
+            </div>
 
-			</div>
 
+            <div class="footer-column">
 
+                <h3>
+                    Support & Legal
+                </h3>
 
-			<div class="footer-column">
 
-				<h3>
-					Support & Legal
-				</h3>
+                <a href="index.html">
+                    How It Works
+                </a>
 
 
-				<a href="index.html">
-					How It Works
-				</a>
+                <a href="index.html">
+                    Contact Us
+                </a>
 
 
-				<a href="index.html">
-					Contact Us
-				</a>
+                <a href="index.html">
+                    Privacy Policy
+                </a>
 
 
-				<a href="index.html">
-					Privacy Policy
-				</a>
+                <a href="index.html">
+                    Terms & Conditions
+                </a>
 
+            </div>
 
-				<a href="index.html">
-					Terms & Conditions
-				</a>
+        </div>
 
-			</div>
 
+        <div class="footer-bottom">
 
-		</div>
+            <div class="footer-social">
 
+                <span>
+                    Follow us
+                </span>
 
 
-		<div class="footer-bottom">
+                <a
+                    href="#"
+                    aria-label="Facebook"
+                >
+                    Facebook
+                </a>
 
 
-			<div class="footer-social">
+                <a
+                    href="#"
+                    aria-label="Instagram"
+                >
+                    Instagram
+                </a>
 
-				<span>
-					Follow us
-				</span>
 
+                <a
+                    href="#"
+                    aria-label="LinkedIn"
+                >
+                    LinkedIn
+                </a>
 
-				<a
-					href="#"
-					aria-label="Facebook"
-				>
-					Facebook
-				</a>
 
+                <a
+                    href="#"
+                    aria-label="YouTube"
+                >
+                    YouTube
+                </a>
 
-				<a
-					href="#"
-					aria-label="Instagram"
-				>
-					Instagram
-				</a>
+            </div>
 
 
-				<a
-					href="#"
-					aria-label="LinkedIn"
-				>
-					LinkedIn
-				</a>
+            <p>
+                © 2026 Review Platform. All rights reserved.
+            </p>
 
+        </div>
 
-				<a
-					href="#"
-					aria-label="YouTube"
-				>
-					YouTube
-				</a>
+    </footer>
 
-			</div>
 
+    <!-- =====================================================
+         EXISTING JAVASCRIPT
+    ===================================================== -->
 
-			<p>
-				© 2026 Review Platform. All rights reserved.
-			</p>
+    <script src="js/script.js"></script>
 
-		</div>
 
+    <!-- =====================================================
+         LOGIN / LOGOUT + NOTIFICATION UI
+    ===================================================== -->
 
-	</footer>
+    <script>
 
+        document.addEventListener(
+            "DOMContentLoaded",
+            function () {
 
+                const loginLink =
+                    document.getElementById(
+                        "homeLoginLink"
+                    );
 
-	<!-- =====================================================
-	     EXISTING JAVASCRIPT
-	===================================================== -->
+                const registerLink =
+                    document.getElementById(
+                        "homeRegisterLink"
+                    );
 
-	<script src="js/script.js"></script>
+                const dashboardLink =
+                    document.getElementById(
+                        "homeDashboardLink"
+                    );
 
+                const logoutButton =
+                    document.getElementById(
+                        "homeLogoutButton"
+                    );
 
+                const notificationWrapper =
+                    document.getElementById(
+                        "notificationWrapper"
+                    );
 
-	<!-- =====================================================
-	     LOGIN / LOGOUT UI
-	===================================================== -->
+                const notificationButton =
+                    document.getElementById(
+                        "notificationButton"
+                    );
 
-	<script>
+                const notificationBadge =
+                    document.getElementById(
+                        "notificationBadge"
+                    );
 
-		document.addEventListener(
-			"DOMContentLoaded",
-			function() {
+                const notificationDropdown =
+                    document.getElementById(
+                        "notificationDropdown"
+                    );
 
-				const loginLink =
-					document.getElementById(
-						"homeLoginLink"
-					);
+                const notificationList =
+                    document.getElementById(
+                        "notificationList"
+                    );
 
-				const registerLink =
-					document.getElementById(
-						"homeRegisterLink"
-					);
+                const notificationMarkAll =
+                    document.getElementById(
+                        "notificationMarkAll"
+                    );
 
-				const dashboardLink =
-					document.getElementById(
-						"homeDashboardLink"
-					);
 
-				const logoutButton =
-					document.getElementById(
-						"homeLogoutButton"
-					);
+                let loggedInUser = null;
 
-				let loggedInUser = null;
 
+                try {
 
-				try {
+                    loggedInUser =
+                        JSON.parse(
+                            localStorage.getItem(
+                                "loggedInUser"
+                            )
+                        );
 
-					loggedInUser =
-						JSON.parse(
-							localStorage.getItem(
-								"loggedInUser"
-							)
-						);
+                } catch (error) {
 
-				} catch (error) {
+                    console.error(
+                        "Unable to read logged-in user:",
+                        error
+                    );
 
-					console.error(
-						"Unable to read logged-in user:",
-						error
-					);
+                }
 
-				}
 
+                if (
+                    loggedInUser &&
+                    loggedInUser.id
+                ) {
 
-				if (
-					loggedInUser &&
-					loggedInUser.id
-				) {
+                    if (loginLink) {
 
-					if (loginLink) {
+                        loginLink.style.display =
+                            "none";
 
-						loginLink.style.display =
-							"none";
+                    }
 
-					}
 
+                    if (registerLink) {
 
-					if (registerLink) {
+                        registerLink.style.display =
+                            "none";
 
-						registerLink.style.display =
-							"none";
+                    }
 
-					}
 
+                    if (dashboardLink) {
 
-					if (dashboardLink) {
+                        dashboardLink.style.display =
+                            "inline-block";
 
-						dashboardLink.style.display =
-							"inline-block";
+                    }
 
-					}
 
+                    if (logoutButton) {
 
-					if (logoutButton) {
+                        logoutButton.style.display =
+                            "inline-block";
 
-						logoutButton.style.display =
-							"inline-block";
+                    }
 
-					}
 
-				} else {
+                    if (notificationWrapper) {
 
-					if (loginLink) {
+                        notificationWrapper.style.display =
+                            "inline-block";
 
-						loginLink.style.display =
-							"inline-block";
+                    }
 
-					}
 
+                    /*
+                     * Load notification count
+                     */
 
-					if (registerLink) {
+                    if (
+                        typeof loadNotificationUnreadCount ===
+                        "function"
+                    ) {
 
-						registerLink.style.display =
-							"inline-block";
+                        loadNotificationUnreadCount();
 
-					}
+                    }
 
+                } else {
 
-					if (dashboardLink) {
+                    if (loginLink) {
 
-						dashboardLink.style.display =
-							"none";
+                        loginLink.style.display =
+                            "inline-block";
 
-					}
+                    }
 
 
-					if (logoutButton) {
+                    if (registerLink) {
 
-						logoutButton.style.display =
-							"none";
+                        registerLink.style.display =
+                            "inline-block";
 
-					}
+                    }
 
-				}
 
+                    if (dashboardLink) {
 
-				if (logoutButton) {
+                        dashboardLink.style.display =
+                            "none";
 
-					logoutButton.addEventListener(
-						"click",
-						function() {
+                    }
 
-							localStorage.removeItem(
-								"loggedInUser"
-							);
 
-							localStorage.removeItem(
-								"myBusiness"
-							);
+                    if (logoutButton) {
 
-							window.location.href =
-								"index.html";
+                        logoutButton.style.display =
+                            "none";
 
-						}
-					);
+                    }
 
-				}
 
-			}
+                    if (notificationWrapper) {
 
-		);
+                        notificationWrapper.style.display =
+                            "none";
 
-	</script>
+                    }
+
+                }
+
+
+                /*
+                 * Notification button
+                 */
+
+                if (notificationButton) {
+
+                    notificationButton.addEventListener(
+                        "click",
+                        function (event) {
+
+                            event.stopPropagation();
+
+                            if (
+                                notificationDropdown
+                            ) {
+
+                                notificationDropdown.classList.toggle(
+                                    "show"
+                                );
+
+                            }
+
+
+                            if (
+                                notificationDropdown &&
+                                notificationDropdown.classList.contains(
+                                    "show"
+                                )
+                            ) {
+
+                                if (
+                                    typeof loadNotifications ===
+                                    "function"
+                                ) {
+
+                                    loadNotifications();
+
+                                }
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                /*
+                 * Close notification dropdown
+                 * when clicking outside
+                 */
+
+                document.addEventListener(
+                    "click",
+                    function (event) {
+
+                        if (
+                            notificationWrapper &&
+                            !notificationWrapper.contains(
+                                event.target
+                            )
+                        ) {
+
+                            if (
+                                notificationDropdown
+                            ) {
+
+                                notificationDropdown.classList.remove(
+                                    "show"
+                                );
+
+                            }
+
+                        }
+
+                    }
+                );
+
+
+                /*
+                 * Mark all notifications as read
+                 */
+
+                if (notificationMarkAll) {
+
+                    notificationMarkAll.addEventListener(
+                        "click",
+                        function () {
+
+                            if (
+                                typeof markAllNotificationsAsRead ===
+                                "function"
+                            ) {
+
+                                markAllNotificationsAsRead();
+
+                            }
+
+                        }
+                    );
+
+                }
+
+
+                /*
+                 * Logout
+                 */
+
+                if (logoutButton) {
+
+                    logoutButton.addEventListener(
+                        "click",
+                        function () {
+
+                            fetch(
+                                "/review-platform/users/logout",
+                                {
+                                    method: "POST"
+                                }
+                            )
+
+                            .catch(
+                                function (error) {
+
+                                    console.error(
+                                        "Logout API error:",
+                                        error
+                                    );
+
+                                }
+                            )
+
+                            .finally(
+                                function () {
+
+                                    localStorage.removeItem(
+                                        "loggedInUser"
+                                    );
+
+                                    localStorage.removeItem(
+                                        "myBusiness"
+                                    );
+
+                                    window.location.href =
+                                        "index.html";
+
+                                }
+                            );
+
+                        }
+                    );
+
+                }
+
+            }
+
+        );
+
+    </script>
 
 
 </body>

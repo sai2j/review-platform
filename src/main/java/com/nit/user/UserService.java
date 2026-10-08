@@ -8,201 +8,406 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.nit.admin.AdminRepository;
+import com.nit.dto.PublicUserProfileDTO;
+import com.nit.dto.UserProfileDTO;
 
 @Service
 public class UserService {
 
-	private final UserRepository userRepository;
-	private final AdminRepository adminRepository;
-	private final PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final AdminRepository adminRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AvatarStorageService avatarStorageService;
 
-	public UserService(UserRepository userRepository, AdminRepository adminRepository,
-			PasswordEncoder passwordEncoder) {
-		this.userRepository = userRepository;
-		this.adminRepository = adminRepository;
-		this.passwordEncoder = passwordEncoder;
-	}
+    public UserService(
+            UserRepository userRepository,
+            AdminRepository adminRepository,
+            PasswordEncoder passwordEncoder,
+            AvatarStorageService avatarStorageService) {
 
-	public User registerUser(String email, String password) {
+        this.userRepository = userRepository;
+        this.adminRepository = adminRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.avatarStorageService = avatarStorageService;
+    }
 
-		String normalizedEmail = email == null
-				? ""
-				: email.trim().toLowerCase();
+    public User registerUser(String email, String password) {
+        String normalizedEmail = email == null
+                ? ""
+                : email.trim().toLowerCase();
 
-		if (normalizedEmail.isBlank()) {
-			throw new RuntimeException("Email is required");
-		}
+        if (normalizedEmail.isBlank()) {
+            throw new RuntimeException("Email is required");
+        }
 
-		if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
-			throw new RuntimeException("Email already registered");
-		}
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            throw new RuntimeException("Email already registered");
+        }
 
-		User user = new User();
+        User user = new User();
+        user.setEmail(normalizedEmail);
+        user.setPassword(passwordEncoder.encode(password));
 
-		user.setEmail(normalizedEmail);
-		user.setPassword(passwordEncoder.encode(password));
-		user.setRole("USER");
-		user.setStatus("ACTIVE");
+        // Public registration always creates a normal user.
+        user.setRole("USER");
+        user.setStatus("ACTIVE");
 
-		return userRepository.save(user);
-	}
+        return userRepository.save(user);
+    }
 
-	public User saveUser(User user) {
+    /**
+     * Creates a normal user.
+     * Role and status supplied by the request are not trusted.
+     */
+    public User saveUser(User user) {
+        if (user == null) {
+            throw new RuntimeException("User data is required");
+        }
 
-		if (user.getEmail() != null) {
-			user.setEmail(
-					user.getEmail()
-							.trim()
-							.toLowerCase()
-			);
-		}
+        if (user.getEmail() == null
+                || user.getEmail().isBlank()) {
+            throw new RuntimeException("Email is required");
+        }
 
-		if (user.getPassword() != null) {
-			user.setPassword(
-					passwordEncoder.encode(
-							user.getPassword()
-					)
-			);
-		}
+        String normalizedEmail =
+                user.getEmail().trim().toLowerCase();
 
-		return userRepository.save(user);
-	}
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            throw new RuntimeException("Email already registered");
+        }
 
-	public List<User> getAllUsers() {
-		return userRepository.findAll();
-	}
+        if (user.getPassword() == null
+                || user.getPassword().isBlank()) {
+            throw new RuntimeException("Password is required");
+        }
 
-	public User getUserById(Long id) {
-		return userRepository.findById(id).orElse(null);
-	}
+        if (user.getPassword().length() < 8
+                || user.getPassword().length() > 100) {
+            throw new RuntimeException(
+                    "Password must be between 8 and 100 characters");
+        }
 
-	public User getUserByEmail(String email) {
+        user.setEmail(normalizedEmail);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
-		String normalizedEmail = email == null
-				? ""
-				: email.trim().toLowerCase();
+        // Never accept ADMIN or MODERATOR through this generic method.
+        user.setRole("USER");
+        user.setStatus("ACTIVE");
 
-		return userRepository.findByEmailIgnoreCase(
-				normalizedEmail
-		);
-	}
+        return userRepository.save(user);
+    }
 
-	public boolean isAdmin(Long userId) {
-		return adminRepository.existsByUserId(userId);
-	}
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 
-	public void deleteUser(Long id) {
-		userRepository.deleteById(id);
-	}
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElse(null);
+    }
 
-	public void deleteOwnAccount() {
+    public User getUserByEmail(String email) {
+        String normalizedEmail = email == null
+                ? ""
+                : email.trim().toLowerCase();
 
-		Authentication authentication =
-				SecurityContextHolder
-						.getContext()
-						.getAuthentication();
+        return userRepository.findByEmailIgnoreCase(normalizedEmail);
+    }
 
-		if (authentication == null
-				|| !authentication.isAuthenticated()) {
+    public boolean isAdmin(Long userId) {
+        return adminRepository.existsByUserId(userId);
+    }
 
-			throw new AccessDeniedException(
-					"You must be logged in"
-			);
-		}
+    /**
+     * Assign or remove the MODERATOR role.
+     * Only an authenticated ADMIN can perform this operation.
+     *
+     * enabled = true  -> MODERATOR
+     * enabled = false -> USER
+     *
+     * An existing ADMIN account cannot be changed through this method.
+     */
+    @Transactional
+    public User updateModeratorRole(Long id, boolean enabled) {
+        requireAdmin();
 
-		String email = authentication.getName();
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("User not found"));
 
-		User user = userRepository.findByEmailIgnoreCase(email);
+        String currentRole = user.getRole();
 
-		if (user == null) {
-			throw new RuntimeException("User not found");
-		}
+        if (currentRole == null || currentRole.isBlank()) {
+            currentRole = "USER";
+        } else {
+            currentRole = currentRole.trim().toUpperCase();
+        }
 
-		Long userId = user.getId();
+        if ("ADMIN".equals(currentRole)) {
+            throw new RuntimeException(
+                    "An ADMIN account cannot be changed through moderator management");
+        }
 
-		user.setEmail(
-				"deleted-user-"
-						+ userId
-						+ "@deleted.local"
-		);
+        if (!"USER".equals(currentRole)
+                && !"MODERATOR".equals(currentRole)) {
+            throw new RuntimeException(
+                    "Only USER and MODERATOR roles can be changed here");
+        }
 
-		user.setPassword(
-				passwordEncoder.encode(
-						UUID.randomUUID().toString()
-				)
-		);
+        if (enabled) {
+            user.setRole("MODERATOR");
+        } else {
+            user.setRole("USER");
+        }
 
-		user.setStatus("RESTRICTED");
+        return userRepository.save(user);
+    }
 
-		userRepository.save(user);
-	}
+    private void requireAdmin() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
-	public User updateUserStatus(Long id, String status) {
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+            throw new AccessDeniedException(
+                    "You must be logged in as an ADMIN");
+        }
 
-		User user =
-				userRepository
-						.findById(id)
-						.orElse(null);
+        boolean isAdmin = authentication.getAuthorities()
+                .stream()
+                .anyMatch(authority ->
+                        "ROLE_ADMIN".equals(authority.getAuthority()));
 
-		if (user == null) {
-			throw new RuntimeException("User not found");
-		}
+        if (!isAdmin) {
+            throw new AccessDeniedException(
+                    "Only ADMIN can manage moderator roles");
+        }
+    }
 
-		if (status == null || status.isBlank()) {
-			throw new RuntimeException("Status is required");
-		}
+    public void deleteUser(Long id) {
+        userRepository.deleteById(id);
+    }
 
-		status = status.toUpperCase();
+    public void deleteOwnAccount() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
-		if (!status.equals("ACTIVE")
-				&& !status.equals("RESTRICTED")) {
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+            throw new AccessDeniedException("You must be logged in");
+        }
 
-			throw new RuntimeException(
-					"Status must be ACTIVE or RESTRICTED"
-			);
-		}
+        User user = userRepository.findByEmailIgnoreCase(
+                authentication.getName());
 
-		user.setStatus(status);
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
 
-		return userRepository.save(user);
-	}
+        Long userId = user.getId();
 
-	// ADMIN: Update an existing user's password
-	public User updateUserPassword(
-			Long id,
-			String newPassword) {
+        user.setEmail(
+                "deleted-user-" + userId + "@deleted.local");
 
-		User user =
-				userRepository
-						.findById(id)
-						.orElse(null);
+        user.setPassword(
+                passwordEncoder.encode(UUID.randomUUID().toString()));
 
-		if (user == null) {
-			throw new RuntimeException("User not found");
-		}
+        user.setStatus("RESTRICTED");
 
-		if (newPassword == null
-				|| newPassword.isBlank()) {
+        userRepository.save(user);
+    }
 
-			throw new RuntimeException(
-					"Password is required"
-			);
-		}
+    public User updateUserStatus(Long id, String status) {
+        User user = userRepository.findById(id).orElse(null);
 
-		if (newPassword.length() < 8
-				|| newPassword.length() > 100) {
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
 
-			throw new RuntimeException(
-					"Password must be between 8 and 100 characters"
-			);
-		}
+        if (status == null || status.isBlank()) {
+            throw new RuntimeException("Status is required");
+        }
 
-		user.setPassword(
-				passwordEncoder.encode(newPassword)
-		);
+        status = status.trim().toUpperCase();
 
-		return userRepository.save(user);
-	}
+        if (!status.equals("ACTIVE")
+                && !status.equals("RESTRICTED")) {
+            throw new RuntimeException(
+                    "Status must be ACTIVE or RESTRICTED");
+        }
+
+        user.setStatus(status);
+        return userRepository.save(user);
+    }
+
+    public User updateUserPassword(Long id, String newPassword) {
+        User user = userRepository.findById(id).orElse(null);
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        if (newPassword == null || newPassword.isBlank()) {
+            throw new RuntimeException("Password is required");
+        }
+
+        if (newPassword.length() < 8
+                || newPassword.length() > 100) {
+            throw new RuntimeException(
+                    "Password must be between 8 and 100 characters");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        return userRepository.save(user);
+    }
+
+    // PROFILE: GET MY PROFILE
+
+    @Transactional(readOnly = true)
+    public UserProfileDTO getMyProfile() {
+        return toUserProfileDTO(getAuthenticatedUser());
+    }
+
+    // PROFILE: UPDATE EDITABLE FIELDS
+
+    @Transactional
+    public UserProfileDTO updateMyProfile(
+            UserProfileDTO profileDTO) {
+
+        if (profileDTO == null) {
+            throw new RuntimeException("Profile data is required");
+        }
+
+        User user = getAuthenticatedUser();
+
+        if (profileDTO.getName() == null
+                || profileDTO.getName().isBlank()) {
+            throw new RuntimeException("Display name is required");
+        }
+
+        String name = profileDTO.getName().trim();
+
+        if (name.length() > 255) {
+            throw new RuntimeException(
+                    "Display name cannot exceed 255 characters");
+        }
+
+        if (profileDTO.getBio() != null
+                && profileDTO.getBio().length() > 500) {
+            throw new RuntimeException(
+                    "Bio cannot exceed 500 characters");
+        }
+
+        if (profileDTO.getCountry() != null
+                && profileDTO.getCountry().length() > 100) {
+            throw new RuntimeException(
+                    "Country cannot exceed 100 characters");
+        }
+
+        user.setName(name);
+        user.setBio(normalizeOptionalText(profileDTO.getBio()));
+        user.setCountry(normalizeOptionalText(profileDTO.getCountry()));
+
+        if (profileDTO.getProfilePublic() != null) {
+            user.setProfilePublic(profileDTO.getProfilePublic());
+        } else if (user.getProfilePublic() == null) {
+            user.setProfilePublic(true);
+        }
+
+        // Never accept an arbitrary avatar URL from the request body.
+
+        User savedUser = userRepository.save(user);
+
+        return toUserProfileDTO(savedUser);
+    }
+
+    // PROFILE: UPLOAD OR REPLACE AVATAR
+
+    @Transactional
+    public UserProfileDTO uploadMyAvatar(MultipartFile file) {
+        User user = getAuthenticatedUser();
+
+        String avatarUrl = avatarStorageService.store(file);
+
+        user.setAvatarUrl(avatarUrl);
+
+        User savedUser = userRepository.save(user);
+
+        return toUserProfileDTO(savedUser);
+    }
+
+    // PUBLIC PROFILE
+
+    @Transactional(readOnly = true)
+    public PublicUserProfileDTO getPublicProfile(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Profile not found"));
+
+        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+            throw new RuntimeException("Profile not found");
+        }
+
+        if (!Boolean.TRUE.equals(user.getProfilePublic())) {
+            throw new AccessDeniedException(
+                    "This profile is private");
+        }
+
+        return new PublicUserProfileDTO(
+                user.getId(),
+                user.getName(),
+                user.getBio(),
+                user.getCountry(),
+                user.getAvatarUrl());
+    }
+
+    private User getAuthenticatedUser() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null
+                || !authentication.isAuthenticated()
+                || authentication.getName() == null
+                || authentication.getName().equals("anonymousUser")) {
+            throw new AccessDeniedException("Please login first");
+        }
+
+        User user = userRepository.findByEmailIgnoreCase(
+                authentication.getName());
+
+        if (user == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        if (!"ACTIVE".equalsIgnoreCase(user.getStatus())) {
+            throw new AccessDeniedException(
+                    "Your account is not active");
+        }
+
+        return user;
+    }
+
+    private UserProfileDTO toUserProfileDTO(User user) {
+        return new UserProfileDTO(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getBio(),
+                user.getCountry(),
+                user.getProfilePublic(),
+                user.getAvatarUrl());
+    }
+
+    private String normalizeOptionalText(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        return value.trim();
+    }
 }

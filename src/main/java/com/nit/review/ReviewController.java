@@ -1,5 +1,5 @@
 package com.nit.review;
-
+import com.nit.dto.WebsiteRankingDTO;
 import java.time.LocalDate;
 
 import java.util.List;
@@ -194,6 +194,15 @@ public class ReviewController {
 
     }
 
+    // ==============================
+    // WEBSITE RANKING
+    // ==============================
+
+    @GetMapping("/ranking")
+    public List<WebsiteRankingDTO> getWebsiteRanking() {
+
+        return reviewService.getWebsiteRanking();
+    }
     // ==============================
 
     // RATING SUMMARY

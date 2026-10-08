@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -72,6 +73,32 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     long countByUserIdAndCreatedAtAfter(
             Long userId,
             LocalDateTime createdAt);
+
+    // ============================================
+    // WEBSITE RANKING - APPROVED REVIEWS ONLY
+    // ============================================
+
+    @Query("""
+            SELECT r.websiteId, AVG(r.rating), COUNT(r)
+            FROM Review r
+            WHERE UPPER(r.status) = 'APPROVED'
+            GROUP BY r.websiteId
+            ORDER BY AVG(r.rating) DESC, COUNT(r) DESC
+            """)
+    List<Object[]> findWebsiteRanking();
+    // ============================================
+    // MOVE REVIEWS DURING WEBSITE MERGE
+    // ============================================
+
+    @Modifying
+    @Query("""
+            UPDATE Review r
+            SET r.websiteId = :targetWebsiteId
+            WHERE r.websiteId = :sourceWebsiteId
+            """)
+    int moveReviewsToWebsite(
+            @Param("sourceWebsiteId") Long sourceWebsiteId,
+            @Param("targetWebsiteId") Long targetWebsiteId);
 
     // ============================================
     // AVERAGE RATING - APPROVED REVIEWS ONLY

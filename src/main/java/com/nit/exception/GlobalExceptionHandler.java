@@ -32,12 +32,19 @@ public class GlobalExceptionHandler {
 
         ex.getBindingResult().getFieldErrors()
                 .forEach(error ->
-                        errors.put(error.getField(), error.getDefaultMessage()));
+                        errors.put(
+                                error.getField(),
+                                error.getDefaultMessage()));
 
         ApiResponse<Map<String, String>> response =
-                new ApiResponse<>(false, "Validation failed", errors);
+                new ApiResponse<>(
+                        false,
+                        "Validation failed",
+                        errors);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -45,9 +52,14 @@ public class GlobalExceptionHandler {
             AccessDeniedException ex) {
 
         ApiResponse<Void> response =
-                new ApiResponse<>(false, ex.getMessage(), null);
+                new ApiResponse<>(
+                        false,
+                        ex.getMessage(),
+                        null);
 
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(response);
     }
 
     // Handle specific HTTP status exceptions, including 404 Not Found.
@@ -55,31 +67,57 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Void>> handleResponseStatusException(
             ResponseStatusException ex) {
 
-        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        HttpStatus status =
+                HttpStatus.valueOf(ex.getStatusCode().value());
 
-        String message = ex.getReason() != null
-                ? ex.getReason()
-                : status.getReasonPhrase();
+        String message =
+                ex.getReason() != null
+                        ? ex.getReason()
+                        : status.getReasonPhrase();
 
         ApiResponse<Void> response =
-                new ApiResponse<>(false, message, null);
+                new ApiResponse<>(
+                        false,
+                        message,
+                        null);
 
-        return ResponseEntity.status(status).body(response);
+        return ResponseEntity
+                .status(status)
+                .body(response);
+    }
+
+    // Handle application/business validation errors.
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ApiResponse<Void>> handleRuntimeException(
+            RuntimeException ex) {
+
+        ApiResponse<Void> response =
+                new ApiResponse<>(
+                        false,
+                        ex.getMessage(),
+                        null);
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(response);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleException(Exception ex) {
+    public ResponseEntity<ApiResponse<Void>> handleException(
+            Exception ex) {
 
-        logger.error("Unexpected application error", ex);
+        logger.error(
+                "Unexpected application error",
+                ex);
 
         ApiResponse<Void> response =
                 new ApiResponse<>(
                         false,
                         "An internal server error occurred.",
-                        null
-                );
+                        null);
 
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(response);
     }
 }

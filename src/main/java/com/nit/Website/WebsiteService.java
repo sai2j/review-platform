@@ -2,13 +2,17 @@
 package com.nit.Website;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.nit.business.Business;
@@ -18,6 +22,7 @@ import com.nit.business.BusinessClaim;
 import com.nit.dto.ReviewResponseDTO;
 import com.nit.dto.WebsitePageResponseDTO;
 import com.nit.dto.WebsiteResponseDTO;
+import com.nit.review.ReviewRepository;
 import com.nit.review.ReviewService;
 
 @Service
@@ -27,16 +32,20 @@ public class WebsiteService {
     private final ReviewService reviewService;
     private final BusinessRepository businessRepository;
     private final BusinessclaimRepository businessClaimRepository;
+    private final ReviewRepository reviewRepository;
 
     public WebsiteService(
             WebsiteRepository websiteRepository,
             ReviewService reviewService,
             BusinessRepository businessRepository,
-            BusinessclaimRepository businessClaimRepository) {
+            BusinessclaimRepository businessClaimRepository,
+            ReviewRepository reviewRepository) {
+
         this.websiteRepository = websiteRepository;
         this.reviewService = reviewService;
         this.businessRepository = businessRepository;
         this.businessClaimRepository = businessClaimRepository;
+        this.reviewRepository = reviewRepository;
     }
 
     public Website saveWebsite(Website website) {
@@ -70,7 +79,6 @@ public class WebsiteService {
         return convertToPageResponse(websitePage);
     }
 
-    // NEW: Paginated website search
     public WebsitePageResponseDTO searchWebsitesPage(
             String query, int page, int size) {
 
@@ -92,7 +100,6 @@ public class WebsiteService {
         return convertToPageResponse(websitePage);
     }
 
-    // NEW: Paginated category/country filtering
     public WebsitePageResponseDTO filterWebsitesPage(
             String category, String country, int page, int size) {
 
@@ -190,7 +197,6 @@ public class WebsiteService {
                 .getContent();
     }
 
-    // Existing non-paginated search retained
     public List<WebsiteResponseDTO> searchWebsites(String query) {
         List<Website> websites;
 
@@ -209,7 +215,6 @@ public class WebsiteService {
                 .toList();
     }
 
-    // Existing non-paginated filter retained
     public List<WebsiteResponseDTO> filterWebsites(
             String category, String country) {
 
@@ -261,6 +266,7 @@ public class WebsiteService {
     private String getRelatedKeyword(Website website) {
         if (website.getName() != null
                 && !website.getName().trim().isEmpty()) {
+
             String[] words = website.getName().trim().split("\\s+");
 
             for (String word : words) {
@@ -272,6 +278,7 @@ public class WebsiteService {
 
         if (website.getDescription() != null
                 && !website.getDescription().trim().isEmpty()) {
+
             String[] words =
                     website.getDescription().trim().split("\\s+");
 
@@ -286,8 +293,10 @@ public class WebsiteService {
     }
 
     public Website updateSeo(
-            Long id, String seoTitle,
-            String seoDescription, String canonicalUrl) {
+            Long id,
+            String seoTitle,
+            String seoDescription,
+            String canonicalUrl) {
 
         Website website = websiteRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -309,6 +318,98 @@ public class WebsiteService {
 
         reviewService.deleteReviewsByWebsiteId(website.getId());
         websiteRepository.delete(website);
+    }
+
+    // ============================================
+    // TASK 4: FIND DUPLICATE WEBSITES
+    // ============================================
+
+    public List<WebsiteResponseDTO> findDuplicateWebsites() {
+        List<Website> websites = websiteRepository.findAll();
+
+        Map<String, List<Website>> websitesByDomain = new HashMap<>();
+
+        for (Website website : websites) {
+            try {
+                String domain = normalizeDomain(website.getUrl());
+
+                websitesByDomain
+                        .computeIfAbsent(domain, key -> new ArrayList<>())
+                        .add(website);
+
+            } catch (RuntimeException exception) {
+                // Ignore invalid URLs during duplicate detection.
+            }
+        }
+
+        List<WebsiteResponseDTO> duplicates = new ArrayList<>();
+
+        for (List<Website> sameDomainWebsites
+                : websitesByDomain.values()) {
+
+            if (sameDomainWebsites.size() > 1) {
+                sameDomainWebsites.stream()
+                        .map(this::convertToResponseDTO)
+                        .forEach(duplicates::add);
+            }
+        }
+
+        return duplicates;
+    }
+
+    // ============================================
+    // TASK 4: MERGE DUPLICATE WEBSITES
+    // ============================================
+
+    @Transactional
+    public WebsiteResponseDTO mergeWebsites(
+            Long sourceWebsiteId,
+            Long targetWebsiteId) {
+
+        if (sourceWebsiteId == null || targetWebsiteId == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Source and target website IDs are required");
+        }
+
+        if (sourceWebsiteId.equals(targetWebsiteId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Source and target website IDs must be different");
+        }
+
+        Website sourceWebsite = websiteRepository
+                .findById(sourceWebsiteId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Source website not found: " + sourceWebsiteId));
+
+        Website targetWebsite = websiteRepository
+                .findById(targetWebsiteId)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Target website not found: " + targetWebsiteId));
+
+        String sourceDomain = normalizeDomain(sourceWebsite.getUrl());
+        String targetDomain = normalizeDomain(targetWebsite.getUrl());
+
+        if (!sourceDomain.equals(targetDomain)) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Websites have different domains and cannot be merged "
+                            + "by this duplicate-merge operation");
+        }
+
+        // Transfer reviews without changing their IDs.
+        // Votes, reports and business responses remain linked.
+        reviewRepository.moveReviewsToWebsite(
+                sourceWebsiteId, targetWebsiteId);
+
+        // Delete only the source website, not its reviews.
+        websiteRepository.delete(sourceWebsite);
+
+        // Return the target website with updated review statistics.
+        return convertToResponseDTO(targetWebsite);
     }
 
     private WebsiteResponseDTO convertToResponseDTO(Website website) {
@@ -399,6 +500,10 @@ public class WebsiteService {
 
     private String normalizeDomain(String url) {
         try {
+            if (url == null || url.isBlank()) {
+                throw new RuntimeException("Invalid website URL");
+            }
+
             String cleanUrl = url.trim();
 
             if (!cleanUrl.startsWith("http://")
@@ -420,6 +525,7 @@ public class WebsiteService {
             }
 
             return domain;
+
         } catch (Exception e) {
             throw new RuntimeException("Invalid website URL");
         }

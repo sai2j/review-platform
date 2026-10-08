@@ -1,10 +1,16 @@
+
 /* =========================
+
    LOGGED-IN USER
+
 ========================= */
 
 const loggedInUser =
+
     JSON.parse(
+
         localStorage.getItem("loggedInUser")
+
     );
 
 if (!loggedInUser || !loggedInUser.id) {
@@ -12,66 +18,93 @@ if (!loggedInUser || !loggedInUser.id) {
     alert("Please login first.");
 
     window.location.href =
+
         "login.html";
 
 }
 
 
 /* =========================
+
    USER ID
+
 ========================= */
 
 const USER_ID =
+
     loggedInUser.id;
 
 
 /* =========================
+
    API URLs
+
 ========================= */
 
 const CLAIM_API =
+
     "/review-platform/business-claims";
 
 const BUSINESS_API =
+
     "/review-platform/businesses";
 
 
 /* =========================
+
    PAGE ELEMENTS
+
 ========================= */
 
 const userInfo =
+
     document.getElementById(
+
         "userInfo"
+
     );
 
 
 const businessMessage =
+
     document.getElementById(
+
         "businessMessage"
+
     );
 
 
 const businessInfo =
+
     document.getElementById(
+
         "businessInfo"
+
     );
 
 
 const verificationSection =
+
     document.getElementById(
+
         "verificationSection"
+
     );
 
 
 const dashboardMessage =
+
     document.getElementById(
+
         "dashboardMessage"
+
     );
 
 
 /* =========================
+
    SHOW USER
+
 ========================= */
 
 if (userInfo) {
@@ -79,12 +112,15 @@ if (userInfo) {
     if (loggedInUser.email) {
 
         userInfo.textContent =
+
             "Logged in as: " +
+
             loggedInUser.email;
 
     } else {
 
         userInfo.textContent =
+
             "Logged in as: User";
 
     }
@@ -93,50 +129,79 @@ if (userInfo) {
 
 
 /* =========================
+
    NAVIGATION - HOME
+
 ========================= */
 
 function goToHome() {
 
     window.location.href =
+
         "index.html";
 
 }
 
 
 /* =========================
+
    NAVIGATION - WRITE REVIEW
+
 ========================= */
 
 function goToWriteReview() {
 
     window.location.href =
+
         "review.html";
 
 }
 
 
 /* =========================
+
    NAVIGATION - WEBSITES
+
 ========================= */
 
 function goToWebsites() {
 
     window.location.href =
+
         "website.html";
 
 }
 
 
 /* =========================
+
+   NAVIGATION - MY PROFILE
+   NEW FUNCTION
+========================= */
+
+function openMyProfile() {
+
+    window.location.href =
+
+        "user-profile.html";
+
+}
+
+
+/* =========================
+
    SCROLL TO MY BUSINESS
+
 ========================= */
 
 function scrollToBusiness() {
 
     const businessSection =
+
         document.getElementById(
+
             "myBusinessSection"
+
         );
 
 
@@ -156,14 +221,19 @@ function scrollToBusiness() {
 
 
 /* =========================
+
    SCROLL TO VERIFICATION
+
 ========================= */
 
 function scrollToVerification() {
 
     const verification =
+
         document.getElementById(
+
             "verificationSection"
+
         );
 
 
@@ -183,14 +253,19 @@ function scrollToVerification() {
 
 
 /* =========================
+
    SCROLL TO CLAIM BUSINESS
+
 ========================= */
 
 function scrollToClaim() {
 
     const claimSection =
+
         document.getElementById(
+
             "claimBusinessSection"
+
         );
 
 
@@ -210,7 +285,9 @@ function scrollToClaim() {
 
 
 /* =========================
+
    LOAD APPROVED BUSINESS
+
 ========================= */
 
 function loadMyBusiness() {
@@ -218,8 +295,11 @@ function loadMyBusiness() {
     fetch(
 
         CLAIM_API +
+
         "/user/" +
+
         USER_ID +
+
         "/approved"
 
     )
@@ -244,8 +324,11 @@ function loadMyBusiness() {
         .then(function(claim) {
 
             if (
+
                 !claim ||
+
                 !claim.businessId
+
             ) {
 
                 throw new Error(
@@ -286,6 +369,7 @@ function loadMyBusiness() {
             if (businessInfo) {
 
                 businessInfo.style.display =
+
                     "none";
 
             }
@@ -294,6 +378,7 @@ function loadMyBusiness() {
             if (verificationSection) {
 
                 verificationSection.style.display =
+
                     "none";
 
             }
@@ -304,7 +389,9 @@ function loadMyBusiness() {
 
 
 /* =========================
+
    LOAD BUSINESS
+
 ========================= */
 
 function loadBusiness(businessId) {
@@ -312,7 +399,9 @@ function loadBusiness(businessId) {
     fetch(
 
         BUSINESS_API +
+
         "/" +
+
         businessId
 
     )
@@ -378,7 +467,9 @@ function loadBusiness(businessId) {
 
 
 /* =========================
+
    DISPLAY BUSINESS
+
 ========================= */
 
 function displayBusiness(business) {
@@ -393,6 +484,7 @@ function displayBusiness(business) {
     if (businessInfo) {
 
         businessInfo.style.display =
+
             "block";
 
     }
@@ -401,66 +493,85 @@ function displayBusiness(business) {
     if (verificationSection) {
 
         verificationSection.style.display =
+
             "block";
 
     }
 
 
     /* =========================
+
        BUSINESS INFORMATION
+
     ========================== */
 
     const businessIdElement =
+
         document.getElementById(
+
             "businessId"
+
         );
 
 
     if (businessIdElement) {
 
         businessIdElement.textContent =
+
             business.id || "N/A";
 
     }
 
 
     const businessNameElement =
+
         document.getElementById(
+
             "businessName"
+
         );
 
 
     if (businessNameElement) {
 
         businessNameElement.textContent =
+
             business.name || "N/A";
 
     }
 
 
     const officialUrlElement =
+
         document.getElementById(
+
             "officialUrl"
+
         );
 
 
     if (officialUrlElement) {
 
         officialUrlElement.textContent =
+
             business.officialUrl || "N/A";
 
     }
 
 
     const businessStatus =
+
         document.getElementById(
+
             "businessStatus"
+
         );
 
 
     if (businessStatus) {
 
         businessStatus.textContent =
+
             business.status || "PENDING";
 
 
@@ -476,10 +587,13 @@ function displayBusiness(business) {
 
 
     /* =========================
+
        EMAIL VERIFICATION
+
     ========================== */
 
     const emailVerified =
+
         business.emailVerified === true;
 
 
@@ -495,23 +609,33 @@ function displayBusiness(business) {
 
 
     const emailForm =
+
         document.getElementById(
+
             "emailVerificationForm"
+
         );
 
 
     const businessEmail =
+
         document.getElementById(
+
             "businessEmail"
+
         );
 
 
     if (
+
         businessEmail &&
+
         business.businessEmail
+
     ) {
 
         businessEmail.value =
+
             business.businessEmail;
 
     }
@@ -522,11 +646,13 @@ function displayBusiness(business) {
         if (emailVerified) {
 
             emailForm.style.display =
+
                 "none";
 
         } else {
 
             emailForm.style.display =
+
                 "block";
 
         }
@@ -535,10 +661,13 @@ function displayBusiness(business) {
 
 
     /* =========================
+
        META VERIFICATION
+
     ========================== */
 
     const metaVerified =
+
         business.metaVerified === true;
 
 
@@ -554,10 +683,13 @@ function displayBusiness(business) {
 
 
     /* =========================
+
        DNS VERIFICATION
+
     ========================== */
 
     const dnsVerified =
+
         business.dnsVerified === true;
 
 
@@ -573,10 +705,13 @@ function displayBusiness(business) {
 
 
     /* =========================
+
        BUSINESS VERIFIED
+
     ========================== */
 
     const isVerified =
+
         String(
 
             business.status || ""
@@ -587,8 +722,11 @@ function displayBusiness(business) {
 
 
     const verifiedMessage =
+
         document.getElementById(
+
             "verifiedMessage"
+
         );
 
 
@@ -597,11 +735,13 @@ function displayBusiness(business) {
         if (isVerified) {
 
             verifiedMessage.style.display =
+
                 "block";
 
         } else {
 
             verifiedMessage.style.display =
+
                 "none";
 
         }
@@ -610,7 +750,9 @@ function displayBusiness(business) {
 
 
     /* =========================
+
        SAVE BUSINESS
+
     ========================== */
 
     localStorage.setItem(
@@ -625,7 +767,9 @@ function displayBusiness(business) {
 
 
 /* =========================
+
    VERIFICATION UI
+
 ========================= */
 
 function updateVerificationUI(
@@ -639,14 +783,20 @@ function updateVerificationUI(
 ) {
 
     const statusElement =
+
         document.getElementById(
+
             statusElementId
+
         );
 
 
     const badgeElement =
+
         document.getElementById(
+
             badgeElementId
+
         );
 
 
@@ -660,27 +810,33 @@ function updateVerificationUI(
     if (verified) {
 
         statusElement.textContent =
+
             "Verified";
 
 
         badgeElement.textContent =
+
             "VERIFIED";
 
 
         badgeElement.className =
+
             "badge verified";
 
     } else {
 
         statusElement.textContent =
+
             "Not Verified";
 
 
         badgeElement.textContent =
+
             "NOT VERIFIED";
 
 
         badgeElement.className =
+
             "badge not-verified";
 
     }
@@ -689,7 +845,9 @@ function updateVerificationUI(
 
 
 /* =========================
+
    BUSINESS STATUS CLASS
+
 ========================= */
 
 function updateBusinessStatusClass(
@@ -708,6 +866,7 @@ function updateBusinessStatusClass(
 
 
     element.className =
+
         "status";
 
 
@@ -741,14 +900,19 @@ function updateBusinessStatusClass(
 
 
 /* =========================
+
    SEND EMAIL VERIFICATION
+
 ========================= */
 
 function sendEmailVerification() {
 
     const storedBusiness =
+
         localStorage.getItem(
+
             "myBusiness"
+
         );
 
 
@@ -777,8 +941,11 @@ function sendEmailVerification() {
     try {
 
         business =
+
             JSON.parse(
+
                 storedBusiness
+
             );
 
     } catch (error) {
@@ -804,8 +971,11 @@ function sendEmailVerification() {
 
 
     if (
+
         !business ||
+
         !business.id
+
     ) {
 
         if (dashboardMessage) {
@@ -826,8 +996,11 @@ function sendEmailVerification() {
 
 
     const emailElement =
+
         document.getElementById(
+
             "businessEmail"
+
         );
 
 
@@ -839,6 +1012,7 @@ function sendEmailVerification() {
 
 
     const email =
+
         emailElement.value.trim();
 
 
@@ -864,16 +1038,22 @@ function sendEmailVerification() {
     if (dashboardMessage) {
 
         dashboardMessage.textContent =
+
             "Sending verification email...";
 
     }
 
 
     const url =
+
         BUSINESS_API +
+
         "/" +
+
         business.id +
+
         "/verify-email?email=" +
+
         encodeURIComponent(email);
 
 
@@ -965,14 +1145,19 @@ function sendEmailVerification() {
 
 
 /* =========================
+
    OPEN BUSINESS DASHBOARD
+
 ========================= */
 
 function openBusinessDashboard() {
 
     const storedBusiness =
+
         localStorage.getItem(
+
             "myBusiness"
+
         );
 
 
@@ -1001,8 +1186,11 @@ function openBusinessDashboard() {
     try {
 
         business =
+
             JSON.parse(
+
                 storedBusiness
+
             );
 
     } catch (error) {
@@ -1028,8 +1216,11 @@ function openBusinessDashboard() {
 
 
     if (
+
         !business ||
+
         !business.id
+
     ) {
 
         if (dashboardMessage) {
@@ -1050,6 +1241,7 @@ function openBusinessDashboard() {
 
 
     const isVerified =
+
         String(
 
             business.status || ""
@@ -1082,16 +1274,22 @@ function openBusinessDashboard() {
 
 
     window.location.href =
+
         "business-dashboard.html";
 
 }
 
 
 /* =========================
+
    CLAIM BUSINESS
+
    Manual Business ID flow removed.
+
    Users should claim from
+
    Business Profile.
+
 ========================= */
 
 function claimBusiness() {
@@ -1115,7 +1313,9 @@ function claimBusiness() {
 
 
 /* =========================
+
    LOGOUT
+
 ========================= */
 
 function logoutUser() {
@@ -1135,13 +1335,16 @@ function logoutUser() {
 
 
     window.location.href =
+
         "login.html";
 
 }
 
 
 /* =========================
+
    ESCAPE HTML
+
 ========================= */
 
 function escapeHtml(value) {
@@ -1205,7 +1408,9 @@ function escapeHtml(value) {
 
 
 /* =========================
+
    PAGE LOAD
+
 ========================= */
 
 document.addEventListener(
@@ -1219,3 +1424,4 @@ document.addEventListener(
     }
 
 );
+

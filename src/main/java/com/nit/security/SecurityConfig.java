@@ -21,204 +21,285 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
-	@Bean
-	public AuthenticationManager authenticationManager(
-			AuthenticationConfiguration configuration) throws Exception {
+    @Bean
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration configuration) throws Exception {
 
-		return configuration.getAuthenticationManager();
-	}
+        return configuration.getAuthenticationManager();
+    }
 
-	@Bean
-	public CorsConfigurationSource corsConfigurationSource() {
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
 
-		CorsConfiguration configuration =
-				new CorsConfiguration();
+        CorsConfiguration configuration = new CorsConfiguration();
 
-		configuration.setAllowedOrigins(
-				Arrays.asList(
-						"http://localhost:8080",
-						"http://127.0.0.1:8080"
-				)
-		);
+        configuration.setAllowedOrigins(
+                Arrays.asList(
+                        "http://localhost:8080",
+                        "http://127.0.0.1:8080"
+                )
+        );
 
-		configuration.setAllowedMethods(
-				Arrays.asList(
-						"GET",
-						"POST",
-						"PUT",
-						"PATCH",
-						"DELETE",
-						"OPTIONS"
-				)
-		);
+        configuration.setAllowedMethods(
+                Arrays.asList(
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "PATCH",
+                        "DELETE",
+                        "OPTIONS"
+                )
+        );
 
-		configuration.setAllowedHeaders(
-				Arrays.asList(
-						"Content-Type",
-						"Authorization"
-				)
-		);
+        configuration.setAllowedHeaders(
+                Arrays.asList(
+                        "Content-Type",
+                        "Authorization"
+                )
+        );
 
-		configuration.setAllowCredentials(true);
+        configuration.setAllowCredentials(true);
 
-		UrlBasedCorsConfigurationSource source =
-				new UrlBasedCorsConfigurationSource();
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
 
-		source.registerCorsConfiguration(
-				"/**",
-				configuration
-		);
+        source.registerCorsConfiguration("/**", configuration);
 
-		return source;
-	}
+        return source;
+    }
 
-	@Bean
-	public SecurityFilterChain securityFilterChain(
-			HttpSecurity http) throws Exception {
+    @Bean
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
 
-		http
-				.csrf(csrf -> csrf.disable())
+        http
 
-				.cors(cors ->
-						cors.configurationSource(
-								corsConfigurationSource()
-						)
-				)
+            .csrf(csrf -> csrf.disable())
 
-				.addFilterBefore(
-						new RateLimitFilter(),
-						UsernamePasswordAuthenticationFilter.class
-				)
+            .cors(cors ->
+                cors.configurationSource(corsConfigurationSource())
+            )
 
-				.headers(headers -> headers
+            /*
+             * Persist the SecurityContext in the HTTP session.
+             * This ensures the authenticated user's current
+             * authorities (ADMIN / MODERATOR / USER) are correctly
+             * maintained across requests.
+             */
+            .securityContext(securityContext ->
+                securityContext.requireExplicitSave(false)
+            )
 
-						.contentTypeOptions(
-								contentTypeOptions -> {
-								}
-						)
+            .addFilterBefore(
+                    new RateLimitFilter(),
+                    UsernamePasswordAuthenticationFilter.class
+            )
 
-						.frameOptions(
-								frameOptions ->
-										frameOptions.deny()
-						)
+            .headers(headers -> headers
 
-						.contentSecurityPolicy(
-								csp ->
-										csp.policyDirectives(
-												"default-src 'self'; "
-														+ "script-src 'self' 'unsafe-inline'; "
-														+ "style-src 'self' 'unsafe-inline'; "
-														+ "img-src 'self' data: https:; "
-														+ "font-src 'self' data:; "
-														+ "connect-src 'self'; "
-														+ "object-src 'none'; "
-														+ "base-uri 'self'; "
-														+ "form-action 'self'"
-										)
-						)
+                .contentTypeOptions(contentTypeOptions -> {
+                })
 
-						.referrerPolicy(
-								referrerPolicy ->
-										referrerPolicy.policy(
-												org.springframework.security.web.header.writers
-														.ReferrerPolicyHeaderWriter
-														.ReferrerPolicy
-														.NO_REFERRER
-										)
-						)
-				)
+                .frameOptions(frameOptions ->
+                        frameOptions.deny()
+                )
 
-				.authorizeHttpRequests(auth -> auth
+                .contentSecurityPolicy(csp ->
+                    csp.policyDirectives(
+                        "default-src 'self'; "
+                        + "script-src 'self' 'unsafe-inline'; "
+                        + "style-src 'self' 'unsafe-inline'; "
+                        + "img-src 'self' data: https:; "
+                        + "font-src 'self' data:; "
+                        + "connect-src 'self'; "
+                        + "object-src 'none'; "
+                        + "base-uri 'self'; "
+                        + "form-action 'self'"
+                    )
+                )
 
-						.requestMatchers(
-								"/",
-								"/index.html",
-								"/login.html",
-								"/register.html",
-								"/review.html",
-								"/business-signup.html",
-								"/business-claim.html",
-								"/business-dashboard.html",
-								"/business-response.html",
-								"/admin.html"
-						)
-						.permitAll()
+                .referrerPolicy(referrerPolicy ->
+                    referrerPolicy.policy(
+                        org.springframework.security.web.header.writers
+                            .ReferrerPolicyHeaderWriter
+                            .ReferrerPolicy
+                            .NO_REFERRER
+                    )
+                )
+            )
 
-						.requestMatchers(
-								HttpMethod.GET,
-								"/website/**"
-						)
-						.permitAll()
+            .authorizeHttpRequests(auth -> auth
 
-						.requestMatchers(
-								"/error"
-						)
-						.permitAll()
+                // Public HTML pages
 
-						.requestMatchers(
-								"/swagger-ui/**",
-								"/v3/api-docs/**"
-						)
-						.permitAll()
+                .requestMatchers(
 
-						.requestMatchers(
-								"/sitemap.xml",
-								"/website-sitemap.xml"
-						)
-						.permitAll()
+                        "/",
 
-						.requestMatchers(
-								"/css/**",
-								"/js/**"
-						)
-						.permitAll()
+                        "/index.html",
 
-						.requestMatchers(
-								"/users/register",
-								"/users/login"
-						)
-						.permitAll()
+                        "/login.html",
 
-						.requestMatchers(
-								"/websites/**",
-								"/api/v1/websites/**",
-								"/reviews/website/**",
-								"/businesses/*",
-								"/businesses/website/*",
-								"/business-claims/business/*/approved"
-						)
-						.permitAll()
+                        "/register.html",
 
-						.requestMatchers(
-								"/businesses/*/verify-email"
-						)
-						.permitAll()
+                        "/review.html",
 
-						.requestMatchers(
-								"/discovery/**",
-								"/metadata/**"
-						)
-						.permitAll()
+                        "/website.html",
 
-						.requestMatchers(
-								"/review-votes/*/count"
-						)
-						.permitAll()
+                        "/business-signup.html",
 
-						.requestMatchers(
-								"/admins/**"
-						)
-						.hasRole("ADMIN")
+                        "/business-claim.html",
 
-						.anyRequest()
-						.authenticated()
-				);
+                        "/business-dashboard.html",
 
-		return http.build();
-	}
+                        "/business-response.html",
+
+                        "/subscription.html",
+
+                        "/admin.html",
+
+                        "/forgot-password.html",
+
+                        "/reset-password.html"
+
+                )
+                .permitAll()
+
+                // Public website pages
+
+                .requestMatchers(
+                        HttpMethod.GET,
+                        "/website/**"
+                )
+                .permitAll()
+
+                .requestMatchers("/error")
+                .permitAll()
+
+                // API documentation
+
+                .requestMatchers(
+
+                        "/swagger-ui/**",
+
+                        "/v3/api-docs/**"
+
+                )
+                .permitAll()
+
+                // SEO sitemap files
+
+                .requestMatchers(
+
+                        "/sitemap.xml",
+
+                        "/website-sitemap.xml"
+
+                )
+                .permitAll()
+
+                // Static resources
+
+                .requestMatchers(
+
+                        "/css/**",
+
+                        "/js/**"
+
+                )
+                .permitAll()
+
+                // Registration, login and public user profiles
+
+                .requestMatchers(
+
+                        "/users/register",
+
+                        "/users/login",
+
+                        "/users/public-profile/**"
+
+                )
+                .permitAll()
+
+                // Forgot Password and Reset Password APIs
+
+                .requestMatchers(
+
+                        "/users/password/forgot",
+
+                        "/users/password/reset"
+
+                )
+                .permitAll()
+
+                // Existing public website and review routes
+
+                .requestMatchers(
+
+                        "/websites/**",
+
+                        "/api/v1/websites/**",
+
+                        "/reviews/website/**",
+
+                        "/reviews/ranking",
+
+                        "/businesses/*",
+
+                        "/businesses/website/*",
+
+                        "/business-claims/business/*/approved"
+
+                )
+                .permitAll()
+
+                // Business email verification
+
+                .requestMatchers(
+
+                        "/businesses/*/verify-email"
+
+                )
+                .permitAll()
+
+                // Discovery and metadata APIs
+
+                .requestMatchers(
+
+                        "/discovery/**",
+
+                        "/metadata/**"
+
+                )
+                .permitAll()
+
+                // Public review vote counts
+
+                .requestMatchers(
+
+                        "/review-votes/*/count"
+
+                )
+                .permitAll()
+
+                // Admin-only endpoints
+
+                .requestMatchers("/admins/**")
+                .hasRole("ADMIN")
+
+                // All other routes require authentication
+
+                .anyRequest()
+                .authenticated()
+
+            );
+
+        return http.build();
+    }
 }

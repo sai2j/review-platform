@@ -984,13 +984,85 @@ function updateReviewStructuredData(
 
 }
 
+/* =========================================================
 
+SHOW WEBSITE LOGO
+
+========================================================= */
+
+function showWebsiteLogo(website) {
+
+    const logoBox =
+        document.querySelector(
+            ".website-logo"
+        );
+
+    if (!logoBox || !website) {
+        return;
+    }
+
+    let domain =
+        website.canonicalDomain || "";
+
+    if (!domain && website.url) {
+
+        try {
+
+            domain =
+                new URL(website.url)
+                    .hostname
+                    .replace(/^www\./, "");
+
+        } catch (error) {
+
+            domain = "";
+        }
+    }
+
+    const initial =
+        (website.name || "W")
+            .trim()
+            .charAt(0)
+            .toUpperCase();
+
+    if (!domain) {
+
+        logoBox.textContent = initial;
+
+        return;
+    }
+
+    const image =
+        document.createElement("img");
+
+    image.src =
+        "https://www.google.com/s2/favicons?sz=128&domain=" +
+        encodeURIComponent(domain);
+
+    image.alt =
+        (website.name || "Website") + " logo";
+
+    image.style.width = "56px";
+    image.style.height = "56px";
+    image.style.objectFit = "contain";
+
+    image.addEventListener(
+        "error",
+        function () {
+
+            logoBox.textContent = initial;
+        }
+    );
+
+    logoBox.textContent = "";
+
+    logoBox.appendChild(image);
+}
 /* =========================================================
 
 LOAD WEBSITE INFORMATION
 
 ========================================================= */
-
 function loadWebsiteInfo() {
 
     if (!websiteId) {
@@ -998,7 +1070,6 @@ function loadWebsiteInfo() {
         return;
 
     }
-
 
     fetch(
 
@@ -1022,7 +1093,6 @@ function loadWebsiteInfo() {
 
             }
 
-
             return response.json();
 
         })
@@ -1033,20 +1103,17 @@ function loadWebsiteInfo() {
 
                 website;
 
-
             updateWebsiteSEO(
 
                 website
 
             );
 
-
             updateStructuredData(
 
                 website
 
             );
-
 
             updateReviewStructuredData(
 
@@ -1056,6 +1123,11 @@ function loadWebsiteInfo() {
 
             );
 
+            showWebsiteLogo(
+
+                website
+
+            );
 
             const websiteInfo =
 
@@ -1065,13 +1137,11 @@ function loadWebsiteInfo() {
 
                 );
 
-
             if (!websiteInfo) {
 
                 return;
 
             }
-
 
             websiteInfo.innerHTML = `
 
@@ -1137,7 +1207,6 @@ function loadWebsiteInfo() {
 
         `;
 
-
             loadClaimStatus();
 
         })
@@ -1146,7 +1215,6 @@ function loadWebsiteInfo() {
 
             console.error(error);
 
-
             const websiteInfo =
 
                 document.getElementById(
@@ -1154,7 +1222,6 @@ function loadWebsiteInfo() {
                     "websiteInfo"
 
                 );
-
 
             if (websiteInfo) {
 
@@ -1173,8 +1240,6 @@ function loadWebsiteInfo() {
         });
 
 }
-
-
 /* =========================================================
 
 LOAD BUSINESS CLAIM STATUS

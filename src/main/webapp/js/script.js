@@ -16,7 +16,6 @@ const METADATA_API =
 const NOTIFICATION_API =
     "/review-platform/notifications";
 
-
 let allWebsites = [];
 
 let websiteRankings = [];
@@ -27,7 +26,6 @@ const RECENT_WEBSITES_KEY =
 const MAX_RECENT_WEBSITES = 5;
 
 const MAX_RECENT_REVIEWS = 4;
-
 
 /* =========================================================
    HOMEPAGE LOGGED-IN USER
@@ -64,7 +62,6 @@ function getHomepageLoggedInUser() {
     }
 }
 
-
 /* =========================================================
    NOTIFICATIONS
 ========================================================= */
@@ -83,7 +80,7 @@ function loadNotificationUnreadCount() {
         "/unread-count"
     )
 
-        .then(function (response) {
+        .then(function(response) {
 
             if (!response.ok) {
 
@@ -95,14 +92,14 @@ function loadNotificationUnreadCount() {
             return response.json();
         })
 
-        .then(function (count) {
+        .then(function(count) {
 
             updateNotificationBadge(
                 Number(count) || 0
             );
         })
 
-        .catch(function (error) {
+        .catch(function(error) {
 
             console.error(
                 "Unable to load notification count:",
@@ -110,7 +107,6 @@ function loadNotificationUnreadCount() {
             );
         });
 }
-
 
 function updateNotificationBadge(
     count
@@ -148,7 +144,6 @@ function updateNotificationBadge(
             : String(safeCount);
 }
 
-
 function loadNotifications() {
 
     const notificationList =
@@ -170,7 +165,7 @@ function loadNotifications() {
         NOTIFICATION_API
     )
 
-        .then(function (response) {
+        .then(function(response) {
 
             if (!response.ok) {
 
@@ -182,14 +177,14 @@ function loadNotifications() {
             return response.json();
         })
 
-        .then(function (notifications) {
+        .then(function(notifications) {
 
             displayNotifications(
                 notifications || []
             );
         })
 
-        .catch(function (error) {
+        .catch(function(error) {
 
             console.error(
                 "Unable to load notifications:",
@@ -203,7 +198,6 @@ function loadNotifications() {
             `;
         });
 }
-
 
 function displayNotifications(
     notifications
@@ -239,7 +233,7 @@ function displayNotifications(
     notificationList.innerHTML = "";
 
     notifications.forEach(
-        function (notification) {
+        function(notification) {
 
             const item =
                 document.createElement(
@@ -295,7 +289,7 @@ function displayNotifications(
 
             item.addEventListener(
                 "click",
-                function () {
+                function() {
 
                     if (
                         Number(
@@ -320,7 +314,6 @@ function displayNotifications(
     loadNotificationUnreadCount();
 }
 
-
 function markNotificationAsRead(
     notificationId,
     notificationElement
@@ -342,7 +335,7 @@ function markNotificationAsRead(
         }
     )
 
-        .then(function (response) {
+        .then(function(response) {
 
             if (!response.ok) {
 
@@ -354,7 +347,7 @@ function markNotificationAsRead(
             return response.json();
         })
 
-        .then(function () {
+        .then(function() {
 
             if (
                 notificationElement
@@ -368,7 +361,7 @@ function markNotificationAsRead(
             loadNotificationUnreadCount();
         })
 
-        .catch(function (error) {
+        .catch(function(error) {
 
             console.error(
                 "Unable to mark notification as read:",
@@ -376,7 +369,6 @@ function markNotificationAsRead(
             );
         });
 }
-
 
 function markAllNotificationsAsRead() {
 
@@ -388,7 +380,7 @@ function markAllNotificationsAsRead() {
         }
     )
 
-        .then(function (response) {
+        .then(function(response) {
 
             if (!response.ok) {
 
@@ -398,7 +390,7 @@ function markAllNotificationsAsRead() {
             }
         })
 
-        .then(function () {
+        .then(function() {
 
             const notificationItems =
                 document.querySelectorAll(
@@ -406,7 +398,7 @@ function markAllNotificationsAsRead() {
                 );
 
             notificationItems.forEach(
-                function (item) {
+                function(item) {
 
                     item.classList.remove(
                         "unread"
@@ -417,7 +409,7 @@ function markAllNotificationsAsRead() {
             updateNotificationBadge(0);
         })
 
-        .catch(function (error) {
+        .catch(function(error) {
 
             console.error(
                 "Unable to mark all notifications as read:",
@@ -425,7 +417,6 @@ function markAllNotificationsAsRead() {
             );
         });
 }
-
 
 function formatNotificationDate(
     value
@@ -466,13 +457,12 @@ function formatNotificationDate(
     }
 }
 
-
 /* =========================================================
    NOTIFICATION AUTO REFRESH
 ========================================================= */
 
 setInterval(
-    function () {
+    function() {
 
         const loggedInUser =
             getHomepageLoggedInUser();
@@ -488,7 +478,6 @@ setInterval(
     },
     30000
 );
-
 
 /* =========================================================
    LOAD RECENT REVIEWS
@@ -534,7 +523,7 @@ function loadRecentReviews() {
 
     ])
 
-        .then(function (responses) {
+        .then(function(responses) {
 
             const reviewResponse =
                 responses[0];
@@ -565,7 +554,7 @@ function loadRecentReviews() {
             ]);
         })
 
-        .then(function (data) {
+        .then(function(data) {
 
             const reviewData =
                 data[0];
@@ -582,7 +571,7 @@ function loadRecentReviews() {
             const approvedReviews =
                 reviews
                     .filter(
-                        function (review) {
+                        function(review) {
 
                             return (
                                 review.status &&
@@ -612,7 +601,7 @@ function loadRecentReviews() {
             );
         })
 
-        .catch(function (error) {
+        .catch(function(error) {
 
             console.error(
                 "Unable to load recent reviews:",
@@ -622,7 +611,6 @@ function loadRecentReviews() {
             displayDemoRecentReviews();
         });
 }
-
 
 /* =========================================================
    DISPLAY DEMO RECENT REVIEWS
@@ -715,7 +703,7 @@ function displayDemoRecentReviews() {
         "";
 
     demoReviews.forEach(
-        function (review) {
+        function(review) {
 
             const rating =
                 Math.max(
@@ -738,10 +726,9 @@ function displayDemoRecentReviews() {
             ) {
 
                 stars += `
-                    <span class="recent-review-star ${
-                        i <= rating
-                            ? ""
-                            : "empty"
+                    <span class="recent-review-star ${i <= rating
+                        ? ""
+                        : "empty"
                     }">
                         ★
                     </span>
@@ -762,16 +749,16 @@ function displayDemoRecentReviews() {
 
                             <div class="recent-review-avatar">
                                 ${escapeHtml(
-                                    initial
-                                )}
+                initial
+            )}
                             </div>
 
                             <div class="recent-review-user-info">
 
                                 <p class="recent-review-user-name">
                                     ${escapeHtml(
-                                        review.userName
-                                    )}
+                review.userName
+            )}
                                 </p>
 
                                 <div class="recent-review-rating">
@@ -784,8 +771,8 @@ function displayDemoRecentReviews() {
 
                         <p class="recent-review-text">
                             ${escapeHtml(
-                                review.comment
-                            )}
+                review.comment
+            )}
                         </p>
 
                     </div>
@@ -794,24 +781,24 @@ function displayDemoRecentReviews() {
 
                         <div class="recent-review-website-logo">
                             ${escapeHtml(
-                                getWebsiteInitial(
-                                    review.websiteName
-                                )
-                            )}
+                getWebsiteInitial(
+                    review.websiteName
+                )
+            )}
                         </div>
 
                         <div class="recent-review-website-info">
 
                             <p class="recent-review-website-name">
                                 ${escapeHtml(
-                                    review.websiteName
-                                )}
+                review.websiteName
+            )}
                             </p>
 
                             <p class="recent-review-website-domain">
                                 ${escapeHtml(
-                                    review.websiteDomain
-                                )}
+                review.websiteDomain
+            )}
                             </p>
 
                         </div>
@@ -823,7 +810,6 @@ function displayDemoRecentReviews() {
         }
     );
 }
-
 
 /* =========================================================
    DISPLAY RECENT REVIEWS
@@ -861,7 +847,7 @@ function displayRecentReviews(
         "";
 
     reviewList.forEach(
-        function (review) {
+        function(review) {
 
             const rating =
                 Math.max(
@@ -884,10 +870,9 @@ function displayRecentReviews(
             ) {
 
                 stars += `
-                    <span class="recent-review-star ${
-                        i <= rating
-                            ? ""
-                            : "empty"
+                    <span class="recent-review-star ${i <= rating
+                        ? ""
+                        : "empty"
                     }">
                         ★
                     </span>
@@ -896,7 +881,7 @@ function displayRecentReviews(
 
             const website =
                 allWebsites.find(
-                    function (item) {
+                    function(item) {
 
                         return (
                             String(
@@ -911,7 +896,7 @@ function displayRecentReviews(
 
             const websiteName =
                 website &&
-                website.name
+                    website.name
                     ? website.name
                     : "Website";
 
@@ -925,7 +910,7 @@ function displayRecentReviews(
             const userName =
                 review.userId
                     ? "User #" +
-                      review.userId
+                    review.userId
                     : "User";
 
             const initial =
@@ -946,16 +931,16 @@ function displayRecentReviews(
 
                             <div class="recent-review-avatar">
                                 ${escapeHtml(
-                                    initial
-                                )}
+                initial
+            )}
                             </div>
 
                             <div class="recent-review-user-info">
 
                                 <p class="recent-review-user-name">
                                     ${escapeHtml(
-                                        userName
-                                    )}
+                userName
+            )}
                                 </p>
 
                                 <div class="recent-review-rating">
@@ -968,8 +953,8 @@ function displayRecentReviews(
 
                         <p class="recent-review-text">
                             ${escapeHtml(
-                                reviewComment
-                            )}
+                reviewComment
+            )}
                         </p>
 
                     </div>
@@ -978,24 +963,24 @@ function displayRecentReviews(
 
                         <div class="recent-review-website-logo">
                             ${escapeHtml(
-                                getWebsiteInitial(
-                                    websiteName
-                                )
-                            )}
+                getWebsiteInitial(
+                    websiteName
+                )
+            )}
                         </div>
 
                         <div class="recent-review-website-info">
 
                             <p class="recent-review-website-name">
                                 ${escapeHtml(
-                                    websiteName
-                                )}
+                websiteName
+            )}
                             </p>
 
                             <p class="recent-review-website-domain">
                                 ${escapeHtml(
-                                    websiteDomain
-                                )}
+                websiteDomain
+            )}
                             </p>
 
                         </div>
@@ -1007,7 +992,6 @@ function displayRecentReviews(
         }
     );
 }
-
 
 /* =========================================================
    INTERNAL SEARCH SEO
@@ -1055,7 +1039,6 @@ function updateSearchRobotsMeta(
     }
 }
 
-
 /* =========================================================
    UPDATE SEARCH URL
 ========================================================= */
@@ -1101,7 +1084,6 @@ function updateSearchUrl(
     );
 }
 
-
 /* =========================================================
    LOAD SAVED WEBSITES + RANKING
 ========================================================= */
@@ -1122,7 +1104,7 @@ function loadWebsites(
 
     ])
 
-        .then(function (responses) {
+        .then(function(responses) {
 
             const websiteResponse =
                 responses[0];
@@ -1153,7 +1135,7 @@ function loadWebsites(
             ]);
         })
 
-        .then(function (data) {
+        .then(function(data) {
 
             allWebsites =
                 data[0] || [];
@@ -1169,7 +1151,7 @@ function loadWebsites(
             }
         })
 
-        .catch(function (error) {
+        .catch(function(error) {
 
             console.error(
                 error
@@ -1194,7 +1176,6 @@ function loadWebsites(
         });
 }
 
-
 /* =========================================================
    FIND WEBSITE RANKING
 ========================================================= */
@@ -1204,7 +1185,7 @@ function getWebsiteRanking(
 ) {
 
     return websiteRankings.find(
-        function (ranking) {
+        function(ranking) {
 
             return (
                 String(
@@ -1217,7 +1198,6 @@ function getWebsiteRanking(
         }
     ) || null;
 }
-
 
 /* =========================================================
    SORT WEBSITES BY RANKING
@@ -1238,7 +1218,7 @@ function sortWebsitesByRanking(
 
     return websites
         .map(
-            function (website, originalIndex) {
+            function(website, originalIndex) {
 
                 const ranking =
                     getWebsiteRanking(
@@ -1258,7 +1238,7 @@ function sortWebsitesByRanking(
             }
         )
         .sort(
-            function (a, b) {
+            function(a, b) {
 
                 /*
                  * Ranked websites first.
@@ -1371,13 +1351,12 @@ function sortWebsitesByRanking(
             }
         )
         .map(
-            function (item) {
+            function(item) {
 
                 return item.website;
             }
         );
 }
-
 
 /* =========================================================
    DISPLAY SAVED WEBSITES
@@ -1446,7 +1425,7 @@ function displayWebsites(
     `;
 
     sortedWebsites.forEach(
-        function (website) {
+        function(website) {
 
             const ranking =
                 getWebsiteRanking(
@@ -1456,7 +1435,7 @@ function displayWebsites(
             const rankText =
                 ranking
                     ? "#" +
-                      ranking.rank
+                    ranking.rank
                     : "Not ranked";
 
             const averageRating =
@@ -1477,28 +1456,28 @@ function displayWebsites(
                 <div
                     class="website-card"
                     data-website-id="${escapeAttribute(
-                        website.id
-                    )}"
+                website.id
+            )}"
                 >
 
                     <div class="website-ranking-info">
 
                         <strong>
                             Rank ${escapeHtml(
-                                rankText
-                            )}
+                rankText
+            )}
                         </strong>
 
                         <span>
                             ★ ${escapeHtml(
-                                averageRating
-                            )}
+                averageRating
+            )}
                         </span>
 
                         <span>
                             ${escapeHtml(
-                                reviewCount
-                            )}
+                reviewCount
+            )}
                             Reviews
                         </span>
 
@@ -1506,14 +1485,14 @@ function displayWebsites(
 
                     <h3>
                         ${escapeHtml(
-                            website.name
-                        )}
+                website.name
+            )}
                     </h3>
 
                     <p>
                         ${escapeHtml(
-                            website.description || ""
-                        )}
+                website.description || ""
+            )}
                     </p>
 
                     <p>
@@ -1524,14 +1503,14 @@ function displayWebsites(
 
                         <a
                             href="${escapeAttribute(
-                                website.url
-                            )}"
+                website.url
+            )}"
                             target="_blank"
                             rel="noopener noreferrer"
                         >
                             ${escapeHtml(
-                                website.url
-                            )}
+                website.url
+            )}
                         </a>
 
                     </p>
@@ -1540,8 +1519,8 @@ function displayWebsites(
                         type="button"
                         class="view-website-button"
                         data-website-id="${escapeAttribute(
-                            website.id
-                        )}"
+                website.id
+            )}"
                     >
                         View Website & Review
                     </button>
@@ -1551,7 +1530,6 @@ function displayWebsites(
         }
     );
 }
-
 
 /* =========================================================
    SEARCH WEBSITES
@@ -1613,8 +1591,8 @@ function searchWebsites() {
                 Searching for
                 <strong>
                     ${escapeHtml(
-                        keyword
-                    )}
+            keyword
+        )}
                 </strong>...
             </p>
         `;
@@ -1628,7 +1606,7 @@ function searchWebsites() {
         )
     )
 
-        .then(function (response) {
+        .then(function(response) {
 
             if (!response.ok) {
 
@@ -1640,14 +1618,14 @@ function searchWebsites() {
             return response.json();
         })
 
-        .then(function (results) {
+        .then(function(results) {
 
             displaySearchResults(
                 results
             );
         })
 
-        .catch(function (error) {
+        .catch(function(error) {
 
             console.error(
                 error
@@ -1663,7 +1641,6 @@ function searchWebsites() {
             }
         });
 }
-
 
 /* =========================================================
    DISPLAY SEARCH RESULT
@@ -1714,14 +1691,14 @@ function displaySearchResults(
 
             <h3>
                 ${escapeHtml(
-                    result.title
-                )}
+        result.title
+    )}
             </h3>
 
             <p>
                 ${escapeHtml(
-                    result.description || ""
-                )}
+        result.description || ""
+    )}
             </p>
 
             <p>
@@ -1732,14 +1709,14 @@ function displaySearchResults(
 
                 <a
                     href="${escapeAttribute(
-                        result.url
-                    )}"
+        result.url
+    )}"
                     target="_blank"
                     rel="noopener noreferrer"
                 >
                     ${escapeHtml(
-                        result.url
-                    )}
+        result.url
+    )}
                 </a>
 
             </p>
@@ -1748,14 +1725,14 @@ function displaySearchResults(
                 type="button"
                 class="view-website-button search-website-button"
                 data-title="${escapeAttribute(
-                    result.title
-                )}"
+        result.title
+    )}"
                 data-url="${escapeAttribute(
-                    result.url
-                )}"
+        result.url
+    )}"
                 data-description="${escapeAttribute(
-                    result.description || ""
-                )}"
+        result.description || ""
+    )}"
             >
                 View Website & Review
             </button>
@@ -1763,7 +1740,6 @@ function displaySearchResults(
         </div>
     `;
 }
-
 
 /* =========================================================
    OPEN WEBSITE FOR REVIEW
@@ -1787,7 +1763,7 @@ function openWebsiteForReview(
         );
 
         window.location.href =
-            "website.html?websiteId=" +
+            "review.html?websiteId=" +
             existingWebsite.id;
 
         return;
@@ -1823,7 +1799,7 @@ function openWebsiteForReview(
         }
     )
 
-        .then(function (response) {
+        .then(function(response) {
 
             if (!response.ok) {
 
@@ -1835,14 +1811,14 @@ function openWebsiteForReview(
             return response.json();
         })
 
-        .then(function (savedWebsite) {
+        .then(function(savedWebsite) {
 
             window.location.href =
-                "website.html?websiteId=" +
+                "review.html?websiteId=" +
                 savedWebsite.id;
         })
 
-        .catch(function (error) {
+        .catch(function(error) {
 
             console.error(
                 error
@@ -1853,7 +1829,6 @@ function openWebsiteForReview(
             );
         });
 }
-
 
 /* =========================================================
    FIND EXISTING WEBSITE
@@ -1898,7 +1873,6 @@ function findExistingWebsite(
 
     return null;
 }
-
 
 /* =========================================================
    NORMALIZE WEBSITE URL
@@ -1951,7 +1925,6 @@ function normalizeWebsiteUrl(
     }
 }
 
-
 /* =========================================================
    VIEW SAVED WEBSITE
 ========================================================= */
@@ -1962,7 +1935,7 @@ function viewWebsite(
 
     const website =
         allWebsites.find(
-            function (item) {
+            function(item) {
 
                 return (
                     String(
@@ -1983,10 +1956,9 @@ function viewWebsite(
     }
 
     window.location.href =
-        "website.html?websiteId=" +
+        "review.html?websiteId=" +
         websiteId;
 }
-
 
 /* =========================================================
    RECENTLY VISITED WEBSITES
@@ -2044,7 +2016,7 @@ function saveRecentWebsite(
 
     recentWebsites =
         recentWebsites.filter(
-            function (item) {
+            function(item) {
 
                 return (
                     String(
@@ -2084,7 +2056,6 @@ function saveRecentWebsite(
         );
     }
 }
-
 
 function getRecentWebsites() {
 
@@ -2129,7 +2100,6 @@ function getRecentWebsites() {
     }
 }
 
-
 function getWebsiteInitial(
     name
 ) {
@@ -2149,7 +2119,6 @@ function getWebsiteInitial(
         )
         .toUpperCase();
 }
-
 
 function getWebsiteDomain(
     url
@@ -2180,7 +2149,6 @@ function getWebsiteDomain(
         return url;
     }
 }
-
 
 function displayRecentWebsites() {
 
@@ -2213,41 +2181,41 @@ function displayRecentWebsites() {
         "";
 
     recentWebsites.forEach(
-        function (website) {
+        function(website) {
 
             continueList.innerHTML += `
                 <div class="continue-card">
 
                     <div class="website-logo-placeholder">
                         ${escapeHtml(
-                            getWebsiteInitial(
-                                website.name
-                            )
-                        )}
+                getWebsiteInitial(
+                    website.name
+                )
+            )}
                     </div>
 
                     <div class="continue-card-content">
 
                         <h3>
                             ${escapeHtml(
-                                website.name
-                            )}
+                website.name
+            )}
                         </h3>
 
                         <p class="website-domain">
                             ${escapeHtml(
-                                getWebsiteDomain(
-                                    website.url
-                                )
-                            )}
+                getWebsiteDomain(
+                    website.url
+                )
+            )}
                         </p>
 
                         <button
                             type="button"
                             class="continue-button"
                             data-recent-website-id="${escapeAttribute(
-                                website.id
-                            )}"
+                website.id
+            )}"
                         >
                             View Website
                         </button>
@@ -2259,7 +2227,6 @@ function displayRecentWebsites() {
         }
     );
 }
-
 
 /* =========================================================
    SELECT WEBSITE
@@ -2286,7 +2253,6 @@ function selectWebsite(
     ).value =
         description || "";
 }
-
 
 /* =========================================================
    ADD WEBSITE
@@ -2348,7 +2314,7 @@ function addWebsite(
         }
     )
 
-        .then(function (response) {
+        .then(function(response) {
 
             if (!response.ok) {
 
@@ -2360,7 +2326,7 @@ function addWebsite(
             return response.json();
         })
 
-        .then(function (data) {
+        .then(function(data) {
 
             if (message) {
 
@@ -2384,7 +2350,7 @@ function addWebsite(
             loadWebsites();
         })
 
-        .catch(function (error) {
+        .catch(function(error) {
 
             console.error(
                 error
@@ -2400,7 +2366,6 @@ function addWebsite(
             }
         });
 }
-
 
 /* =========================================================
    ESCAPE HTML
@@ -2446,7 +2411,6 @@ function escapeHtml(
         );
 }
 
-
 /* =========================================================
    ESCAPE ATTRIBUTE
 ========================================================= */
@@ -2459,7 +2423,6 @@ function escapeAttribute(
         value
     );
 }
-
 
 /* =========================================================
    ESCAPE JAVASCRIPT
@@ -2504,7 +2467,6 @@ function escapeJs(
             "\\r"
         );
 }
-
 
 /* =========================================================
    HANDLE URL SEARCH
@@ -2552,19 +2514,17 @@ function loadSearchFromUrl() {
     }
 }
 
-
 /* =========================================================
    BROWSER BACK / FORWARD
 ========================================================= */
 
 window.addEventListener(
     "popstate",
-    function () {
+    function() {
 
         loadSearchFromUrl();
     }
 );
-
 
 /* =========================================================
    SEARCH BUTTON + WEBSITE BUTTONS
@@ -2572,7 +2532,7 @@ window.addEventListener(
 
 document.addEventListener(
     "DOMContentLoaded",
-    function () {
+    function() {
 
         const searchButton =
             document.getElementById(
@@ -2587,7 +2547,6 @@ document.addEventListener(
             );
         }
 
-
         const searchInput =
             document.getElementById(
                 "searchInput"
@@ -2597,7 +2556,7 @@ document.addEventListener(
 
             searchInput.addEventListener(
                 "keypress",
-                function (event) {
+                function(event) {
 
                     if (
                         event.key ===
@@ -2610,7 +2569,45 @@ document.addEventListener(
             );
         }
 
+        /* =================================================
+           CATEGORY BUTTONS (Banks, Shopping, Travel...)
+           Open the separate category page.
+        ================================================= */
 
+        const categoryList =
+            document.getElementById(
+                "categoryList"
+            );
+
+        if (categoryList) {
+
+            categoryList.addEventListener(
+                "click",
+                function(event) {
+
+                    const button =
+                        event.target.closest(
+                            ".category-item"
+                        );
+
+                    if (!button) {
+                        return;
+                    }
+
+                    const category =
+                        button.dataset.category;
+
+                    if (category) {
+
+                        window.location.href =
+                            "category.html?category=" +
+                            encodeURIComponent(
+                                category
+                            );
+                    }
+                }
+            );
+        }
         /* =================================================
            WEBSITES NAVBAR BUTTON
         ================================================= */
@@ -2624,7 +2621,7 @@ document.addEventListener(
 
             websitesNavLink.addEventListener(
                 "click",
-                function () {
+                function() {
 
                     /*
                      * Load fresh website ranking
@@ -2636,7 +2633,6 @@ document.addEventListener(
                 }
             );
         }
-
 
         const websiteForm =
             document.getElementById(
@@ -2651,7 +2647,6 @@ document.addEventListener(
             );
         }
 
-
         const websiteList =
             document.getElementById(
                 "websiteList"
@@ -2661,7 +2656,7 @@ document.addEventListener(
 
             websiteList.addEventListener(
                 "click",
-                function (event) {
+                function(event) {
 
                     const button =
                         event.target.closest(
@@ -2709,7 +2704,6 @@ document.addEventListener(
             );
         }
 
-
         const continueList =
             document.getElementById(
                 "continueList"
@@ -2719,7 +2713,7 @@ document.addEventListener(
 
             continueList.addEventListener(
                 "click",
-                function (event) {
+                function(event) {
 
                     const button =
                         event.target.closest(
@@ -2742,7 +2736,6 @@ document.addEventListener(
                 }
             );
         }
-
 
         displayRecentWebsites();
 

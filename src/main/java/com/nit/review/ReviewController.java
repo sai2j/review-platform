@@ -1,4 +1,5 @@
 package com.nit.review;
+
 import com.nit.dto.WebsiteRankingDTO;
 import java.time.LocalDate;
 
@@ -56,471 +57,464 @@ import jakarta.validation.Valid;
 
 public class ReviewController {
 
-    private final ReviewService reviewService;
+	private final ReviewService reviewService;
 
-    private static final Set<String> ALLOWED_SORT_FIELDS =
+	private static final Set<String> ALLOWED_SORT_FIELDS =
 
-            Set.of("createdAt", "rating");
+			Set.of("createdAt", "rating");
 
-    public ReviewController(ReviewService reviewService) {
+	public ReviewController(ReviewService reviewService) {
 
-        this.reviewService = reviewService;
+		this.reviewService = reviewService;
 
-    }
+	}
 
-    // ==============================
+	@GetMapping("/website/{websiteId}")
 
-    // GET REVIEWS BY WEBSITE
+	public Page<ReviewResponseDTO> getReviewsByWebsiteId(
 
-    // ==============================
+			@PathVariable Long websiteId,
 
-    @GetMapping("/website/{websiteId}")
+			@RequestParam(required = false) Integer rating,
 
-    public Page<ReviewResponseDTO> getReviewsByWebsiteId(
+			@RequestParam(required = false) String verificationStatus,
 
-            @PathVariable Long websiteId,
+			@RequestParam(required = false) String experienceType,
 
-            @RequestParam(required = false) Integer rating,
+			@RequestParam(required = false) Integer experienceRating,
 
-            @RequestParam(required = false) String verificationStatus,
+			@RequestParam(required = false)
 
-            @RequestParam(required = false) String experienceType,
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 
-            @RequestParam(required = false) Integer experienceRating,
+			LocalDate startDate,
 
-            @RequestParam(required = false)
+			@RequestParam(required = false)
 
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+			@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
 
-            LocalDate startDate,
+			LocalDate endDate,
 
-            @RequestParam(required = false)
+			@PageableDefault(
 
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+					size = 10,
 
-            LocalDate endDate,
+					sort = "createdAt",
 
-            @PageableDefault(
+					direction = Sort.Direction.DESC
 
-                    size = 10,
+			)
 
-                    sort = "createdAt",
+			Pageable pageable) {
 
-                    direction = Sort.Direction.DESC
+		pageable = validateSorting(pageable);
 
-            )
+		if (experienceType != null && !experienceType.isBlank()) {
 
-            Pageable pageable) {
+			return reviewService.getReviewsByWebsiteIdAndExperienceType(
 
-        pageable = validateSorting(pageable);
+					websiteId,
 
-        if (experienceType != null && !experienceType.isBlank()) {
+					experienceType,
 
-            return reviewService.getReviewsByWebsiteIdAndExperienceType(
+					experienceRating,
 
-                    websiteId,
+					pageable
 
-                    experienceType,
+			);
 
-                    experienceRating,
+		}
 
-                    pageable
+		if (rating != null) {
 
-            );
+			return reviewService.getReviewsByWebsiteIdAndRating(
 
-        }
+					websiteId,
 
-        if (rating != null) {
+					rating,
 
-            return reviewService.getReviewsByWebsiteIdAndRating(
+					pageable
 
-                    websiteId,
+			);
 
-                    rating,
+		}
 
-                    pageable
+		if (verificationStatus != null
 
-            );
+				&& !verificationStatus.isBlank()) {
 
-        }
+			return reviewService.getReviewsByWebsiteIdAndVerificationStatus(
 
-        if (verificationStatus != null
+					websiteId,
 
-                && !verificationStatus.isBlank()) {
+					verificationStatus,
 
-            return reviewService.getReviewsByWebsiteIdAndVerificationStatus(
+					pageable
 
-                    websiteId,
+			);
 
-                    verificationStatus,
+		}
 
-                    pageable
+		if (startDate != null || endDate != null) {
 
-            );
+			return reviewService.getReviewsByWebsiteIdAndDate(
 
-        }
+					websiteId,
 
-        if (startDate != null || endDate != null) {
+					startDate,
 
-            return reviewService.getReviewsByWebsiteIdAndDate(
+					endDate,
 
-                    websiteId,
+					pageable
 
-                    startDate,
+			);
 
-                    endDate,
+		}
 
-                    pageable
+		/*
+		 * Public website review listing: show reviews returned by ReviewService.
+		 *
+		 * This allows PENDING and APPROVED reviews to appear in the Customer Reviews
+		 * section.
+		 */
 
-            );
+		return reviewService.getReviewsByWebsiteId(
 
-        }
+				websiteId,
 
-        /*
-         * Public website review listing:
-         * show reviews returned by ReviewService.
-         *
-         * This allows PENDING and APPROVED reviews
-         * to appear in the Customer Reviews section.
-         */
+				pageable
 
-        return reviewService.getReviewsByWebsiteId(
+		);
 
-                websiteId,
+	}
 
-                pageable
+	// ==============================
+	// WEBSITE RANKING
+	// ==============================
 
-        );
+	@GetMapping("/ranking")
+	public List<WebsiteRankingDTO> getWebsiteRanking() {
 
-    }
+		return reviewService.getWebsiteRanking();
+	}
+	// ==============================
 
-    // ==============================
-    // WEBSITE RANKING
-    // ==============================
+	// RATING SUMMARY
 
-    @GetMapping("/ranking")
-    public List<WebsiteRankingDTO> getWebsiteRanking() {
+	// ==============================
 
-        return reviewService.getWebsiteRanking();
-    }
-    // ==============================
+	@GetMapping("/website/{websiteId}/summary")
 
-    // RATING SUMMARY
+	public RatingSummary getRatingSummary(
 
-    // ==============================
+			@PathVariable Long websiteId) {
 
-    @GetMapping("/website/{websiteId}/summary")
+		return new RatingSummary(
 
-    public RatingSummary getRatingSummary(
+				reviewService.getAverageRating(websiteId),
 
-            @PathVariable Long websiteId) {
+				reviewService.getReviewCount(websiteId),
 
-        return new RatingSummary(
+				reviewService.getFiveStarCount(websiteId),
 
-                reviewService.getAverageRating(websiteId),
+				reviewService.getFourStarCount(websiteId),
 
-                reviewService.getReviewCount(websiteId),
+				reviewService.getThreeStarCount(websiteId),
 
-                reviewService.getFiveStarCount(websiteId),
+				reviewService.getTwoStarCount(websiteId),
 
-                reviewService.getFourStarCount(websiteId),
+				reviewService.getOneStarCount(websiteId)
 
-                reviewService.getThreeStarCount(websiteId),
+		);
 
-                reviewService.getTwoStarCount(websiteId),
+	}
 
-                reviewService.getOneStarCount(websiteId)
+	// ==============================
 
-        );
+	// CREATE REVIEW
 
-    }
+	// ==============================
 
-    // ==============================
+	@PostMapping
 
-    // CREATE REVIEW
+	public ReviewResponseDTO createReview(
 
-    // ==============================
+			@Valid @RequestBody ReviewRequestDTO request) {
 
-    @PostMapping
+		return reviewService.saveReview(request);
 
-    public ReviewResponseDTO createReview(
+	}
 
-            @Valid @RequestBody ReviewRequestDTO request) {
+	// ==============================
 
-        return reviewService.saveReview(request);
+	// CREATE REVIEW FOR WEBSITE
 
-    }
+	// ==============================
 
-    // ==============================
+	@PostMapping("/website/{websiteId}")
 
-    // CREATE REVIEW FOR WEBSITE
+	public ReviewResponseDTO createReviewForWebsite(
 
-    // ==============================
+			@PathVariable Long websiteId,
 
-    @PostMapping("/website/{websiteId}")
+			@Valid @RequestBody ReviewRequestDTO request) {
 
-    public ReviewResponseDTO createReviewForWebsite(
+		request.setWebsiteId(websiteId);
 
-            @PathVariable Long websiteId,
+		return reviewService.saveReview(request);
 
-            @Valid @RequestBody ReviewRequestDTO request) {
+	}
 
-        request.setWebsiteId(websiteId);
+	// ==============================
 
-        return reviewService.saveReview(request);
+	// GET ALL REVIEWS
 
-    }
+	// ==============================
 
-    // ==============================
+	@GetMapping
 
-    // GET ALL REVIEWS
+	public Page<ReviewResponseDTO> getAllReviews(
 
-    // ==============================
+			@PageableDefault(
 
-    @GetMapping
+					size = 10,
 
-    public Page<ReviewResponseDTO> getAllReviews(
+					sort = "createdAt",
 
-            @PageableDefault(
+					direction = Sort.Direction.DESC
 
-                    size = 10,
+			)
 
-                    sort = "createdAt",
+			Pageable pageable) {
 
-                    direction = Sort.Direction.DESC
+		pageable = validateSorting(pageable);
 
-            )
+		return reviewService.getAllReviews(pageable);
 
-            Pageable pageable) {
+	}
 
-        pageable = validateSorting(pageable);
+	// ==============================
 
-        return reviewService.getAllReviews(pageable);
+	// GET PENDING REVIEWS
 
-    }
+	// ==============================
 
-    // ==============================
+	@PreAuthorize("hasRole('ADMIN')")
 
-    // GET PENDING REVIEWS
+	@GetMapping("/pending")
 
-    // ==============================
+	public List<ReviewResponseDTO> getPendingReviews() {
 
-    @PreAuthorize("hasRole('ADMIN')")
+		return reviewService.convertToResponseDTOList(
 
-    @GetMapping("/pending")
+				reviewService.getPendingReviews()
 
-    public List<ReviewResponseDTO> getPendingReviews() {
+		);
 
-        return reviewService.convertToResponseDTOList(
+	}
 
-                reviewService.getPendingReviews()
+	// ==============================
 
-        );
+	// GET HIDDEN REVIEWS
 
-    }
+	// ==============================
 
-    // ==============================
+	@PreAuthorize("hasRole('ADMIN')")
 
-    // GET HIDDEN REVIEWS
+	@GetMapping("/hidden")
 
-    // ==============================
+	public List<ReviewResponseDTO> getHiddenReviews() {
 
-    @PreAuthorize("hasRole('ADMIN')")
+		return reviewService.convertToResponseDTOList(
 
-    @GetMapping("/hidden")
+				reviewService.getHiddenReviews()
 
-    public List<ReviewResponseDTO> getHiddenReviews() {
+		);
 
-        return reviewService.convertToResponseDTOList(
+	}
 
-                reviewService.getHiddenReviews()
+	// ==============================
 
-        );
+	// GET REVIEW BY ID
 
-    }
+	// ==============================
 
-    // ==============================
+	@GetMapping("/{id}")
 
-    // GET REVIEW BY ID
+	public ReviewResponseDTO getReviewById(
 
-    // ==============================
+			@PathVariable Long id) {
 
-    @GetMapping("/{id}")
+		return reviewService.convertToResponseDTO(
 
-    public ReviewResponseDTO getReviewById(
+				reviewService.getReviewById(id)
 
-            @PathVariable Long id) {
+		);
 
-        return reviewService.convertToResponseDTO(
+	}
 
-                reviewService.getReviewById(id)
+	// ==============================
 
-        );
+	// UPDATE OWN REVIEW - PATCH
 
-    }
+	// ==============================
 
-    // ==============================
+	@PatchMapping("/{id}")
 
-    // UPDATE OWN REVIEW - PATCH
+	public ReviewResponseDTO updateReview(
 
-    // ==============================
+			@PathVariable Long id,
 
-    @PatchMapping("/{id}")
+			@Valid @RequestBody ReviewRequestDTO request) {
 
-    public ReviewResponseDTO updateReview(
+		return reviewService.updateReview(id, request);
 
-            @PathVariable Long id,
+	}
 
-            @Valid @RequestBody ReviewRequestDTO request) {
+	// ==============================
 
-        return reviewService.updateReview(id, request);
+	// UPDATE OWN REVIEW - PUT
 
-    }
+	// ==============================
 
-    // ==============================
+	// Added because current frontend was using PUT.
 
-    // UPDATE OWN REVIEW - PUT
+	// Existing PATCH endpoint is also kept.
 
-    // ==============================
+	@PutMapping("/{id}")
 
-    // Added because current frontend was using PUT.
+	public ReviewResponseDTO updateReviewWithPut(
 
-    // Existing PATCH endpoint is also kept.
+			@PathVariable Long id,
 
-    @PutMapping("/{id}")
+			@Valid @RequestBody ReviewRequestDTO request) {
 
-    public ReviewResponseDTO updateReviewWithPut(
+		return reviewService.updateReview(id, request);
 
-            @PathVariable Long id,
+	}
 
-            @Valid @RequestBody ReviewRequestDTO request) {
+	// ==============================
 
-        return reviewService.updateReview(id, request);
+	// UPDATE REVIEW STATUS - ADMIN
 
-    }
+	// ==============================
 
-    // ==============================
+	@PreAuthorize("hasRole('ADMIN')")
 
-    // UPDATE REVIEW STATUS - ADMIN
+	@PutMapping("/{id}/status")
 
-    // ==============================
+	public ReviewResponseDTO updateReviewStatus(
 
-    @PreAuthorize("hasRole('ADMIN')")
+			@PathVariable Long id,
 
-    @PutMapping("/{id}/status")
+			@RequestParam String status) {
 
-    public ReviewResponseDTO updateReviewStatus(
+		return reviewService.updateReviewStatus(id, status);
 
-            @PathVariable Long id,
+	}
 
-            @RequestParam String status) {
+	// ==============================
 
-        return reviewService.updateReviewStatus(id, status);
+	// ADMIN REVIEW UPDATE
 
-    }
+	// ==============================
 
-    // ==============================
+	@PreAuthorize("hasRole('ADMIN')")
 
-    // ADMIN REVIEW UPDATE
+	@PatchMapping("/api/v1/admin/reviews/{id}")
 
-    // ==============================
+	public ReviewResponseDTO adminUpdateReview(
 
-    @PreAuthorize("hasRole('ADMIN')")
+			@PathVariable Long id,
 
-    @PatchMapping("/api/v1/admin/reviews/{id}")
+			@RequestParam String status) {
 
-    public ReviewResponseDTO adminUpdateReview(
+		return reviewService.updateReviewStatus(id, status);
 
-            @PathVariable Long id,
+	}
 
-            @RequestParam String status) {
+	// ==============================
 
-        return reviewService.updateReviewStatus(id, status);
+	// UPDATE VERIFICATION STATUS
 
-    }
+	// ==============================
 
-    // ==============================
+	@PreAuthorize("hasRole('ADMIN')")
 
-    // UPDATE VERIFICATION STATUS
+	@PutMapping("/{id}/verification-status")
 
-    // ==============================
+	public ReviewResponseDTO updateReviewVerificationStatus(
 
-    @PreAuthorize("hasRole('ADMIN')")
+			@PathVariable Long id,
 
-    @PutMapping("/{id}/verification-status")
+			@RequestParam String verificationStatus) {
 
-    public ReviewResponseDTO updateReviewVerificationStatus(
+		return reviewService.updateReviewVerificationStatus(
 
-            @PathVariable Long id,
+				id,
 
-            @RequestParam String verificationStatus) {
+				verificationStatus
 
-        return reviewService.updateReviewVerificationStatus(
+		);
 
-                id,
+	}
 
-                verificationStatus
+	// ==============================
 
-        );
+	// DELETE REVIEW
 
-    }
+	// ==============================
 
-    // ==============================
+	@DeleteMapping("/{id}")
 
-    // DELETE REVIEW
+	public String deleteReview(
 
-    // ==============================
+			@PathVariable Long id) {
 
-    @DeleteMapping("/{id}")
+		reviewService.deleteReview(id);
 
-    public String deleteReview(
+		return "Review delete Sucessfully";
 
-            @PathVariable Long id) {
+	}
 
-        reviewService.deleteReview(id);
+	// ==============================
 
-        return "Review delete Sucessfully";
+	// VALIDATE SORTING
 
-    }
+	// ==============================
 
-    // ==============================
+	private Pageable validateSorting(Pageable pageable) {
 
-    // VALIDATE SORTING
+		if (pageable.getSort().isUnsorted()) {
 
-    // ==============================
+			return pageable;
 
-    private Pageable validateSorting(Pageable pageable) {
+		}
 
-        if (pageable.getSort().isUnsorted()) {
+		for (Sort.Order order : pageable.getSort()) {
 
-            return pageable;
+			if (!ALLOWED_SORT_FIELDS.contains(order.getProperty())) {
 
-        }
+				throw new RuntimeException(
 
-        for (Sort.Order order : pageable.getSort()) {
+						"Sorting is allowed only by: createdAt, rating"
 
-            if (!ALLOWED_SORT_FIELDS.contains(order.getProperty())) {
+				);
 
-                throw new RuntimeException(
+			}
 
-                        "Sorting is allowed only by: createdAt, rating"
+		}
 
-                );
+		return PageRequest.of(
 
-            }
+				pageable.getPageNumber(),
 
-        }
+				pageable.getPageSize(),
 
-        return PageRequest.of(
+				pageable.getSort()
 
-                pageable.getPageNumber(),
+		);
 
-                pageable.getPageSize(),
-
-                pageable.getSort()
-
-        );
-
-    }
+	}
 
 }

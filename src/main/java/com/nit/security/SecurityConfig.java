@@ -23,6 +23,7 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
+
         return new BCryptPasswordEncoder();
     }
 
@@ -78,7 +79,6 @@ public class SecurityConfig {
             HttpSecurity http) throws Exception {
 
         http
-
             .csrf(csrf -> csrf.disable())
 
             .cors(cors ->
@@ -136,42 +136,25 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
 
                 // Public HTML pages
-
                 .requestMatchers(
-
                         "/",
-
                         "/index.html",
-
                         "/login.html",
-
                         "/register.html",
-
                         "/review.html",
-
                         "/website.html",
-
                         "/business-signup.html",
-
                         "/business-claim.html",
-
                         "/business-dashboard.html",
-
                         "/business-response.html",
-
                         "/subscription.html",
-
                         "/admin.html",
-
                         "/forgot-password.html",
-
                         "/reset-password.html"
-
                 )
                 .permitAll()
 
                 // Public website pages
-
                 .requestMatchers(
                         HttpMethod.GET,
                         "/website/**"
@@ -182,122 +165,93 @@ public class SecurityConfig {
                 .permitAll()
 
                 // API documentation
-
                 .requestMatchers(
-
                         "/swagger-ui/**",
-
                         "/v3/api-docs/**"
-
                 )
                 .permitAll()
 
                 // SEO sitemap files
-
                 .requestMatchers(
-
                         "/sitemap.xml",
-
                         "/website-sitemap.xml"
-
                 )
                 .permitAll()
 
                 // Static resources
-
                 .requestMatchers(
-
                         "/css/**",
-
                         "/js/**"
-
                 )
                 .permitAll()
 
                 // Registration, login and public user profiles
-
                 .requestMatchers(
-
                         "/users/register",
-
                         "/users/login",
-
                         "/users/public-profile/**"
-
                 )
                 .permitAll()
 
                 // Forgot Password and Reset Password APIs
-
                 .requestMatchers(
-
                         "/users/password/forgot",
-
                         "/users/password/reset"
-
                 )
                 .permitAll()
 
                 // Existing public website and review routes
-
                 .requestMatchers(
-
                         "/websites/**",
-
                         "/api/v1/websites/**",
-
                         "/reviews/website/**",
-
                         "/reviews/ranking",
-
                         "/businesses/*",
-
                         "/businesses/website/*",
-
                         "/business-claims/business/*/approved"
-
                 )
                 .permitAll()
 
                 // Business email verification
-
                 .requestMatchers(
-
                         "/businesses/*/verify-email"
-
                 )
                 .permitAll()
 
                 // Discovery and metadata APIs
-
                 .requestMatchers(
-
                         "/discovery/**",
-
                         "/metadata/**"
-
                 )
                 .permitAll()
 
                 // Public review vote counts
-
                 .requestMatchers(
-
                         "/review-votes/*/count"
-
                 )
                 .permitAll()
 
                 // Admin-only endpoints
-
                 .requestMatchers("/admins/**")
                 .hasRole("ADMIN")
 
-                // All other routes require authentication
-
-                .anyRequest()
+                // Subscription creation
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/subscriptions/business/*/create"
+                )
                 .authenticated()
 
+                // Test payment
+                .requestMatchers(
+                        HttpMethod.POST,
+                        "/subscriptions/*/test-payment"
+                )
+                .authenticated()
+
+                // All other routes require authentication
+                .anyRequest()
+                .authenticated()
             );
 
         return http.build();

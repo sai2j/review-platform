@@ -48,6 +48,9 @@ const METRICS_API =
 const RESPONSE_API =
     "/review-platform/business-responses";
 
+const SUBSCRIPTION_API =
+    "/review-platform/subscriptions/business/";
+
 
 /* =========================
    LOGOUT
@@ -76,7 +79,9 @@ function loadBusiness() {
 
             if (!response.ok) {
 
-                throw new Error("Business API Error");
+                throw new Error(
+                    "Business API Error"
+                );
 
             }
 
@@ -86,7 +91,38 @@ function loadBusiness() {
 
         .then(function(business) {
 
+            /*
+             * Save the currently loaded business.
+             * Subscription page uses this business ID.
+             */
+
+            if (business && business.id) {
+
+                localStorage.setItem(
+                    "myBusiness",
+                    JSON.stringify(business)
+                );
+
+            }
+
             displayBusiness(business);
+
+            /*
+             * Load subscription after business
+             * information is available.
+             */
+
+            if (business && business.id) {
+
+                loadSubscription(
+                    business.id
+                );
+
+            } else {
+
+                displayNoSubscription();
+
+            }
 
         })
 
@@ -95,7 +131,9 @@ function loadBusiness() {
             console.error(error);
 
             const businessInfo =
-                document.getElementById("businessInfo");
+                document.getElementById(
+                    "businessInfo"
+                );
 
             if (businessInfo) {
 
@@ -103,6 +141,8 @@ function loadBusiness() {
                     "<p>Unable to load business information.</p>";
 
             }
+
+            displayNoSubscription();
 
         });
 
@@ -116,7 +156,9 @@ function loadBusiness() {
 function displayBusiness(business) {
 
     const businessInfo =
-        document.getElementById("businessInfo");
+        document.getElementById(
+            "businessInfo"
+        );
 
     if (!businessInfo) {
 
@@ -132,6 +174,18 @@ function displayBusiness(business) {
         return;
 
     }
+
+
+    /*
+     * Keep business information available
+     * for the subscription page.
+     */
+
+    localStorage.setItem(
+        "myBusiness",
+        JSON.stringify(business)
+    );
+
 
     businessInfo.innerHTML = `
 
@@ -150,9 +204,8 @@ function displayBusiness(business) {
                 <strong>Name:</strong>
 
                 ${escapeHtml(
-
-                    business.name || "Not available"
-
+                    business.name ||
+                    "Not available"
                 )}
 
             </p>
@@ -162,9 +215,8 @@ function displayBusiness(business) {
                 <strong>Description:</strong>
 
                 ${escapeHtml(
-
-                    business.description || "Not available"
-
+                    business.description ||
+                    "Not available"
                 )}
 
             </p>
@@ -174,9 +226,8 @@ function displayBusiness(business) {
                 <strong>Official URL:</strong>
 
                 ${escapeHtml(
-
-                    business.officialUrl || "Not available"
-
+                    business.officialUrl ||
+                    "Not available"
                 )}
 
             </p>
@@ -186,9 +237,8 @@ function displayBusiness(business) {
                 <strong>Status:</strong>
 
                 ${escapeHtml(
-
-                    business.status || "Not available"
-
+                    business.status ||
+                    "Not available"
                 )}
 
             </p>
@@ -196,6 +246,324 @@ function displayBusiness(business) {
         </div>
 
     `;
+
+}
+
+
+/* =========================
+   LOAD SUBSCRIPTION
+========================= */
+
+function loadSubscription(businessId) {
+
+    const subscriptionInfo =
+        document.getElementById(
+            "subscriptionInfo"
+        );
+
+    if (!subscriptionInfo) {
+
+        return;
+
+    }
+
+    subscriptionInfo.innerHTML =
+        "<p>Loading subscription information...</p>";
+
+
+    fetch(
+        SUBSCRIPTION_API
+        + Number(businessId)
+    )
+
+        .then(function(response) {
+
+            /*
+             * 404 means business does not have
+             * a subscription yet.
+             */
+
+            if (response.status === 404) {
+
+                return null;
+
+            }
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Subscription API Error"
+                );
+
+            }
+
+            return response.json();
+
+        })
+
+        .then(function(subscription) {
+
+            /*
+             * No subscription found.
+             */
+
+            if (!subscription) {
+
+                displayNoSubscription();
+
+                return;
+
+            }
+
+
+            /*
+             * Only ACTIVE subscription should
+             * be displayed as current plan.
+             */
+
+            if (
+                !subscription.status ||
+                subscription.status.toUpperCase()
+                    !== "ACTIVE"
+            ) {
+
+                displayNoSubscription();
+
+                return;
+
+            }
+
+
+            displaySubscription(
+                subscription
+            );
+
+        })
+
+        .catch(function(error) {
+
+            console.error(error);
+
+            if (subscriptionInfo) {
+
+                subscriptionInfo.innerHTML = `
+
+                    <div class="info-card">
+
+                        <p>
+                            Unable to load subscription information.
+                        </p>
+
+                        <p>
+                            <a href="subscription.html">
+                                Manage Subscription
+                            </a>
+                        </p>
+
+                    </div>
+
+                `;
+
+            }
+
+        });
+
+}
+
+
+/* =========================
+   DISPLAY ACTIVE SUBSCRIPTION
+========================= */
+
+function displaySubscription(
+    subscription
+) {
+
+    const subscriptionInfo =
+        document.getElementById(
+            "subscriptionInfo"
+        );
+
+    if (!subscriptionInfo) {
+
+        return;
+
+    }
+
+
+    const planName =
+        subscription.planName ||
+        "Not available";
+
+    const status =
+        subscription.status ||
+        "Not available";
+
+    const billingCycle =
+        subscription.billingCycle ||
+        "Not available";
+
+    const amount =
+        Number(subscription.amount || 0);
+
+
+    const startDate =
+        formatSubscriptionDate(
+            subscription.startDate
+        );
+
+    const endDate =
+        formatSubscriptionDate(
+            subscription.endDate
+        );
+
+
+    subscriptionInfo.innerHTML = `
+
+        <div class="info-card">
+
+            <p>
+
+                <strong>Current Plan:</strong>
+
+                ${escapeHtml(planName)}
+
+            </p>
+
+            <p>
+
+                <strong>Status:</strong>
+
+                ${escapeHtml(status)}
+
+            </p>
+
+            <p>
+
+                <strong>Billing Cycle:</strong>
+
+                ${escapeHtml(billingCycle)}
+
+            </p>
+
+            <p>
+
+                <strong>Amount:</strong>
+
+                ₹${amount.toFixed(2)}
+
+            </p>
+
+            <p>
+
+                <strong>Start Date:</strong>
+
+                ${escapeHtml(startDate)}
+
+            </p>
+
+            <p>
+
+                <strong>End Date:</strong>
+
+                ${escapeHtml(endDate)}
+
+            </p>
+
+            <p>
+
+                <a href="subscription.html">
+
+                    Manage Subscription
+
+                </a>
+
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================
+   NO ACTIVE SUBSCRIPTION
+========================= */
+
+function displayNoSubscription() {
+
+    const subscriptionInfo =
+        document.getElementById(
+            "subscriptionInfo"
+        );
+
+    if (!subscriptionInfo) {
+
+        return;
+
+    }
+
+
+    subscriptionInfo.innerHTML = `
+
+        <div class="info-card">
+
+            <p>
+                No active subscription found.
+            </p>
+
+            <p>
+
+                <a href="subscription.html">
+
+                    Choose a Plan
+
+                </a>
+
+            </p>
+
+        </div>
+
+    `;
+
+}
+
+
+/* =========================
+   FORMAT SUBSCRIPTION DATE
+========================= */
+
+function formatSubscriptionDate(
+    dateValue
+) {
+
+    if (!dateValue) {
+
+        return "Not available";
+
+    }
+
+
+    const date =
+        new Date(dateValue);
+
+
+    if (Number.isNaN(date.getTime())) {
+
+        return "Not available";
+
+    }
+
+
+    return date.toLocaleDateString(
+        "en-IN",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }
+    );
 
 }
 
@@ -212,7 +580,9 @@ function loadWebsite() {
 
             if (!response.ok) {
 
-                throw new Error("Website API Error");
+                throw new Error(
+                    "Website API Error"
+                );
 
             }
 
@@ -231,7 +601,9 @@ function loadWebsite() {
             console.error(error);
 
             const websiteInfo =
-                document.getElementById("websiteInfo");
+                document.getElementById(
+                    "websiteInfo"
+                );
 
             if (websiteInfo) {
 
@@ -252,7 +624,9 @@ function loadWebsite() {
 function displayWebsite(website) {
 
     const websiteInfo =
-        document.getElementById("websiteInfo");
+        document.getElementById(
+            "websiteInfo"
+        );
 
     if (!websiteInfo) {
 
@@ -268,6 +642,7 @@ function displayWebsite(website) {
         return;
 
     }
+
 
     websiteInfo.innerHTML = `
 
@@ -286,9 +661,8 @@ function displayWebsite(website) {
                 <strong>Name:</strong>
 
                 ${escapeHtml(
-
-                    website.name || "Not available"
-
+                    website.name ||
+                    "Not available"
                 )}
 
             </p>
@@ -298,9 +672,8 @@ function displayWebsite(website) {
                 <strong>URL:</strong>
 
                 ${escapeHtml(
-
-                    website.url || "Not available"
-
+                    website.url ||
+                    "Not available"
                 )}
 
             </p>
@@ -310,9 +683,8 @@ function displayWebsite(website) {
                 <strong>Description:</strong>
 
                 ${escapeHtml(
-
-                    website.description || "Not available"
-
+                    website.description ||
+                    "Not available"
                 )}
 
             </p>
@@ -322,9 +694,8 @@ function displayWebsite(website) {
                 <strong>Domain:</strong>
 
                 ${escapeHtml(
-
-                    website.canonicalDomain || "Not available"
-
+                    website.canonicalDomain ||
+                    "Not available"
                 )}
 
             </p>
@@ -351,9 +722,7 @@ function loadReviews() {
                 if (!response.ok) {
 
                     throw new Error(
-
                         "Reviews API Error"
-
                     );
 
                 }
@@ -362,6 +731,7 @@ function loadReviews() {
 
             }),
 
+
         fetch(BUSINESS_API)
 
             .then(function(response) {
@@ -369,9 +739,7 @@ function loadReviews() {
                 if (!response.ok) {
 
                     throw new Error(
-
                         "Business API Error"
-
                     );
 
                 }
@@ -384,38 +752,48 @@ function loadReviews() {
 
     .then(function(results) {
 
-        const reviews = results[0];
+        const reviews =
+            results[0];
 
-        const business = results[1];
+        const business =
+            results[1];
+
 
         if (!business || !business.id) {
 
             throw new Error(
-
                 "Business ID not found"
-
             );
 
         }
 
+
+        /*
+         * Keep business information synchronized.
+         */
+
+        localStorage.setItem(
+            "myBusiness",
+            JSON.stringify(business)
+        );
+
+
         const businessResponseAPI =
-
             RESPONSE_API
-
             + "/business/"
-
             + business.id;
 
-        return fetch(businessResponseAPI)
+
+        return fetch(
+            businessResponseAPI
+        )
 
             .then(function(response) {
 
                 if (!response.ok) {
 
                     throw new Error(
-
                         "Business Response API Error"
-
                     );
 
                 }
@@ -427,14 +805,13 @@ function loadReviews() {
             .then(function(responses) {
 
                 displayReviews(
-
                     reviews,
-
                     responses
-
                 );
 
-                calculateSummary(reviews);
+                calculateSummary(
+                    reviews
+                );
 
             });
 
@@ -445,13 +822,13 @@ function loadReviews() {
         console.error(error);
 
         const reviewList =
-
-            document.getElementById("reviewList");
+            document.getElementById(
+                "reviewList"
+            );
 
         if (reviewList) {
 
             reviewList.innerHTML =
-
                 "<p>Unable to load reviews.</p>";
 
         }
@@ -474,9 +851,7 @@ function loadDashboardMetrics() {
             if (!response.ok) {
 
                 throw new Error(
-
                     "Dashboard Metrics API Error"
-
                 );
 
             }
@@ -487,7 +862,9 @@ function loadDashboardMetrics() {
 
         .then(function(metrics) {
 
-            displayDashboardMetrics(metrics);
+            displayDashboardMetrics(
+                metrics
+            );
 
         })
 
@@ -496,23 +873,27 @@ function loadDashboardMetrics() {
             console.error(error);
 
             const responseRate =
-
-                document.getElementById("responseRate");
+                document.getElementById(
+                    "responseRate"
+                );
 
             const ratingTrend =
+                document.getElementById(
+                    "ratingTrend"
+                );
 
-                document.getElementById("ratingTrend");
 
             if (responseRate) {
 
-                responseRate.textContent = "0.0%";
+                responseRate.textContent =
+                    "0.0%";
 
             }
+
 
             if (ratingTrend) {
 
                 ratingTrend.innerHTML =
-
                     "<p>Unable to load rating trend.</p>";
 
             }
@@ -526,7 +907,9 @@ function loadDashboardMetrics() {
    DISPLAY DASHBOARD METRICS
 ========================= */
 
-function displayDashboardMetrics(metrics) {
+function displayDashboardMetrics(
+    metrics
+) {
 
     if (!metrics) {
 
@@ -534,50 +917,58 @@ function displayDashboardMetrics(metrics) {
 
     }
 
-    const responseRate =
 
-        document.getElementById("responseRate");
+    const responseRate =
+        document.getElementById(
+            "responseRate"
+        );
+
 
     if (responseRate) {
 
         responseRate.textContent =
-
-            Number(metrics.responseRate || 0)
-
-                .toFixed(1) + "%";
+            Number(
+                metrics.responseRate || 0
+            ).toFixed(1)
+            + "%";
 
     }
 
-    const averageRating =
 
-        document.getElementById("averageRating");
+    const averageRating =
+        document.getElementById(
+            "averageRating"
+        );
+
 
     if (averageRating) {
 
         averageRating.textContent =
-
-            Number(metrics.averageRating || 0)
-
-                .toFixed(1);
+            Number(
+                metrics.averageRating || 0
+            ).toFixed(1);
 
     }
 
-    const reviewCount =
 
-        document.getElementById("reviewCount");
+    const reviewCount =
+        document.getElementById(
+            "reviewCount"
+        );
+
 
     if (reviewCount) {
 
         reviewCount.textContent =
-
-            Number(metrics.reviewCount || 0);
+            Number(
+                metrics.reviewCount || 0
+            );
 
     }
 
+
     displayRatingTrend(
-
         metrics.ratingTrend || []
-
     );
 
 }
@@ -590,8 +981,10 @@ function displayDashboardMetrics(metrics) {
 function displayRatingTrend(trend) {
 
     const ratingTrend =
+        document.getElementById(
+            "ratingTrend"
+        );
 
-        document.getElementById("ratingTrend");
 
     if (!ratingTrend) {
 
@@ -599,17 +992,19 @@ function displayRatingTrend(trend) {
 
     }
 
+
     if (!trend || trend.length === 0) {
 
         ratingTrend.innerHTML =
-
             "<p>No rating trend data available yet.</p>";
 
         return;
 
     }
 
+
     ratingTrend.innerHTML = "";
+
 
     trend.forEach(function(item) {
 
@@ -622,9 +1017,7 @@ function displayRatingTrend(trend) {
                     <strong>Month:</strong>
 
                     ${escapeHtml(
-
                         item.month || ""
-
                     )}
 
                 </p>
@@ -634,9 +1027,7 @@ function displayRatingTrend(trend) {
                     <strong>Average Rating:</strong>
 
                     ${Number(
-
                         item.averageRating || 0
-
                     ).toFixed(1)}
 
                     / 5
@@ -648,9 +1039,7 @@ function displayRatingTrend(trend) {
                     <strong>Reviews:</strong>
 
                     ${Number(
-
                         item.reviewCount || 0
-
                     )}
 
                 </p>
@@ -669,16 +1058,15 @@ function displayRatingTrend(trend) {
 ========================= */
 
 function displayReviews(
-
     reviews,
-
     responses
-
 ) {
 
     const reviewList =
+        document.getElementById(
+            "reviewList"
+        );
 
-        document.getElementById("reviewList");
 
     if (!reviewList) {
 
@@ -686,17 +1074,19 @@ function displayReviews(
 
     }
 
+
     reviewList.innerHTML = "";
+
 
     if (!reviews || reviews.length === 0) {
 
         reviewList.innerHTML =
-
             "<p>No customer reviews found.</p>";
 
         return;
 
     }
+
 
     if (!responses) {
 
@@ -704,31 +1094,37 @@ function displayReviews(
 
     }
 
+
     reviews.forEach(function(review) {
 
         const response =
-
             responses.find(function(item) {
 
-                return Number(item.reviewId)
-
-                    === Number(review.id);
+                return Number(
+                    item.reviewId
+                )
+                ===
+                Number(
+                    review.id
+                );
 
             });
 
-        const reviewId =
 
+        const reviewId =
             Number(review.id) || 0;
 
-        const userId =
 
+        const userId =
             Number(review.userId) || 0;
 
-        const rating =
 
+        const rating =
             Number(review.rating) || 0;
 
+
         let responseHTML = "";
+
 
         if (response) {
 
@@ -736,20 +1132,19 @@ function displayReviews(
 
                 <div class="business-response">
 
-                    <h4>Business Response</h4>
+                    <h4>
+                        Business Response
+                    </h4>
 
                     <p>
 
                         ${escapeHtml(
-
                             response.response || ""
-
                         )}
 
                     </p>
 
                     <button
-
                         onclick="updateResponse(${reviewId})">
 
                         Update Response
@@ -767,13 +1162,10 @@ function displayReviews(
                 <div class="business-response">
 
                     <p>
-
                         No response added yet.
-
                     </p>
 
                     <button
-
                         onclick="respondToReview(${reviewId})">
 
                         Respond
@@ -786,22 +1178,20 @@ function displayReviews(
 
         }
 
+
         reviewList.innerHTML += `
 
             <div class="review-card">
 
                 <h3>
-
                     ⭐ ${rating}/5
-
                 </h3>
 
                 <p>
 
                     ${escapeHtml(
-
-                        review.comment || "No comment"
-
+                        review.comment ||
+                        "No comment"
                     )}
 
                 </p>
@@ -840,31 +1230,36 @@ function displayReviews(
 function calculateSummary(reviews) {
 
     const reviewCount =
+        reviews
+            ? reviews.length
+            : 0;
 
-        reviews ? reviews.length : 0;
 
     const reviewCountElement =
+        document.getElementById(
+            "reviewCount"
+        );
 
-        document.getElementById("reviewCount");
 
     const averageRatingElement =
+        document.getElementById(
+            "averageRating"
+        );
 
-        document.getElementById("averageRating");
 
     if (reviewCountElement) {
 
         reviewCountElement.textContent =
-
             reviewCount;
 
     }
+
 
     if (reviewCount === 0) {
 
         if (averageRatingElement) {
 
             averageRatingElement.textContent =
-
                 "0.0";
 
         }
@@ -873,24 +1268,27 @@ function calculateSummary(reviews) {
 
     }
 
+
     let totalRating = 0;
+
 
     reviews.forEach(function(review) {
 
         totalRating +=
-
-            Number(review.rating) || 0;
+            Number(
+                review.rating
+            ) || 0;
 
     });
 
-    const averageRating =
 
+    const averageRating =
         totalRating / reviewCount;
+
 
     if (averageRatingElement) {
 
         averageRatingElement.textContent =
-
             averageRating.toFixed(1);
 
     }
@@ -905,9 +1303,7 @@ function calculateSummary(reviews) {
 function respondToReview(reviewId) {
 
     window.location.href =
-
         "business-response.html?reviewId="
-
         + Number(reviewId);
 
 }
@@ -920,9 +1316,7 @@ function respondToReview(reviewId) {
 function updateResponse(reviewId) {
 
     window.location.href =
-
         "business-response.html?reviewId="
-
         + Number(reviewId);
 
 }
@@ -935,28 +1329,41 @@ function updateResponse(reviewId) {
 function escapeHtml(value) {
 
     if (
-
         value === null ||
-
         value === undefined
-
     ) {
 
         return "";
 
     }
 
+
     return String(value)
 
-        .replace(/&/g, "&amp;")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
 
-        .replace(/</g, "&lt;")
+        .replace(
+            /</g,
+            "&lt;"
+        )
 
-        .replace(/>/g, "&gt;")
+        .replace(
+            />/g,
+            "&gt;"
+        )
 
-        .replace(/"/g, "&quot;")
+        .replace(
+            /"/g,
+            "&quot;"
+        )
 
-        .replace(/'/g, "&#039;");
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
@@ -966,9 +1373,7 @@ function escapeHtml(value) {
 ========================= */
 
 document.addEventListener(
-
     "DOMContentLoaded",
-
     function() {
 
         const logoutButton =
@@ -996,5 +1401,4 @@ document.addEventListener(
         loadDashboardMetrics();
 
     }
-
 );

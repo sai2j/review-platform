@@ -20,6 +20,7 @@ public class BusinessResponse {
 	private Long reviewId;
 	@NotBlank(message = "Response is required")
 	private String response;
+
 	public BusinessResponse() {
 	}
 

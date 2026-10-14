@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Review Platform - Plans & Pricing</title>
+<style>
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+body {
+	font-family: Arial, Helvetica, sans-serif;
+	background: #e8f6ff;
+	color: #000000;
+	min-height: 100vh;
+}
+.navbar {
+	height: 69px;
+	background: #000000;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 64px;
+	border-bottom: 1px solid #1e1e1e;
+}
+.brand {
+	text-decoration: none;
+	font-size: 23px;
+	font-weight: 700;
+	color: #ffffff;
+}
+.brand-blue {
+	color: #42b4e8;
+}
+.back-link {
+	text-decoration: none;
+	color: #ffffff;
+	font-size: 14px;
+	font-weight: 500;
+}
+.back-link:hover {
+	color: #42b4e8;
+}
+.pricing-container {
+	max-width: 1250px;
+	margin: 0 auto;
+	padding: 55px 25px 60px;
+}
+.pricing-header {
+	text-align: center;
+}
+.pricing-header h1 {
+	font-size: 35px;
+	font-weight: 700;
+	color: #000000;
+	margin-bottom: 15px;
+}
+.pricing-header h1 span {
+	color: #2da8df;
+}
+.pricing-header p {
+	max-width: 700px;
+	margin: 0 auto;
+	font-size: 15px;
+	line-height: 1.6;
+	color: #36566c;
+}
+.billing-area {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	margin-top: 34px;
+	margin-bottom: 35px;
+}
+.billing-label {
+	font-size: 14px;
+	font-weight: 700;
+	color: #000000;
+}
+.billing-toggle {
+	display: flex;
+	align-items: center;
+	background: #ffffff;
+	border: 1px solid #b8d9eb;
+	border-radius: 25px;
+	padding: 3px;
+}
+.billing-button {
+	border: none;
+	background: transparent;
+	color: #1b4b65;
+	padding: 9px 19px;
+	border-radius: 22px;
+	font-size: 13px;
+	cursor: pointer;
+	transition: 0.2s ease;
+}
+.billing-button.active {
+	background: #2da8df;
+	color: #ffffff;
+	font-weight: 700;
+}
+.billing-button:hover:not(.active) {
+	background: #e2f4ff;
+}
+.plans {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 18px;
+	align-items: stretch;
+}
+.plan-card {
+	position: relative;
+	background: #ffffff;
+	border: 1px solid #c7e2f1;
+	border-radius: 10px;
+	padding: 25px 20px 24px;
+	min-height: 565px;
+	display: flex;
+	flex-direction: column;
+	box-shadow: 0 5px 16px rgba(40, 120, 160, 0.08);
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.plan-card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 9px 22px rgba(40, 120, 160, 0.14);
+}
+.plan-card.featured {
+	border: 2px solid #2da8df;
+	box-shadow: 0 7px 22px rgba(45, 168, 223, 0.16);
+}
+.popular-badge {
+	position: absolute;
+	top: -12px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #2da8df;
+	color: #ffffff;
+	padding: 5px 17px;
+	border-radius: 20px;
+	font-size: 11px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+.plan-name {
+	font-size: 21px;
+	color: #000000;
+	margin-bottom: 10px;
+}
+.plan-description {
+	min-height: 66px;
+	font-size: 14px;
+	line-height: 1.5;
+	color: #527086;
+	margin-bottom: 5px;
+}
+.price {
+	display: flex;
+	align-items: baseline;
+	margin-top: 5px;
+	margin-bottom: 20px;
+	color: #000000;
+}
+.price-amount {
+	font-size: 31px;
+	font-weight: 700;
+}
+.price-period {
+	font-size: 13px;
+	color: #5b7384;
+	margin-left: 5px;
+}
+.features {
+	list-style: none;
+	flex: 1;
+}
+.features li {
+	display: flex;
+	align-items: flex-start;
+	gap: 9px;
+	padding: 9px 0;
+	border-bottom: 1px solid #e1edf4;
+	color: #19384d;
+	font-size: 13px;
+	line-height: 1.4;
+}
+.check {
+	color: #2da8df;
+	font-size: 17px;
+	font-weight: 700;
+	flex-shrink: 0;
+}
+.plan-button {
+	width: 100%;
+	margin-top: 20px;
+	padding: 11px 14px;
+	border-radius: 5px;
+	border: 1px solid #2da8df;
+	background: #ffffff;
+	color: #1687bd;
+	font-size: 13px;
+	font-weight: 700;
+	cursor: pointer;
+	transition: 0.2s ease;
+}
+.plan-button:hover {
+	background: #2da8df;
+	color: #ffffff;
+}
+
+.plan-button.primary {
+	background: #2da8df;
+	color: #ffffff;
+}
+
+.plan-button.primary:hover {
+	background: #188fc5;
+	border-color: #188fc5;
+}
+.enterprise-section {
+	margin-top: 30px;
+	background: #000000;
+	border-radius: 9px;
+	padding: 29px 30px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 25px;
+}
+.enterprise-text h2 {
+	color: #ffffff;
+	font-size: 22px;
+	margin-bottom: 8px;
+}
+.enterprise-text p {
+	color: #c9e6f5;
+	font-size: 14px;
+	line-height: 1.5;
+}
+.enterprise-button {
+	flex-shrink: 0;
+	border: 1px solid #2da8df;
+	background: #2da8df;
+	color: #ffffff;
+	padding: 11px 22px;
+	border-radius: 5px;
+	font-size: 13px;
+	font-weight: 700;
+	cursor: pointer;
+	transition: 0.2s ease;
+}
+.enterprise-button:hover {
+	background: #188fc5;
+	border-color: #188fc5;
+}
+@media ( max-width : 1000px) {
+	.plans {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+	.plan-card {
+		min-height: auto;
+	}
+}
+@media ( max-width : 650px) {
+	.navbar {
+		padding: 0 20px;
+	}
+	.brand {
+		font-size: 19px;
+	}
+	.back-link {
+		font-size: 12px;
+	}
+	.pricing-container {
+		padding: 40px 15px 45px;
+	}
+	.pricing-header h1 {
+		font-size: 27px;
+	}
+	.plans {
+		grid-template-columns: 1fr;
+	}
+	.enterprise-section {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+	.enterprise-button {
+		width: 100%;
+	}
+}
+</style>
+</head>
+<body>
+	<nav class="navbar">
+		<a href="index.html" class="brand"> Review <span
+			class="brand-blue"> Platform </span>
+		</a> <a href="business-dashboard.html" class="back-link"> ← Back to
+			Business Dashboard </a>
+	</nav>
+	<main class="pricing-container">
+		<div class="pricing-header">
+			<h1>
+				Choose the right plan for your <span> business </span>
+			</h1>
+			<p>Grow your business with powerful review management tools,
+				customer insights and business features.</p>
+		</div>
+		<div class="billing-area">
+			<span class="billing-label"> Billing: </span>
+			<div class="billing-toggle">
+				<button id="monthlyButton" class="billing-button active"
+					onclick="setBilling('monthly')">Monthly</button>
+				<button id="yearlyButton" class="billing-button"
+					onclick="setBilling('yearly')">Yearly</button>
+			</div>
+		</div>
+		<section class="plans">
+			<div class="plan-card">
+				<h2 class="plan-name">Free</h2>
+				<p class="plan-description">Get started with the basic tools for
+					managing your business reviews.</p>
+				<div class="price">
+					<span class="price-amount"> ₹0 </span> <span class="price-period">
+						/month </span>
+				</div>
+				<ul class="features">
+					<li><span class="check">✓</span> <span>Business profile</span>
+					</li>
+					<li><span class="check">✓</span> <span>Receive customer
+							reviews</span></li>
+					<li><span class="check">✓</span> <span>Respond to
+							reviews</span></li>
+					<li><span class="check">✓</span> <span>Basic review
+							statistics</span></li>
+					<li><span class="check">✓</span> <span>Basic business
+							dashboard</span></li>
+				</ul>
+				<button class="plan-button" onclick="currentPlan()">
+					Current Plan</button>
+			</div>
+			<div class="plan-card">
+				<h2 class="plan-name">Starter</h2>
+				<p class="plan-description">Essential tools for small and
+					growing businesses.</p>
+				<div class="price">
+					<span class="price-amount" id="starterPrice"> ₹999 </span> <span
+						class="price-period"> /month </span>
+				</div>
+				<ul class="features">
+					<li><span class="check">✓</span> <span>Everything in
+							Free</span></li>
+					<li><span class="check">✓</span> <span>Review
+							management</span></li>
+					<li><span class="check">✓</span> <span>Review response
+							tools</span></li>
+					<li><span class="check">✓</span> <span>Review
+							invitations</span></li>
+					<li><span class="check">✓</span> <span>Basic analytics</span>
+					</li>
+					<li><span class="check">✓</span> <span>Business support</span>
+					</li>
+				</ul>
+				<button class="plan-button" onclick="choosePlan('Starter')">
+					Choose Starter</button>
+			</div>
+			<div class="plan-card featured">
+				<div class="popular-badge">MOST POPULAR</div>
+				<h2 class="plan-name">Professional</h2>
+				<p class="plan-description">Advanced tools for businesses
+					focused on growth.</p>
+				<div class="price">
+					<span class="price-amount" id="professionalPrice"> ₹2,999 </span> <span
+						class="price-period"> /month </span>
+				</div>
+				<ul class="features">
+					<li><span class="check">✓</span> <span>Everything in
+							Starter</span></li>
+					<li><span class="check">✓</span> <span>Advanced
+							analytics</span></li>
+					<li><span class="check">✓</span> <span>Review
+							invitations</span></li>
+					<li><span class="check">✓</span> <span>Review
+							management tools</span></li>
+					<li><span class="check">✓</span> <span>Business
+							performance insights</span></li>
+					<li><span class="check">✓</span> <span>Website review
+							tools</span></li>
+					<li><span class="check">✓</span> <span>Priority support</span>
+					</li>
+				</ul>
+				<button class="plan-button primary"
+					onclick="choosePlan('Professional')">Choose Professional</button>
+			</div>
+			<div class="plan-card">
+				<h2 class="plan-name">Premium</h2>
+				<p class="plan-description">Advanced features for established
+					businesses.</p>
+				<div class="price">
+					<span class="price-amount" id="premiumPrice"> ₹6,999 </span> <span
+						class="price-period"> /month </span>
+				</div>
+				<ul class="features">
+					<li><span class="check">✓</span> <span>Everything in
+							Professional</span></li>
+					<li><span class="check">✓</span> <span>Advanced
+							business insights</span></li>
+					<li><span class="check">✓</span> <span>Advanced review
+							management</span></li>
+					<li><span class="check">✓</span> <span>Multiple
+							business users</span></li>
+					<li><span class="check">✓</span> <span>Advanced
+							integrations</span></li>
+					<li><span class="check">✓</span> <span>Premium support</span>
+					</li>
+				</ul>
+				<button class="plan-button" onclick="choosePlan('Premium')">
+					Choose Premium</button>
+			</div>
+		</section>
+		<section class="enterprise-section">
+			<div class="enterprise-text">
+				<h2>Enterprise</h2>
+				<p>Need a custom solution for a large business? Get advanced
+					features, custom support and solutions designed for your
+					organization.</p>
+			</div>
+			<button class="enterprise-button" onclick="contactSales()">
+				Contact Sales</button>
+		</section>
+	</main>
+	<script>
+		let billingType = "monthly";
+		let currentBusiness = null;
+		const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+		if (!loggedInUser || !loggedInUser.id) {
+			alert("Please login first.");
+			window.location.href = "login.html";
+		}
+		const BUSINESS_API = "/review-platform/business-dashboard/user/"
+				+ loggedInUser.id;
+		async
+		function loadBusiness() {
+			try {
+				const response = await
+				fetch(BUSINESS_API, {
+					method : "GET",
+					credentials : "include"
+				});
+				if (!response.ok) {
+					throw new Error("Business API returned " + response.status);
+				}
+				const business = await
+				response.json();
+				if (!business || !business.id) {
+					throw new Error("Business not found");
+				}
+				currentBusiness = business;
+				console.log("Business loaded:", currentBusiness);
+			} catch (error) {
+				console.error("Business loading error:", error);
+				alert("Unable to connect to the server.\n\n"
+						+ "Please make sure the server is running "
+						+ "and you are logged in.");
+			}
+		}
+		function setBilling(type) {
+			billingType = type;
+			const monthlyButton = document.getElementById("monthlyButton");
+			const yearlyButton = document.getElementById("yearlyButton");
+			const starterPrice = document.getElementById("starterPrice");
+			const professionalPrice = document
+					.getElementById("professionalPrice");
+			const premiumPrice = document.getElementById("premiumPrice");
+			if (type === "monthly") {
+				monthlyButton.classList.add("active");
+				yearlyButton.classList.remove("active");
+				starterPrice.textContent = "₹999";
+				professionalPrice.textContent = "₹2,999";
+				premiumPrice.textContent = "₹6,999";
+			} else {
+				monthlyButton.classList.remove("active");
+				yearlyButton.classList.add("active");
+				starterPrice.textContent = "₹799";
+				professionalPrice.textContent = "₹2,399";
+				premiumPrice.textContent = "₹5,599";
+			}
+		}
+		function currentPlan() {
+			alert("You are currently using the Free plan.");
+		}
+		async
+		function choosePlan(planName) {
+			if (!currentBusiness || !currentBusiness.id) {
+				alert("Business information is not available.");
+				await
+				loadBusiness();
+				if (!currentBusiness || !currentBusiness.id) {
+					return;
+				}
+			}
+			const businessId = currentBusiness.id;
+			const billingCycle = billingType === "monthly" ? "MONTHLY"
+					: "YEARLY";
+			const confirmMessage = "Plan: " + planName + "\nBilling: "
+					+ billingCycle + "\n\nContinue with test payment?";
+			if (!confirm(confirmMessage)) {
+				return;
+			}
+			try {
+				const response = await
+				fetch("/review-platform/subscriptions/business/" + businessId
+						+ "/create?planName=" + encodeURIComponent(planName)
+						+ "&billingCycle=" + encodeURIComponent(billingCycle),
+						{
+							method : "POST",
+							credentials : "include"
+						});
+				if (response.status === 401 || response.status === 403) {
+					alert("You are not authorized.\n\n" + "Please login again.");
+					return;
+				}
+				if (!response.ok) {
+					const errorText = await
+					response.text();
+					throw new Error("HTTP " + response.status + ": "
+							+ errorText);
+				}
+				const subscription = await
+				response.json();
+				console.log("Subscription created:", subscription);
+				const paymentConfirmed = confirm("Subscription created successfully.\n\n"
+						+ "Plan: "
+						+ subscription.planName
+						+ "\nAmount: ₹"
+						+ subscription.amount
+						+ "\nStatus: "
+						+ subscription.status
+						+ "\n\n"
+						+ "Proceed with TEST PAYMENT?");
+				if (!paymentConfirmed) {
+					alert("Subscription is waiting for payment.");
+					return;
+				}
+				const paymentResponse = await
+				fetch("/review-platform/subscriptions/" + subscription.id
+						+ "/test-payment", {
+					method : "POST",
+					credentials : "include"
+				});
+				if (paymentResponse.status === 401
+						|| paymentResponse.status === 403) {
+					alert("Payment authorization failed.");
+					return;
+				}
+				if (!paymentResponse.ok) {
+					const errorText = await
+					paymentResponse.text();
+					throw new Error("Payment failed: " + errorText);
+				}
+				const paidSubscription = await
+				paymentResponse.json();
+				alert("TEST PAYMENT SUCCESSFUL!\n\n" + "Plan: "
+						+ paidSubscription.planName + "\nAmount: ₹"
+						+ paidSubscription.amount + "\nStatus: "
+						+ paidSubscription.status + "\nPayment ID: "
+						+ paidSubscription.paymentId);
+				window.location.href = "business-dashboard.html";
+			} catch (error) {
+				console.error("Subscription error:", error);
+				alert("Unable to connect to the server.\n\n" + error.message);
+			}
+		}
+		function contactSales() {
+			alert("Our Enterprise sales team will contact you soon.");
+		}
+		document.addEventListener("DOMContentLoaded", function() {
+			loadBusiness();
+		});
+	</script>
+</body>
+</html>

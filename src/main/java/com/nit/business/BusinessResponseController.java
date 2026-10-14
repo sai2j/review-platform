@@ -19,20 +19,15 @@ public class BusinessResponseController {
 
 	@PreAuthorize("@businessResponseService.canAccessBusiness(#businessResponse.businessId)")
 	@PostMapping
-	public BusinessResponse createBusinessResponse(
-			@Valid @RequestBody BusinessResponse businessResponse) {
-
+	public BusinessResponse createBusinessResponse(@Valid @RequestBody BusinessResponse businessResponse) {
 		return businessResponseService.saveBusinessResponse(businessResponse);
 	}
 
 	@PreAuthorize("@businessResponseService.canAccessBusiness(#businessResponse.businessId)")
 	@PostMapping("/reviews/{id}/responses")
-	public BusinessResponse createBusinessResponseForReview(
-			@PathVariable Long id,
+	public BusinessResponse createBusinessResponseForReview(@PathVariable Long id,
 			@Valid @RequestBody BusinessResponse businessResponse) {
-
 		businessResponse.setReviewId(id);
-
 		return businessResponseService.saveBusinessResponse(businessResponse);
 	}
 
@@ -44,8 +39,7 @@ public class BusinessResponseController {
 
 	@PreAuthorize("@businessResponseService.canAccessBusiness(#businessId)")
 	@GetMapping("/business/{businessId}")
-	public List<BusinessResponse> getBusinessResponses(
-			@PathVariable Long businessId) {
+	public List<BusinessResponse> getBusinessResponses(@PathVariable Long businessId) {
 
 		return businessResponseService.getBusinessResponses(businessId);
 	}
@@ -58,19 +52,15 @@ public class BusinessResponseController {
 
 	@PreAuthorize("@businessResponseService.canAccessResponse(#id)")
 	@PutMapping("/{id}")
-	public BusinessResponse updateBusinessResponse(
-			@PathVariable Long id,
+	public BusinessResponse updateBusinessResponse(@PathVariable Long id,
 			@Valid @RequestBody BusinessResponse businessResponse) {
-
 		return businessResponseService.updateBusinessResponse(id, businessResponse);
 	}
 
 	@PreAuthorize("@businessResponseService.canAccessResponse(#id)")
 	@DeleteMapping("/{id}")
 	public String deleteBusinessResponse(@PathVariable Long id) {
-
 		businessResponseService.deleteBusinessResponse(id);
-
 		return "Business response deleted successfully";
 	}
 }

@@ -10,143 +10,187 @@
 <link rel="stylesheet" href="css/review.css">
 </head>
 <body>
+
 	<nav class="top-navbar">
 		<div class="logo">
 			Review<span>Platform</span>
 		</div>
 		<div class="nav-links">
-			<a href="index.html"> Home </a> <a href="browse.html"> Websites </a>
+			<a href="index.html"> Home </a>
+			<a href="browse.html"> Websites </a>
 			<a href="login.html"> Log in </a>
 		</div>
 	</nav>
+
 	<main class="profile-container">
+
+		<!-- WEBSITE HEADER -->
 		<section class="profile-header">
 			<div class="profile-main">
 				<div class="website-logo"></div>
+
 				<div class="website-details">
-					<div class="profile-badge">Website Profile</div>
+					<div class="name-row">
+						<h1 id="websiteName">Loading...</h1>
+						<span id="verifiedSlot"></span>
+					</div>
+					<div id="headRating" class="rating-line"></div>
 					<div id="websiteInfo">Loading website information...</div>
 				</div>
-			</div>
-		</section>
-		<section class="rating-area">
-			<div class="rating-overview">
-				<h2>Rating Summary</h2>
-				<div id="averageRating" class="average-rating">Loading
-					rating...</div>
-				<div id="totalReviews" class="total-reviews">Loading
-					reviews...</div>
-				<button type="button" class="write-review-button"
-					id="writeReviewButton">✎ Write a review</button>
-			</div>
-			<div class="rating-distribution">
-				<h3>Rating distribution</h3>
-				<div class="rating-row">
-					<span> ★★★★★ </span>
-					<div class="rating-bar">
-						<div id="fiveStarBar"></div>
-					</div>
-					<strong id="fiveStarCount"> 0 </strong>
-				</div>
-				<div class="rating-row">
-					<span> ★★★★ </span>
-					<div class="rating-bar">
-						<div id="fourStarBar"></div>
-					</div>
-					<strong id="fourStarCount"> 0 </strong>
-				</div>
-				<div class="rating-row">
-					<span> ★★★ </span>
-					<div class="rating-bar">
-						<div id="threeStarBar"></div>
-					</div>
-					<strong id="threeStarCount"> 0 </strong>
-				</div>
-				<div class="rating-row">
-					<span> ★★ </span>
-					<div class="rating-bar">
-						<div id="twoStarBar"></div>
-					</div>
-					<strong id="twoStarCount"> 0 </strong>
-				</div>
-				<div class="rating-row">
-					<span> ★ </span>
-					<div class="rating-bar">
-						<div id="oneStarBar"></div>
-					</div>
-					<strong id="oneStarCount"> 0 </strong>
+
+				<div class="profile-actions">
+					<button type="button" class="write-review-button"
+						id="writeReviewButton">✎ Write a review</button>
+					<a id="visitWebsiteButton" class="visit-button" target="_blank"
+						rel="noopener noreferrer" hidden>Visit website</a>
 				</div>
 			</div>
 		</section>
+
+		<!-- WRITE REVIEW (button dabane par khulta hai) -->
 		<section class="write-review-section">
 			<h2>Share your experience</h2>
 			<p class="section-description">Have you used this website? Share
 				your experience with other users.</p>
 			<form id="reviewForm">
 				<div class="form-group">
-					<label for="rating"> Your rating </label> <select id="rating"
-						required>
+					<label for="rating"> Your rating </label>
+					<select id="rating" required>
 						<option value="">Select Rating</option>
-						<option value="1">⭐ 1</option>
-						<option value="2">⭐⭐ 2</option>
-						<option value="3">⭐⭐⭐ 3</option>
-						<option value="4">⭐⭐⭐⭐ 4</option>
-						<option value="5">⭐⭐⭐⭐⭐ 5</option>
+						<option value="1">1 - Bad</option>
+						<option value="2">2 - Poor</option>
+						<option value="3">3 - Average</option>
+						<option value="4">4 - Good</option>
+						<option value="5">5 - Excellent</option>
 					</select>
 				</div>
 				<div class="form-group">
 					<label for="comment"> Your review </label>
-					<textarea id="comment" placeholder="Share your experience..."
-						required>
-                </textarea>
+					<textarea id="comment" placeholder="Share your experience..." required></textarea>
 				</div>
-				<button type="submit" class="submit-review-button">Submit
-					Review</button>
+				<button type="submit" class="submit-review-button">Submit Review</button>
 			</form>
 			<p id="message"></p>
 		</section>
-		<section class="customer-reviews">
-			<div class="reviews-heading">
-				<div>
-					<h2>Customer Reviews</h2>
-					<p>Read experiences shared by other users.</p>
+
+		<!-- TWO COLUMNS: left = rating, details, FAQ | right = reviews -->
+		<div class="layout">
+
+			<section class="card score-card">
+				<h2 class="card-title">Rating summary</h2>
+				<div id="averageRating" class="average-rating">Loading rating...</div>
+				<div id="scoreStars" class="stars" role="img"></div>
+				<div id="totalReviews" class="total-reviews">Loading reviews...</div>
+
+				<div class="rating-bars">
+					<div class="rating-row">
+						<span>5 stars</span>
+						<div class="rating-bar"><div id="fiveStarBar"></div></div>
+						<strong id="fiveStarCount">0</strong>
+					</div>
+					<div class="rating-row">
+						<span>4 stars</span>
+						<div class="rating-bar"><div id="fourStarBar"></div></div>
+						<strong id="fourStarCount">0</strong>
+					</div>
+					<div class="rating-row">
+						<span>3 stars</span>
+						<div class="rating-bar"><div id="threeStarBar"></div></div>
+						<strong id="threeStarCount">0</strong>
+					</div>
+					<div class="rating-row">
+						<span>2 stars</span>
+						<div class="rating-bar"><div id="twoStarBar"></div></div>
+						<strong id="twoStarCount">0</strong>
+					</div>
+					<div class="rating-row">
+						<span>1 star</span>
+						<div class="rating-bar"><div id="oneStarBar"></div></div>
+						<strong id="oneStarCount">0</strong>
+					</div>
 				</div>
-			</div>
-			<div id="reviewList">Loading reviews...</div>
-		</section>
-		<section class="faq-section">
-			<div class="faq-heading">
-				<h2>Frequently Asked Questions</h2>
-				<p>Find answers to common questions about this website profile
-					and reviews.</p>
-			</div>
-			<div class="faq-item">
-				<h3>What is this website profile?</h3>
-				<p>This profile provides information, ratings, and reviews about
-					the website.</p>
-			</div>
-			<div class="faq-item">
-				<h3>How is the website rating calculated?</h3>
-				<p>The rating is based on reviews submitted by users of the
-					website.</p>
-			</div>
-			<div class="faq-item">
-				<h3>Can I submit a review?</h3>
-				<p>Yes. Logged-in users can share their experience by submitting
-					a review and rating.</p>
-			</div>
-			<div class="faq-item">
-				<h3>Can I report a review?</h3>
-				<p>Yes. Users can report a review when they believe it violates
-					the platform's review guidelines.</p>
-			</div>
-		</section>
+			</section>
+
+			<section class="card details-card">
+				<h2 class="card-title">Company details</h2>
+				<dl id="websiteDetails" class="details"></dl>
+			</section>
+
+			<section class="card faq-section">
+				<div class="faq-heading">
+					<h2>Frequently Asked Questions</h2>
+					<p>Find answers to common questions about this website profile
+						and reviews.</p>
+				</div>
+				<div class="faq-item">
+					<h3>What is this website profile?</h3>
+					<p>This profile provides information, ratings, and reviews about
+						the website.</p>
+				</div>
+				<div class="faq-item">
+					<h3>How is the website rating calculated?</h3>
+					<p>The rating is based on reviews submitted by users of the
+						website.</p>
+				</div>
+				<div class="faq-item">
+					<h3>Can I submit a review?</h3>
+					<p>Yes. Logged-in users can share their experience by submitting
+						a review and rating.</p>
+				</div>
+				<div class="faq-item">
+					<h3>Can I report a review?</h3>
+					<p>Yes. Users can report a review when they believe it violates
+						the platform's review guidelines.</p>
+				</div>
+			</section>
+
+			<section class="customer-reviews">
+				<div class="card reviews-heading">
+					<div>
+						<h2>Customer Reviews</h2>
+						<p>Read experiences shared by other users.</p>
+					</div>
+					<div class="reviews-tools">
+						<div class="filter-chips" role="group"
+							aria-label="Filter reviews by rating">
+							<button type="button" class="filter-chip active" data-filter="0"
+								aria-pressed="true">All</button>
+							<button type="button" class="filter-chip" data-filter="5"
+								aria-pressed="false">5★</button>
+							<button type="button" class="filter-chip" data-filter="4"
+								aria-pressed="false">4★</button>
+							<button type="button" class="filter-chip" data-filter="3"
+								aria-pressed="false">3★</button>
+							<button type="button" class="filter-chip" data-filter="2"
+								aria-pressed="false">2★</button>
+							<button type="button" class="filter-chip" data-filter="1"
+								aria-pressed="false">1★</button>
+						</div>
+						<select id="reviewSort" class="sort-select" aria-label="Sort reviews">
+							<option value="recent">Most recent</option>
+							<option value="high">Highest rated</option>
+							<option value="low">Lowest rated</option>
+						</select>
+					</div>
+				</div>
+
+				<div id="reviewList">Loading reviews...</div>
+
+				<div class="more-wrap">
+					<p id="reviewsShown" class="shown-text"></p>
+					<button type="button" id="loadMoreButton" class="visit-button" hidden>Load more reviews</button>
+				</div>
+			</section>
+
+		</div>
+
 		<div class="back-home">
 			<a href="index.html"> ← Back to Home </a>
 		</div>
 	</main>
-	<script src="js/review.js">
-		
-	</script>
+
+	<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+	<script src="js/review.js"></script>
 </body>
 </html>

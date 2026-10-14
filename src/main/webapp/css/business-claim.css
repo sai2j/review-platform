@@ -14,6 +14,7 @@ body {
 	color: #111827;
 	min-height: 100vh;
 }
+
 .navbar {
 	width: 100%;
 	background: #0b1117;
@@ -112,6 +113,7 @@ body {
 	font-size: 15px;
 	line-height: 1.7;
 }
+
 .claim-card {
 	background: #ffffff;
 	border: 1px solid #cfe8f7;
@@ -183,12 +185,14 @@ body {
 	color: #0b1117;
 	text-decoration: underline;
 }
+
 .loading-text {
 	padding: 24px;
 	color: #5f7282;
 	text-align: center;
 	font-size: 14px;
 }
+
 .form-group {
 	margin-bottom: 22px;
 }
@@ -294,6 +298,7 @@ body {
 .error-message {
 	color: #a63c34;
 }
+
 .claim-message .success-message {
 	display: block;
 	padding: 18px;
@@ -314,10 +319,6 @@ body {
 	color: #5f7282;
 	font-size: 14px;
 }
-
-/* =========================================================
-   SUBMIT BUTTON
-========================================================= */
 .claim-submit-button {
 	width: 100%;
 	min-height: 50px;
@@ -346,9 +347,6 @@ body {
 	cursor: not-allowed;
 }
 
-/* =========================================================
-   SUCCESS ACTIONS
-========================================================= */
 .claim-success-actions {
 	display: flex;
 	justify-content: center;
@@ -387,10 +385,6 @@ body {
 .profile-button:hover {
 	background: #eaf7ff;
 }
-
-/* =========================================================
-   FOOTER LINKS
-========================================================= */
 .claim-footer-links {
 	display: flex;
 	justify-content: center;
@@ -415,10 +409,6 @@ body {
 .claim-footer-links span {
 	color: #9aabb7;
 }
-
-/* =========================================================
-   CLAIM PROCESS
-========================================================= */
 .claim-process {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -470,10 +460,6 @@ body {
 	font-size: 13px;
 	line-height: 1.55;
 }
-
-/* =========================================================
-   FOOTER
-========================================================= */
 .site-footer {
 	width: 100%;
 	margin-top: 25px;
@@ -541,18 +527,12 @@ body {
 	font-size: 12px;
 }
 
-/* =========================================================
-   RESPONSIVE - 900px
-========================================================= */
 @media ( max-width : 900px) {
 	.footer-content {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
-/* =========================================================
-   RESPONSIVE - 768px
-========================================================= */
 @media ( max-width : 768px) {
 	.navbar-inner {
 		min-height: 65px;
@@ -581,9 +561,6 @@ body {
 	}
 }
 
-/* =========================================================
-   RESPONSIVE - 560px
-========================================================= */
 @media ( max-width : 560px) {
 	.navbar-inner {
 		flex-direction: column;
@@ -628,9 +605,6 @@ body {
 	}
 }
 
-/* =========================================================
-   RESPONSIVE - 400px
-========================================================= */
 @media ( max-width : 400px) {
 	.nav-links {
 		gap: 11px;

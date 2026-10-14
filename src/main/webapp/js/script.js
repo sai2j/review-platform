@@ -1240,9 +1240,6 @@ function sortWebsitesByRanking(
         .sort(
             function(a, b) {
 
-                /*
-                 * Ranked websites first.
-                 */
                 if (
                     a.ranking &&
                     !b.ranking
@@ -1259,10 +1256,6 @@ function sortWebsitesByRanking(
                     return 1;
                 }
 
-                /*
-                 * Both are ranked.
-                 * Lower rank number comes first.
-                 */
                 if (
                     a.ranking &&
                     b.ranking
@@ -1289,10 +1282,6 @@ function sortWebsitesByRanking(
                         );
                     }
 
-                    /*
-                     * Safety fallback:
-                     * higher rating first.
-                     */
                     const ratingA =
                         Number(
                             a.ranking.averageRating
@@ -1314,10 +1303,6 @@ function sortWebsitesByRanking(
                         );
                     }
 
-                    /*
-                     * Safety fallback:
-                     * higher review count first.
-                     */
                     const countA =
                         Number(
                             a.ranking.reviewCount
@@ -1340,10 +1325,6 @@ function sortWebsitesByRanking(
                     }
                 }
 
-                /*
-                 * Preserve original API order
-                 * when there is no ranking.
-                 */
                 return (
                     a.originalIndex -
                     b.originalIndex
@@ -1394,17 +1375,6 @@ function displayWebsites(
         return;
     }
 
-    /*
-     * IMPORTANT:
-     * Display websites according to ranking.
-     *
-     * Example:
-     * #1
-     * #2
-     * #3
-     * #4
-     * ...
-     */
     const sortedWebsites =
         sortWebsitesByRanking(
             websites
@@ -1621,7 +1591,8 @@ function searchWebsites() {
         .then(function(results) {
 
             displaySearchResults(
-                results
+                results,
+                keyword
             );
         })
 
@@ -1647,7 +1618,8 @@ function searchWebsites() {
 ========================================================= */
 
 function displaySearchResults(
-    results
+    results,
+    keyword
 ) {
 
     const websiteList =
@@ -1661,8 +1633,8 @@ function displaySearchResults(
 
     websiteList.innerHTML = `
         <h2>
-            Website Found
-        </h2>
+            Search results for "${escapeHtml(keyword || '')}"
+        </h3>
     `;
 
     if (
@@ -1683,10 +1655,6 @@ function displaySearchResults(
         results[0];
 
     websiteList.innerHTML += `
-        <p>
-            Result for your search
-        </p>
-
         <div class="website-card">
 
             <h3>
@@ -2569,11 +2537,6 @@ document.addEventListener(
             );
         }
 
-        /* =================================================
-           CATEGORY BUTTONS (Banks, Shopping, Travel...)
-           Open the separate category page.
-        ================================================= */
-
         const categoryList =
             document.getElementById(
                 "categoryList"
@@ -2608,9 +2571,6 @@ document.addEventListener(
                 }
             );
         }
-        /* =================================================
-           WEBSITES NAVBAR BUTTON
-        ================================================= */
 
         const websitesNavLink =
             document.getElementById(
@@ -2623,10 +2583,6 @@ document.addEventListener(
                 "click",
                 function() {
 
-                    /*
-                     * Load fresh website ranking
-                     * when user clicks Websites.
-                     */
                     loadWebsites(
                         true
                     );
@@ -2741,11 +2697,6 @@ document.addEventListener(
 
         loadSearchFromUrl();
 
-        /*
-         * Load websites and ranking in background.
-         * They will display when the Websites
-         * navbar is clicked.
-         */
         loadWebsites(false);
 
         loadRecentReviews();

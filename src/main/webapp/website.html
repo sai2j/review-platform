@@ -1,43 +1,17 @@
 <!DOCTYPE html>
-
-
-<html lang="en"
-	xmlns:th="[http://www.thymeleaf.org](http://www.thymeleaf.org)">
-
-
+<html lang="en" xmlns:th="[http://www.thymeleaf.org](http://www.thymeleaf.org)">
 <head>
-
-
-
 <meta charset="UTF-8">
-
-
 <title th:text="${pageTitle}">Website Reviews | Review Platform
-
 </title>
 <meta name="description" th:content="${pageDescription}">
-
-
 <meta name="robots"
 	th:content="${thinPage ? 'noindex,follow' : 'index,follow'}">
-
 <link rel="canonical" th:href="${canonicalUrl}">
-
-
 <meta property="og\:title" th:content="${pageTitle}">
-
-
 <meta property="og\:description" th:content="${pageDescription}">
-
-
 <meta property="og\:type" content="website">
-
-
 <meta property="og\:url" th:content="${canonicalUrl}">
-
-
-
-
 <style>
 body {
 	font-family: Arial, sans-serif;
@@ -46,13 +20,11 @@ body {
 	padding: 0;
 	color: #222;
 }
-
 .container {
 	max-width: 1000px;
 	margin: 40px auto;
 	padding: 20px;
 }
-
 .website-card {
 	background: white;
 	padding: 25px;
@@ -60,22 +32,18 @@ body {
 	box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
 	margin-bottom: 25px;
 }
-
 h1 {
 	margin-top: 0;
 }
-
 .website-url {
 	color: #2563eb;
 	text-decoration: none;
 }
-
 .rating {
 	font-size: 22px;
 	font-weight: bold;
 	margin: 15px 0;
 }
-
 .review-card {
 	background: white;
 	padding: 20px;
@@ -83,17 +51,14 @@ h1 {
 	border-radius: 8px;
 	box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
 }
-
 .stars {
 	color: #f59e0b;
 	font-size: 20px;
 }
-
 .review-comment {
 	margin-top: 10px;
 	line-height: 1.6;
 }
-
 .write-review {
 	display: inline-block;
 	margin-top: 15px;
@@ -103,23 +68,19 @@ h1 {
 	text-decoration: none;
 	border-radius: 6px;
 }
-
 .no-reviews {
 	background: white;
 	padding: 20px;
 	border-radius: 8px;
 }
-
 .breadcrumb {
 	margin-bottom: 20px;
 	font-size: 14px;
 }
-
 .breadcrumb a {
 	color: #2563eb;
 	text-decoration: none;
 }
-
 .ranking-box {
 	display: none;
 	background: #f8fafc;
@@ -129,7 +90,6 @@ h1 {
 	margin-top: 20px;
 	font-size: 17px;
 }
-
 .ranking-box strong {
 	color: #1d4ed8;
 }
@@ -140,161 +100,60 @@ h1 {
 	color: #2563eb;
 }
 </style>
-
-
-
-
-<!-- WebPage structured data -->
-
-
 <script type="application/ld+json" th:inline="javascript">
-
     {
-
         "@context": "[https://schema.org](https://schema.org)",
-
         "@type": "WebPage",
-
         "name": [[${pageTitle}]],
-
         "description": [[${pageDescription}]],
-
         "url": [[${canonicalUrl}]]
-
     }
-
 </script>
-
-
-
-
-<!-- Breadcrumb structured data -->
-
-
 <script type="application/ld+json" th:inline="javascript">
-
     {
-
         "@context": "[https://schema.org](https://schema.org)",
-
         "@type": "BreadcrumbList",
-
         "itemListElement": [
-
             {
-
                 "@type": "ListItem",
-
                 "position": 1,
-
                 "name": "Home",
-
                 "item": [[${currentUrl}]]
-
             },
-
             {
-
                 "@type": "ListItem",
-
                 "position": 2,
-
                 "name": [[${website.name}]],
-
                 "item": [[${canonicalUrl}]]
-
             }
-
         ]
-
     }
-
 </script>
-
-
-
-
-<!-- AggregateRating structured data -->
-
-
 <script
 	th:if="${!thinPage
-
                 and reviewCount != null
-
                 and reviewCount > 0
-
                 and averageRating != null
-
                 and averageRating > 0}"
 	type="application/ld+json" th:inline="javascript">
     {
-
         "@context": "[https://schema.org](https://schema.org)",
-
         "@type": "AggregateRating",
-
         "ratingValue": [[${averageRating}]],
-
         "bestRating": 5,
-
         "worstRating": 1,
-
         "reviewCount": [[${reviewCount}]]
-
     }
-
 </script>
-
-
-
-
 </head>
-
-
 <body>
-
-
-
-
 	<div class="container">
-
-
-
-
-		<!-- ==============================
-
-         BREADCRUMB
-
-         \============================== -->
-
-
 		<div class="breadcrumb">
-
 			<a th:href="@{/index.html}"> Home </a> <span
 				th:text="${website.name}"> Website </span>
 		</div>
-
-
-
-
-		<!-- ==============================
-
-         WEBSITE INFORMATION
-
-         \============================== -->
-
-
 		<div class="website-card">
-
-
-
-
 			<h1 th:text="${website.name}">Website Name</h1>
-
-
-
-			\
 			<p th:if="${website.description != null}"
 				th:text="${website.description}">Website description</p>
 
@@ -307,19 +166,7 @@ h1 {
 					th\:href="${website.url}" th\:text="${website.url}"
 					target="\_blank" rel="noopener noreferrer"> Website URL \</a> \
 			</p>
-
-
-
-			\
-			<!-- ==============================
-
-             RATING
-
-             \============================== -->
-
-			\
 			<div class="rating">
-
 				⭐ \<span th\:text="${averageRating != null ? averageRating : 0}">
 
 					0 \</span> / 5 ( \<span
@@ -346,15 +193,6 @@ h1 {
 
 					\- \</span> \<span> overall \</span> \
 			</div>
-
-
-
-			\
-			<!-- ==============================
-
-             REVIEW BUTTON
-
-             \============================== -->
 
 			\<a class="write-review"
 				th\:href="@{/review\.html(websiteId=${website.id})}"> Read &amp;
@@ -509,63 +347,29 @@ h1 {
                 const currentWebsite =
 
                     rankings.find(
-
                         function (item) {
-
                             return String(
-
                                 item.websiteId
-
                             ) === String(
-
                                 websiteId
-
                             );
-
                         }
-
                     );
-
-
-
                 if (!currentWebsite) {
-
                     return;
-
                 }
-
-
-
                 rankElement.textContent =
-
                     "#" + currentWebsite.rank;
-
-
-
                 rankingBox.style.display =
-
                     "block";
-
             })
-
             .catch(function (error) {
-
                 console.error(
-
                     "Website ranking error:",
-
                     error
-
                 );
-
             });
-
     })();
-
 </script>
-
-
-
 </body>
-
 </html>

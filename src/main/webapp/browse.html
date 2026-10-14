@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browse Websites - Review Platform</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/category.css">
+<link rel="stylesheet" href="css/browse.css">
+</head>
+<body>
+	<nav class="navbar">
+		<div class="logo">
+			Review <span>Platform</span>
+		</div>
+		<div class="nav-links">
+			<a href="index.html"> Home </a> <a href="browse.html" class="active">
+				Websites </a> <a href="login.html"> Login </a>
+		</div>
+	</nav>
+	<main class="category-page">
+		<a href="index.html" class="category-back-link"> ← Back to Home </a>
+		<header class="category-page-header">
+			<h1>All Websites</h1>
+			<p id="browseSubtitle">Loading...</p>
+		</header>
+		<div class="browse-toolbar">
+			<input type="text" id="browseSearch" class="browse-search"
+				placeholder="Search by name or domain..."> <select
+				id="browseSort" class="browse-sort">
+				<option value="rating">Best rated</option>
+				<option value="reviews">Most reviewed</option>
+				<option value="name">A to Z</option>
+			</select>
+		</div>
+		<div class="category-chip-row" id="browseChips"></div>
+		<div id="browseList" class="category-website-list"></div>
+		<div class="category-more-wrapper">
+			<button type="button" id="browseShowMore" class="category-show-more"
+				style="display: none;">Show more</button>
+		</div>
+	</main>
+	<script src="js/browse.js"></script>
+</body>
+</html>

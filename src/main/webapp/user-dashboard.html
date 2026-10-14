@@ -8,114 +8,208 @@
 <link rel="stylesheet" href="css/user-dashboard.css">
 </head>
 <body>
-	<div class="dashboard-container">
-		<header class="dashboard-header">
-			<div>
-				<h1>User Dashboard</h1>
-				<p id="userInfo">Loading user...</p>
-			</div>
-			<button type="button" onclick="logoutUser()">Logout</button>
-		</header>
-		<div class="dashboard-nav">
-			<button type="button" onclick="goToHome()">Home</button>
-			<button type="button" onclick="goToWriteReview()">Write a
-				Review</button>
-			<button type="button" onclick="goToWebsites()">Browse
-				Websites</button>
-			<button type="button" onclick="openMyProfile()">My Profile</button>
-			<button type="button" onclick="scrollToBusiness()">My
-				Business</button>
-			<button type="button" onclick="scrollToClaim()">Claim
-				Business</button>
-			<button type="button" onclick="openBusinessDashboard()">Business
-				Dashboard</button>
-		</div>
-		<section class="dashboard-section" id="myBusinessSection">
-			<h2>My Business</h2>
-			<div id="businessMessage" class="message">Loading business
-				information...</div>
-			<div id="businessInfo" class="business-card" style="display: none;">
-				<h3>Business Information</h3>
-				<p>
-					<strong>Business ID:</strong> <span id="businessId"></span>
-				</p>
-				<p>
-					<strong>Business Name:</strong> <span id="businessName"></span>
-				</p>
-				<p>
-					<strong>Official URL:</strong> <span id="officialUrl"></span>
-				</p>
-				<p>
-					<strong>Business Status:</strong> <span id="businessStatus"
-						class="status"></span>
-				</p>
-				<div class="dashboard-actions">
-					<button type="button" onclick="openBusinessDashboard()">
-						Open Business Dashboard</button>
-					<button type="button" onclick="scrollToVerification()">
-						Verify Business</button>
-				</div>
-			</div>
-			<div id="verificationSection" class="business-card"
-				style="display: none;">
-				<h3>Business Verification</h3>
-				<div class="verification-item">
-					<div>
-						<strong>Email Verification</strong>
-						<p id="emailVerificationStatus">Checking...</p>
+	<div class="app">
+
+		<!-- ========== SIDEBAR ========== -->
+		<aside class="sidebar">
+			<div class="brand">Review Platform</div>
+
+			<nav class="side-nav" aria-label="Dashboard navigation">
+				<button type="button" class="side-link" onclick="goToHome()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8" /><path d="M5 10v10h14V10" /></svg>
+					Home
+				</button>
+				<button type="button" class="side-link" onclick="goToWriteReview()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z" /></svg>
+					Write a Review
+				</button>
+				<button type="button" class="side-link" onclick="goToWebsites()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M3 12h18" /><path d="M12 3a14 14 0 010 18M12 3a14 14 0 000 18" /></svg>
+					Browse Websites
+				</button>
+				<button type="button" class="side-link" onclick="openMyProfile()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 4-6 8-6s8 2 8 6" /></svg>
+					My Profile
+				</button>
+				<button type="button" class="side-link active" data-scroll="true" onclick="scrollToBusiness()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M9 8h2M13 8h2M9 12h2M13 12h2M10 21v-4h4v4" /></svg>
+					My Business
+				</button>
+				<button type="button" class="side-link" data-scroll="true" onclick="scrollToClaim()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" /><path d="M9 12l2 2 4-4" /></svg>
+					Claim Business
+				</button>
+				<button type="button" class="side-link" onclick="openBusinessDashboard()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1" /><rect x="14" y="3" width="7" height="5" rx="1" /><rect x="14" y="12" width="7" height="9" rx="1" /><rect x="3" y="16" width="7" height="5" rx="1" /></svg>
+					Business Dashboard
+				</button>
+			</nav>
+
+			<div class="side-footer">
+				<div class="user-card">
+					<div class="avatar" id="userAvatar">U</div>
+					<div class="user-text">
+						<span class="user-label">Logged in as</span> <span
+							class="user-email" id="userEmail">Loading user...</span>
 					</div>
-					<span id="emailBadge" class="badge"></span>
 				</div>
-				<div id="emailVerificationForm" class="verification-form">
-					<label for="businessEmail">Business Email</label> <input
-						type="email" id="businessEmail" placeholder="owner@example.com">
-					<button type="button" onclick="sendEmailVerification()">
-						Send Verification Email</button>
-					<p class="help-text">Your business email domain must match the
-						official website domain.</p>
-				</div>
-				<div class="verification-item">
-					<div>
-						<strong>Meta Tag Verification</strong>
-						<p>
-							Current status: <span id="metaStatus">Checking...</span>
-						</p>
-					</div>
-					<span id="metaBadge" class="badge"></span>
-				</div>
-				<div class="verification-item">
-					<div>
-						<strong>DNS Verification</strong>
-						<p>
-							Current status: <span id="dnsStatus">Checking...</span>
-						</p>
-					</div>
-					<span id="dnsBadge" class="badge"></span>
-				</div>
-				<div id="verifiedMessage" class="verified-box"
-					style="display: none;">
-					<h3>Business Verified</h3>
-					<p>Your business verification is complete.</p>
-					<button type="button" onclick="openBusinessDashboard()">
-						Open Business Dashboard</button>
-				</div>
+				<button type="button" class="logout-btn" onclick="logoutUser()">
+					<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><path d="M16 17l5-5-5-5M21 12H9" /></svg>
+					Logout
+				</button>
 			</div>
-		</section>
-		<section class="dashboard-section" id="claimBusinessSection">
-			<h2>Claim a Business</h2>
-			<p>Find a business profile and claim it directly from the
-				business profile page.</p>
-			<div class="claim-box">
-				<button type="button" onclick="goToWebsites()">Browse
+		</aside>
+
+		<!-- ========== MAIN CONTENT ========== -->
+		<main class="content">
+
+			<header class="page-header">
+				<div>
+					<h1>My Business</h1>
+					<p>Manage your business listing and ownership requests.</p>
+				</div>
+				<button type="button" class="btn btn-light" onclick="goToWebsites()">Browse
 					Websites</button>
-				<button type="button" onclick="goToHome()">Find a Business</button>
-			</div>
-			<p class="help-text">
-				Open a business profile and use <strong>Claim This Business</strong>
-				to submit your ownership request.
-			</p>
-		</section>
-		<div id="dashboardMessage" class="message"></div>
+			</header>
+
+			<section class="stats" aria-label="Summary">
+				<div class="stat-card">
+					<div class="stat-label">Approved businesses</div>
+					<div class="stat-value" id="statBusinesses">-</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-label">Verification steps done</div>
+					<div class="stat-value" id="statVerification">-</div>
+				</div>
+				<div class="stat-card">
+					<div class="stat-label">Business status</div>
+					<div class="stat-value stat-value-text" id="statStatus">-</div>
+				</div>
+			</section>
+
+			<div id="dashboardMessage" class="message" role="status"></div>
+
+			<section class="card" id="myBusinessSection">
+				<div id="businessMessage" class="message">Loading business
+					information...</div>
+
+				<!-- Shown when the user has no approved claim -->
+				<div id="businessEmpty" class="empty-state" style="display: none;">
+					<div class="empty-icon">
+						<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="2" /><path d="M9 8h2M13 8h2M9 12h2M13 12h2M10 21v-4h4v4" /></svg>
+					</div>
+					<h2>No approved business yet</h2>
+					<p>Find your business profile and send an ownership request.
+						Once it is approved, your business will appear here.</p>
+					<div class="empty-actions">
+						<button type="button" class="btn btn-dark" onclick="goToHome()">Find
+							a Business</button>
+						<button type="button" class="btn btn-light" onclick="goToWebsites()">Browse
+							Websites</button>
+					</div>
+				</div>
+
+				<div id="businessInfo" class="business-card" style="display: none;">
+					<h2>Business Information</h2>
+					<p>
+						<strong>Business ID:</strong> <span id="businessId"></span>
+					</p>
+					<p>
+						<strong>Business Name:</strong> <span id="businessName"></span>
+					</p>
+					<p>
+						<strong>Official URL:</strong> <span id="officialUrl"></span>
+					</p>
+					<p>
+						<strong>Business Status:</strong> <span id="businessStatus"
+							class="status"></span>
+					</p>
+					<div class="dashboard-actions">
+						<button type="button" class="btn btn-dark"
+							onclick="openBusinessDashboard()">Open Business
+							Dashboard</button>
+						<button type="button" class="btn btn-light"
+							onclick="scrollToVerification()">Verify Business</button>
+					</div>
+				</div>
+
+				<div id="verificationSection" class="business-card"
+					style="display: none;">
+					<h2>Business Verification</h2>
+					<div class="verification-item">
+						<div>
+							<strong>Email Verification</strong>
+							<p id="emailVerificationStatus">Checking...</p>
+						</div>
+						<span id="emailBadge" class="badge"></span>
+					</div>
+					<div id="emailVerificationForm" class="verification-form">
+						<label for="businessEmail">Business Email</label> <input
+							type="email" id="businessEmail" placeholder="owner@example.com">
+						<button type="button" class="btn btn-light"
+							onclick="sendEmailVerification()">Send Verification
+							Email</button>
+						<p class="help-text">Your business email domain must match the
+							official website domain.</p>
+					</div>
+					<div class="verification-item">
+						<div>
+							<strong>Meta Tag Verification</strong>
+							<p>
+								Current status: <span id="metaStatus">Checking...</span>
+							</p>
+						</div>
+						<span id="metaBadge" class="badge"></span>
+					</div>
+					<div class="verification-item">
+						<div>
+							<strong>DNS Verification</strong>
+							<p>
+								Current status: <span id="dnsStatus">Checking...</span>
+							</p>
+						</div>
+						<span id="dnsBadge" class="badge"></span>
+					</div>
+					<div id="verifiedMessage" class="verified-box"
+						style="display: none;">
+						<h3>Business Verified</h3>
+						<p>Your business verification is complete.</p>
+						<button type="button" class="btn btn-dark"
+							onclick="openBusinessDashboard()">Open Business
+							Dashboard</button>
+					</div>
+				</div>
+			</section>
+
+			<section class="card" id="claimBusinessSection">
+				<h2>How claiming works</h2>
+				<div class="steps">
+					<div class="step">
+						<div class="step-num">1</div>
+						<div>
+							<div class="step-title">Find your business</div>
+							<div class="step-text">Open its profile from Browse Websites.</div>
+						</div>
+					</div>
+					<div class="step">
+						<div class="step-num">2</div>
+						<div>
+							<div class="step-title">Claim This Business</div>
+							<div class="step-text">Submit your ownership request from the
+								business profile page.</div>
+						</div>
+					</div>
+					<div class="step">
+						<div class="step-num">3</div>
+						<div>
+							<div class="step-title">Get approved</div>
+							<div class="step-text">Your business shows up on this page.</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+		</main>
 	</div>
 	<script src="js/user-dashboard.js"></script>
 </body>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, follow">
+<title>Public Profile - Review Platform</title>
+
+<style>
+* {
+	box-sizing: border-box;
+}
+body {
+	margin: 0;
+	padding: 24px 16px;
+	font-family: Arial, Helvetica, sans-serif;
+	background: #f4f6f9;
+	color: #222;
+}
+.container {
+	max-width: 700px;
+	margin: 30px auto;
+}
+.profile-card {
+	padding: 32px;
+	background: #fff;
+	border: 1px solid #e3e6eb;
+	border-radius: 12px;
+	box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+.heading {
+	margin-bottom: 24px;
+	text-align: center;
+}
+.heading h1 {
+	margin: 0 0 8px;
+	font-size: 28px;
+}
+.heading p {
+	margin: 0;
+	color: #666;
+	line-height: 1.5;
+}
+.profile-content {
+	text-align: center;
+}
+.avatar {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100px;
+	height: 100px;
+	margin: 0 auto 18px;
+	border-radius: 50%;
+	background: #e8f0fe;
+	color: #2457a7;
+	font-size: 38px;
+	font-weight: bold;
+	overflow: hidden;
+}
+.avatar img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.profile-name {
+	margin: 0 0 12px;
+	overflow-wrap: anywhere;
+}
+.badge {
+	display: inline-block;
+	padding: 6px 12px;
+	border-radius: 20px;
+	background: #e8f7ed;
+	color: #176534;
+	font-size: 12px;
+	font-weight: bold;
+}
+.details {
+	margin-top: 28px;
+	text-align: left;
+}
+.detail-row {
+	padding: 16px 0;
+	border-bottom: 1px solid #e8e8e8;
+}
+.detail-label {
+	display: block;
+	margin-bottom: 8px;
+	color: #666;
+	font-size: 13px;
+	font-weight: bold;
+}
+.detail-value {
+	overflow-wrap: anywhere;
+	white-space: pre-wrap;
+	line-height: 1.6;
+}
+.message {
+	display: none;
+	margin-top: 20px;
+	padding: 14px;
+	border-radius: 7px;
+	text-align: center;
+	line-height: 1.5;
+	overflow-wrap: anywhere;
+}
+.message.info {
+	display: block;
+	background: #edf4ff;
+	color: #214d91;
+}
+.message.error {
+	display: block;
+	background: #fff0f0;
+	color: #a32121;
+}
+.back-button {
+	display: block;
+	margin: 24px auto 0;
+	padding: 11px 18px;
+	border: 1px solid #d1d5db;
+	border-radius: 7px;
+	background: #fff;
+	color: #333;
+	cursor: pointer;
+	font-size: 14px;
+}
+.back-button:hover {
+	background: #f0f0f0;
+}
+[hidden] {
+	display: none !important;
+}
+@media ( max-width : 480px) {
+	.profile-card {
+		padding: 22px 16px;
+	}
+	.heading h1 {
+		font-size: 24px;
+	}
+}
+</style>
+</head>
+<body>
+	<main class="container">
+		<section class="profile-card">
+			<header class="heading">
+				<h1>Public Profile</h1>
+				<p>Review Platform member profile</p>
+			</header>
+			<div id="profileMessage" class="message info" role="status"
+				aria-live="polite">Loading profile...</div>
+			<div id="profileContent" class="profile-content" hidden>
+				<div id="profileAvatar" class="avatar">U</div>
+				<h2 id="profileName" class="profile-name"></h2>
+				<span class="badge">PUBLIC PROFILE</span>
+				<div class="details">
+					<div class="detail-row">
+						<span class="detail-label">About</span>
+						<div id="profileBio" class="detail-value"></div>
+					</div>
+					<div class="detail-row">
+						<span class="detail-label">Country</span>
+						<div id="profileCountry" class="detail-value"></div>
+					</div>
+				</div>
+			</div>
+			<button type="button" class="back-button" onclick="history.back()">
+				Go Back</button>
+		</section>
+	</main>
+	<script>
+		"use strict";
+		const message = document.getElementById("profileMessage");
+		const content = document.getElementById("profileContent");
+		const avatar = document.getElementById("profileAvatar");
+		const nameElement = document.getElementById("profileName");
+		const bioElement = document.getElementById("profileBio");
+		const countryElement = document.getElementById("profileCountry");
+		function showMessage(text, type) {
+			message.textContent = text;
+			message.className = "message " + type;
+			message.hidden = false;
+		}
+		function showAvatar(profile) {
+			const name = (profile.name || "User").trim();
+			avatar.textContent = name.charAt(0).toUpperCase() || "U";
+			if (!profile.avatarUrl) {
+				return;
+			}
+			try {
+				const imageUrl = new URL(profile.avatarUrl,
+						window.location.origin);
+				if (![ "http:", "https:" ].includes(imageUrl.protocol)) {
+					return;
+				}
+				const image = document.createElement("img");
+				image.alt = "Profile avatar";
+				image.referrerPolicy = "no-referrer";
+				image.onerror = function() {
+					image.remove();
+					avatar.textContent = name.charAt(0).toUpperCase() || "U";
+				};
+				image.src = imageUrl.href;
+				avatar.replaceChildren(image);
+			} catch (error) {
+				console.error("Invalid avatar URL:", error);
+			}
+		}
+		async
+		function loadPublicProfile() {
+			const params = new URLSearchParams(window.location.search);
+			const id = params.get("id");
+
+			if (!id || !/^\d+$/.test(id) || Number(id) <= 0) {
+				showMessage("A valid profile ID is required in the URL.",
+						"error");
+				return;
+			}
+			try {
+				const response = await
+				fetch("/review-platform/users/public-profile/"
+						+ encodeURIComponent(id), {
+					method : "GET",
+					headers : {
+						"Accept" : "application/json"
+					},
+					credentials : "omit"
+				});
+				if (response.status === 403) {
+					throw new Error(
+							"This profile is private or access is not allowed.");
+				}
+				if (response.status === 404) {
+					throw new Error("Profile not found.");
+				}
+				if (!response.ok) {
+					throw new Error(
+							"Unable to load the profile. Please try again.");
+				}
+				const profile = await
+				response.json();
+				if (profile.profilePublic === false) {
+					throw new Error("This profile is private.");
+				}
+				nameElement.textContent = profile.name || "User";
+				bioElement.textContent = profile.bio || "No bio added.";
+				countryElement.textContent = profile.country || "Not specified";
+				showAvatar(profile);
+				content.hidden = false;
+				message.hidden = true;
+			} catch (error) {
+				console.error("Public profile error:", error);
+				content.hidden = true;
+				showMessage(error.message || "Unable to load this profile.",
+						"error");
+			}
+		}
+		loadPublicProfile();
+	</script>
+</body>
+</html>

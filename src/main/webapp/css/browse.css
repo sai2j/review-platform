@@ -1,0 +1,41 @@
+.browse-toolbar {
+	display: flex;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin-bottom: 16px;
+}
+
+.browse-search {
+	flex: 1;
+	min-width: 220px;
+	padding: 12px 14px;
+	border: 1px solid #d9eaf5;
+	border-radius: 10px;
+	font-size: 15px;
+	outline: none;
+}
+
+.browse-search:focus {
+	border-color: #299bd7;
+}
+
+.browse-sort {
+	padding: 12px 14px;
+	border: 1px solid #d9eaf5;
+	border-radius: 10px;
+	background: #ffffff;
+	font-size: 15px;
+	cursor: pointer;
+}
+
+.browse-category-tag {
+	display: inline-block;
+	margin-left: 8px;
+	padding: 2px 9px;
+	border-radius: 999px;
+	background: #f1eefc;
+	color: #5b3fb0;
+	font-size: 11px;
+	font-weight: 700;
+	vertical-align: middle;
+}

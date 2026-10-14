@@ -22,163 +22,101 @@ import jakarta.validation.Valid;
 @RequestMapping("/businesses")
 public class businessController {
 
-    private final BusinessService businessService;
-    private final BusinessEmailVerificationService emailVerificationService;
+	private final BusinessService businessService;
+	private final BusinessEmailVerificationService emailVerificationService;
 
-    public businessController(
-            BusinessService businessService,
-            BusinessEmailVerificationService emailVerificationService) {
+	public businessController(BusinessService businessService,
+			BusinessEmailVerificationService emailVerificationService) {
+		this.businessService = businessService;
+		this.emailVerificationService = emailVerificationService;
+	}
 
-        this.businessService = businessService;
-        this.emailVerificationService = emailVerificationService;
-    }
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping
+	public BusinessResponseDTO createBusiness(@Valid @RequestBody Business business) {
+		return toBusinessResponseDTO(businessService.saveBusiness(business));
+	}
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping
-    public BusinessResponseDTO createBusiness(
-            @Valid @RequestBody Business business) {
+	@GetMapping
+	public List<BusinessResponseDTO> getAllBusinesses() {
+		return businessService.getAllBusinesses().stream().map(this::toBusinessResponseDTO).toList();
+	}
 
-        return toBusinessResponseDTO(
-                businessService.saveBusiness(business)
-        );
-    }
+	@GetMapping("/{id}")
+	public BusinessResponseDTO getBusinessById(@PathVariable Long id) {
+		return toBusinessResponseDTO(businessService.getBusinessById(id));
+	}
 
-    @GetMapping
-    public List<BusinessResponseDTO> getAllBusinesses() {
+	@PreAuthorize("@businessService.canAccessBusiness(#id)")
+	@PutMapping("/{id}")
+	public BusinessResponseDTO updateBusiness(@PathVariable Long id, @Valid @RequestBody Business business) {
+		return toBusinessResponseDTO(businessService.updateBusiness(id, business));
+	}
 
-        return businessService.getAllBusinesses()
-                .stream()
-                .map(this::toBusinessResponseDTO)
-                .toList();
-    }
+	@PreAuthorize("hasRole('ADMIN')")
+	@PutMapping("/{id}/verify")
+	public BusinessResponseDTO verifyBusiness(@PathVariable Long id) {
+		return toBusinessResponseDTO(businessService.verifyBusiness(id));
+	}
 
-    @GetMapping("/{id}")
-    public BusinessResponseDTO getBusinessById(
-            @PathVariable Long id) {
+	@PreAuthorize("@businessService.canAccessBusiness(#id)")
+	@PostMapping("/{id}/verify-email")
+	public String sendBusinessEmailVerification(@PathVariable Long id, @RequestParam String email) {
+		Business business = businessService.createEmailVerificationToken(id, email);
+		emailVerificationService.sendVerificationEmail(business);
+		return "Verification email sent successfully";
+	}
 
-        return toBusinessResponseDTO(
-                businessService.getBusinessById(id)
-        );
-    }
+	@GetMapping("/{id}/verify-email")
+	public String verifyBusinessEmail(@PathVariable Long id, @RequestParam String token) {
+		businessService.verifyBusinessEmail(id, token);
+		return "Business email verified successfully";
+	}
 
-    @PreAuthorize("@businessService.canAccessBusiness(#id)")
-    @PutMapping("/{id}")
-    public BusinessResponseDTO updateBusiness(
-            @PathVariable Long id,
-            @Valid @RequestBody Business business) {
+	@PreAuthorize("hasRole('ADMIN')")
+	@PostMapping("/{id}/generate-meta-token")
+	public String generateMetaVerificationToken(@PathVariable Long id) {
+		businessService.createMetaVerificationToken(id);
+		return "Meta verification token generated. Retrieve it through the authorized verification workflow.";
+	}
 
-        return toBusinessResponseDTO(
-                businessService.updateBusiness(id, business)
-        );
-    }
+	@PreAuthorize("hasRole('ADMIN')")
+	@PostMapping("/{id}/verify-meta")
+	public BusinessResponseDTO verifyBusinessMetaTag(@PathVariable Long id) {
+		return toBusinessResponseDTO(businessService.verifyBusinessMetaTag(id));
+	}
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}/verify")
-    public BusinessResponseDTO verifyBusiness(
-            @PathVariable Long id) {
+	@PreAuthorize("hasRole('ADMIN')")
+	@PostMapping("/{id}/generate-dns-token")
+	public String generateDnsVerificationToken(@PathVariable Long id) {
+		businessService.createDnsVerificationToken(id);
+		return "DNS verification token generated. Retrieve it through the authorized verification workflow.";
+	}
 
-        return toBusinessResponseDTO(
-                businessService.verifyBusiness(id)
-        );
-    }
+	@PreAuthorize("hasRole('ADMIN')")
+	@PostMapping("/{id}/verify-dns")
+	public BusinessResponseDTO verifyBusinessDns(@PathVariable Long id) {
+		return toBusinessResponseDTO(businessService.verifyBusinessDns(id));
+	}
 
-    @PreAuthorize("@businessService.canAccessBusiness(#id)")
-    @PostMapping("/{id}/verify-email")
-    public String sendBusinessEmailVerification(
-            @PathVariable Long id,
-            @RequestParam String email) {
+	@GetMapping("/website/{websiteId}")
+	public BusinessResponseDTO getBusinessForWebsite(@PathVariable Long websiteId) {
+		return toBusinessResponseDTO(businessService.getBusinessForWebsite(websiteId));
+	}
 
-        Business business =
-                businessService.createEmailVerificationToken(id, email);
+	@PreAuthorize("hasRole('ADMIN')")
+	@DeleteMapping("/{id}")
+	public String deleteBusiness(@PathVariable Long id) {
+		businessService.deleteBusiness(id);
+		return "Business deleted successfully";
+	}
 
-        emailVerificationService.sendVerificationEmail(business);
-
-        return "Verification email sent successfully";
-    }
-
-    @GetMapping("/{id}/verify-email")
-    public String verifyBusinessEmail(
-            @PathVariable Long id,
-            @RequestParam String token) {
-
-        businessService.verifyBusinessEmail(id, token);
-
-        return "Business email verified successfully";
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/{id}/generate-meta-token")
-    public String generateMetaVerificationToken(
-            @PathVariable Long id) {
-
-        businessService.createMetaVerificationToken(id);
-
-        return "Meta verification token generated. Retrieve it through the authorized verification workflow.";
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/{id}/verify-meta")
-    public BusinessResponseDTO verifyBusinessMetaTag(
-            @PathVariable Long id) {
-
-        return toBusinessResponseDTO(
-                businessService.verifyBusinessMetaTag(id)
-        );
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/{id}/generate-dns-token")
-    public String generateDnsVerificationToken(
-            @PathVariable Long id) {
-
-        businessService.createDnsVerificationToken(id);
-
-        return "DNS verification token generated. Retrieve it through the authorized verification workflow.";
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping("/{id}/verify-dns")
-    public BusinessResponseDTO verifyBusinessDns(
-            @PathVariable Long id) {
-
-        return toBusinessResponseDTO(
-                businessService.verifyBusinessDns(id)
-        );
-    }
-
-    @GetMapping("/website/{websiteId}")
-    public BusinessResponseDTO getBusinessForWebsite(
-            @PathVariable Long websiteId) {
-
-        return toBusinessResponseDTO(
-                businessService.getBusinessForWebsite(websiteId)
-        );
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id}")
-    public String deleteBusiness(@PathVariable Long id) {
-
-        businessService.deleteBusiness(id);
-
-        return "Business deleted successfully";
-    }
-
-    private BusinessResponseDTO toBusinessResponseDTO(Business business) {
-        if (business == null) {
-            return null;
-        }
-
-        return new BusinessResponseDTO(
-                business.getId(),
-                business.getName(),
-                business.getDescription(),
-                business.getOfficialUrl(),
-                business.getStatus(),
-                business.getBusinessEmail(),
-                business.isEmailVerified(),
-                business.isMetaVerified(),
-                business.isDnsVerified()
-        );
-    }
+	private BusinessResponseDTO toBusinessResponseDTO(Business business) {
+		if (business == null) {
+			return null;
+		}
+		return new BusinessResponseDTO(business.getId(), business.getName(), business.getDescription(),
+				business.getOfficialUrl(), business.getStatus(), business.getBusinessEmail(),
+				business.isEmailVerified(), business.isMetaVerified(), business.isDnsVerified());
+	}
 }

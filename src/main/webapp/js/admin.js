@@ -1,3168 +1,1165 @@
-const REPORT_API = "/review-platform/reports";
-
-const REVIEW_API = "/review-platform/reviews";
-
-const CLAIM_API = "/review-platform/business-claims";
-
-const USER_API = "/review-platform/users";
-
-const WEBSITE_API = "/review-platform/websites";
-
-const AUDIT_LOG_API = "/review-platform/audit-logs";
-
-
-// ==============================
-
-// ADMIN DASHBOARD METRICS
-
-// ==============================
-
-function loadDashboardMetrics() {
-
-    Promise.all([
-
-        fetch(USER_API),
-
-        fetch(WEBSITE_API),
-
-        fetch(REVIEW_API)
-
-    ])
-
-        .then(function(responses) {
-
-            responses.forEach(function(response) {
-
-                if (!response.ok) {
-
-                    throw new Error("Dashboard API Error");
-
-                }
-
-            });
-
-            return Promise.all(
-
-                responses.map(function(response) {
-
-                    return response.json();
-
-                })
-
-            );
-
-        })
-
-        .then(function(data) {
-
-            // USER API can return an array or Page content
-
-            const users =
-
-                Array.isArray(data[0])
-
-                    ? data[0]
-
-                    : (
-
-                        data[0] &&
-
-                        Array.isArray(data[0].content)
-
-                            ? data[0].content
-
-                            : []
-
-                    );
-
-
-            // WEBSITE API can return an array or Page content
-
-            const websites =
-
-                Array.isArray(data[1])
-
-                    ? data[1]
-
-                    : (
-
-                        data[1] &&
-
-                        Array.isArray(data[1].content)
-
-                            ? data[1].content
-
-                            : []
-
-                    );
-
-
-            // REVIEW API returns a Page
-
-            // so use data.content when required
-
-            const reviews =
-
-                Array.isArray(data[2])
-
-                    ? data[2]
-
-                    : (
-
-                        data[2] &&
-
-                        Array.isArray(data[2].content)
-
-                            ? data[2].content
-
-                            : []
-
-                    );
-
-
-            const pendingReviews =
-
-                reviews.filter(function(review) {
-
-                    return (
-
-                        review.status || "PENDING"
-
-                    )
-
-                        .toUpperCase() ===
-
-                        "PENDING";
-
-                });
-
-
-            document.getElementById(
-
-                "totalUsers"
-
-            ).textContent =
-
-                users.length;
-
-
-            document.getElementById(
-
-                "totalWebsites"
-
-            ).textContent =
-
-                websites.length;
-
-
-            document.getElementById(
-
-                "totalReviews"
-
-            ).textContent =
-
-                reviews.length;
-
-
-            document.getElementById(
-
-                "pendingReviews"
-
-            ).textContent =
-
-                pendingReviews.length;
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            const totalUsers =
-
-                document.getElementById(
-
-                    "totalUsers"
-
-                );
-
-
-            const totalWebsites =
-
-                document.getElementById(
-
-                    "totalWebsites"
-
-                );
-
-
-            const totalReviews =
-
-                document.getElementById(
-
-                    "totalReviews"
-
-                );
-
-
-            const pendingReviews =
-
-                document.getElementById(
-
-                    "pendingReviews"
-
-                );
-
-
-            if (totalUsers) {
-
-                totalUsers.textContent =
-
-                    "Error";
-
-            }
-
-
-            if (totalWebsites) {
-
-                totalWebsites.textContent =
-
-                    "Error";
-
-            }
-
-
-            if (totalReviews) {
-
-                totalReviews.textContent =
-
-                    "Error";
-
-            }
-
-
-            if (pendingReviews) {
-
-                pendingReviews.textContent =
-
-                    "Error";
-
-            }
-
-        });
-
+"use strict";
+
+/* =========================================================
+   SETTINGS
+   ========================================================= */
+
+const BASE = "/review-platform";
+
+const API = {
+    pending:     BASE + "/reviews/pending",
+    hidden:      BASE + "/reviews/hidden",
+    allReviews:  BASE + "/reviews?page=0&size=1",     // sirf total count ke liye
+    reviewStatus: function (id, status) {
+        return BASE + "/reviews/" + id + "/status?status=" + status;
+    },
+    reports:     BASE + "/reports",
+    reportStatus: function (id, status) {
+        return BASE + "/reports/" + id + "/status?status=" + status;
+    },
+    claims:      BASE + "/business-claims",
+    claimStatus: function (id, status) {
+        return BASE + "/business-claims/" + id + "/status?status=" + status;
+    },
+    users:       BASE + "/users",
+    websites:    BASE + "/websites",
+    websiteSeo:  function (id) {
+        return BASE + "/websites/" + id + "/seo";
+    },
+    logs:        BASE + "/audit-logs",
+    logout:      BASE + "/users/logout"
+};
+
+const PAGE_SIZE = 5;    // har table / list mein ek page par kitne rows
+
+
+/* =========================================================
+   STATE
+   ========================================================= */
+
+const state = {
+    queue:    { url: API.pending,  rows: [], page: 1, status: "loading", error: "" },
+    hidden:   { url: API.hidden,   rows: [], page: 1, status: "loading", error: "" },
+    claims:   { url: API.claims,   rows: [], page: 1, status: "loading", error: "" },
+    reports:  { url: API.reports,  rows: [], page: 1, status: "loading", error: "" },
+    users:    { url: API.users,    rows: [], page: 1, status: "loading", error: "" },
+    websites: { url: API.websites, rows: [], page: 1, status: "loading", error: "" },
+    logs:     { url: API.logs,     rows: [], page: 1, status: "loading", error: "" }
+};
+
+const SECTIONS = {
+    queue:    { body: "queueBody",    pager: "queuePager",    unit: "reviews",  empty: "No reviews are waiting for a decision.", render: renderQueue },
+    hidden:   { body: "hiddenBody",   pager: "hiddenPager",   unit: "reviews",  empty: "No hidden reviews.",                      render: renderHidden },
+    claims:   { body: "claimsBody",   pager: "claimsPager",   unit: "claims",   empty: "No business claims found.",               render: renderClaims },
+    reports:  { body: "reportsBody",  pager: "reportsPager",  unit: "reports",  empty: "No reported reviews.",                    render: renderReports },
+    users:    { body: "usersBody",    pager: "usersPager",    unit: "users",    empty: "No users found.",                         render: renderUsers },
+    websites: { body: "websitesBody", pager: "websitesPager", unit: "websites", empty: "No websites found.",                      render: renderWebsites },
+    logs:     { body: "logsBody",     pager: "logsPager",     unit: "logs",     empty: "No audit logs found.",                    render: renderLogs }
+};
+
+let totalReviews = null;
+let searchQuery = "";
+
+
+/* =========================================================
+   SMALL HELPERS
+   ========================================================= */
+
+function $(id) {
+    return document.getElementById(id);
 }
 
-
-// ==============================
-
-// LOAD REVIEW MODERATION QUEUE
-
-// ==============================
-
-function loadModerationQueue() {
-
-    fetch(
-
-        REVIEW_API + "/pending"
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Pending Review API Error"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(reviews) {
-
-            displayModerationQueue(
-
-                reviews
-
-            );
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            const moderationList =
-
-                document.getElementById(
-
-                    "moderationList"
-
-                );
-
-
-            if (moderationList) {
-
-                moderationList.innerHTML =
-
-                    `<p class="error-message">
-
-                        Unable to load pending reviews.
-
-                    </p>`;
-
-            }
-
-        });
-
-}
-
-
-// ==============================
-
-// DISPLAY REVIEW MODERATION QUEUE
-
-// ==============================
-
-function displayModerationQueue(
-
-    reviews
-
-) {
-
-    const moderationList =
-
-        document.getElementById(
-
-            "moderationList"
-
-        );
-
-
-    if (!moderationList) {
-
-        return;
-
-    }
-
-
-    moderationList.innerHTML = "";
-
-
-    if (reviews.length === 0) {
-
-        moderationList.innerHTML =
-
-            `<p>No pending reviews.</p>`;
-
-        return;
-
-    }
-
-
-    reviews.forEach(function(review) {
-
-        moderationList.innerHTML += `
-
-            <div class="report-card">
-
-                <p>
-
-                    <strong>Review ID:</strong>
-
-                    ${review.id}
-
-                </p>
-
-
-                <p>
-
-                    <strong>User ID:</strong>
-
-                    ${review.userId}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Website ID:</strong>
-
-                    ${review.websiteId}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Rating:</strong>
-
-                    ${review.rating}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Comment:</strong>
-
-                    ${escapeAdminHtml(
-
-                        review.comment || ""
-
-                    )}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Status:</strong>
-
-                    ${escapeAdminHtml(
-
-                        review.status ||
-
-                        "PENDING"
-
-                    )}
-
-                </p>
-
-
-                <button
-
-                    onclick="updateReviewStatus(
-
-                        ${review.id},
-
-                        'APPROVED'
-
-                    )">
-
-                    Approve
-
-                </button>
-
-
-                <button
-
-                    onclick="updateReviewStatus(
-
-                        ${review.id},
-
-                        'REJECTED'
-
-                    )">
-
-                    Reject
-
-                </button>
-
-
-                <button
-
-                    onclick="updateReviewStatus(
-
-                        ${review.id},
-
-                        'HIDDEN'
-
-                    )">
-
-                    Hide
-
-                </button>
-
-            </div>
-
-        `;
-
-    });
-
-}
-
-
-// ==============================
-
-// LOAD HIDDEN REVIEWS
-
-// ==============================
-
-function loadHiddenReviews() {
-
-    fetch(
-
-        REVIEW_API + "/hidden"
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Review API Error"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(reviews) {
-
-            const hiddenReviews =
-
-                reviews.filter(function(review) {
-
-                    return (
-
-                        review.status || ""
-
-                    )
-
-                        .toUpperCase() ===
-
-                        "HIDDEN";
-
-                });
-
-
-            displayHiddenReviews(
-
-                hiddenReviews
-
-            );
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            const hiddenReviewList =
-
-                document.getElementById(
-
-                    "hiddenReviewList"
-
-                );
-
-
-            if (hiddenReviewList) {
-
-                hiddenReviewList.innerHTML =
-
-                    `<p class="error-message">
-
-                        Unable to load hidden reviews.
-
-                    </p>`;
-
-            }
-
-        });
-
-}
-
-
-// ==============================
-
-// DISPLAY HIDDEN REVIEWS
-
-// ==============================
-
-function displayHiddenReviews(
-
-    reviews
-
-) {
-
-    const hiddenReviewList =
-
-        document.getElementById(
-
-            "hiddenReviewList"
-
-        );
-
-
-    if (!hiddenReviewList) {
-
-        return;
-
-    }
-
-
-    hiddenReviewList.innerHTML = "";
-
-
-    if (reviews.length === 0) {
-
-        hiddenReviewList.innerHTML =
-
-            `<p>No hidden reviews.</p>`;
-
-        return;
-
-    }
-
-
-    reviews.forEach(function(review) {
-
-        hiddenReviewList.innerHTML += `
-
-            <div class="report-card">
-
-                <p>
-
-                    <strong>Review ID:</strong>
-
-                    ${review.id}
-
-                </p>
-
-
-                <p>
-
-                    <strong>User ID:</strong>
-
-                    ${review.userId}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Website ID:</strong>
-
-                    ${review.websiteId}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Rating:</strong>
-
-                    ${review.rating}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Comment:</strong>
-
-                    ${escapeAdminHtml(
-
-                        review.comment || ""
-
-                    )}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Status:</strong>
-
-                    ${escapeAdminHtml(
-
-                        review.status ||
-
-                        "HIDDEN"
-
-                    )}
-
-                </p>
-
-
-                <button
-
-                    onclick="restoreReview(
-
-                        ${review.id}
-
-                    )">
-
-                    Restore
-
-                </button>
-
-            </div>
-
-        `;
-
-    });
-
-}
-
-
-// ==============================
-
-// RESTORE REVIEW
-
-// ==============================
-
-function restoreReview(
-
-    reviewId
-
-) {
-
-    if (!confirm(
-
-        "Restore this review?"
-
-    )) {
-
-        return;
-
-    }
-
-
-    fetch(
-
-        REVIEW_API +
-
-        "/" +
-
-        reviewId +
-
-        "/status?status=APPROVED",
-
-        {
-
-            method: "PUT"
-
-        }
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Review restore failed"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(data) {
-
-            alert(
-
-                "Review restored successfully."
-
-            );
-
-
-            loadHiddenReviews();
-
-            loadModerationQueue();
-
-            loadDashboardMetrics();
-
-            loadAuditLogs();
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            alert(
-
-                "Review could not be restored."
-
-            );
-
-        });
-
-}
-
-
-// ==============================
-
-// UPDATE REVIEW STATUS
-
-// ==============================
-
-function updateReviewStatus(
-
-    reviewId,
-
-    status
-
-) {
-
-    let message = "";
-
-
-    if (status === "APPROVED") {
-
-        message =
-
-            "Approve this review?";
-
-    }
-
-    else if (status === "REJECTED") {
-
-        message =
-
-            "Reject this review?";
-
-    }
-
-    else if (status === "HIDDEN") {
-
-        message =
-
-            "Hide this review?";
-
-    }
-
-    else if (status === "PENDING") {
-
-        message =
-
-            "Restore this review to pending?";
-
-    }
-
-
-    if (!confirm(message)) {
-
-        return;
-
-    }
-
-
-    fetch(
-
-        REVIEW_API +
-
-        "/" +
-
-        reviewId +
-
-        "/status?status=" +
-
-        status,
-
-        {
-
-            method: "PUT"
-
-        }
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Review status update failed"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(data) {
-
-            alert(
-
-                "Review status updated to " +
-
-                status
-
-            );
-
-
-            loadModerationQueue();
-
-            loadHiddenReviews();
-
-            loadDashboardMetrics();
-
-            loadAuditLogs();
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            alert(
-
-                "Review status could not be updated."
-
-            );
-
-        });
-
-}
-
-
-// ==============================
-
-// LOAD REPORTS
-
-// ==============================
-
-function loadReports() {
-
-    fetch(
-
-        REPORT_API
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Report API Error"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(reports) {
-
-            displayReports(
-
-                reports
-
-            );
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            document.getElementById(
-
-                "reportList"
-
-            ).innerHTML =
-
-                `<p class="error-message">
-
-                    Unable to load reports.
-
-                </p>`;
-
-        });
-
-}
-
-
-// ==============================
-
-// DISPLAY REPORTS
-
-// ==============================
-
-function displayReports(
-
-    reports
-
-) {
-
-    const reportList =
-
-        document.getElementById(
-
-            "reportList"
-
-        );
-
-
-    reportList.innerHTML = "";
-
-
-    if (reports.length === 0) {
-
-        reportList.innerHTML =
-
-            `<p>No reported reviews.</p>`;
-
-        return;
-
-    }
-
-
-    reports.forEach(function(report) {
-
-        const status =
-
-            report.status ||
-
-            "PENDING";
-
-
-        reportList.innerHTML += `
-
-            <div class="report-card">
-
-                <p>
-
-                    <strong>Report ID:</strong>
-
-                    ${report.id}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Review ID:</strong>
-
-                    ${report.reviewId}
-
-                </p>
-
-
-                <p>
-
-                    <strong>User ID:</strong>
-
-                    ${report.userId}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Reason:</strong>
-
-                    ${escapeAdminHtml(
-
-                        report.reason || ""
-
-                    )}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Status:</strong>
-
-                    ${escapeAdminHtml(
-
-                        status
-
-                    )}
-
-                </p>
-
-
-                <button
-
-                    onclick="markReportReviewed(
-
-                        ${report.id}
-
-                    )">
-
-                    Mark Reviewed
-
-                </button>
-
-
-                <button
-
-                    onclick="rejectReport(
-
-                        ${report.id}
-
-                    )">
-
-                    Reject Report
-
-                </button>
-
-
-                <button
-
-                    onclick="deleteReportedReview(
-
-                        ${report.reviewId},
-
-                        ${report.id}
-
-                    )">
-
-                    Delete Review
-
-                </button>
-
-            </div>
-
-        `;
-
-    });
-
-}
-
-
-// ==============================
-
-// MARK REPORT AS REVIEWED
-
-// ==============================
-
-function markReportReviewed(
-
-    reportId
-
-) {
-
-    if (!confirm(
-
-        "Mark this report as reviewed?"
-
-    )) {
-
-        return;
-
-    }
-
-
-    fetch(
-
-        REPORT_API +
-
-        "/" +
-
-        reportId +
-
-        "/status?status=REVIEWED",
-
-        {
-
-            method: "PUT"
-
-        }
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Report status update failed"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(data) {
-
-            alert(
-
-                "Report marked as reviewed."
-
-            );
-
-
-            loadReports();
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            alert(
-
-                "Report status could not be updated."
-
-            );
-
-        });
-
-}
-
-
-// ==============================
-
-// REJECT REPORT
-
-// ==============================
-
-function rejectReport(
-
-    reportId
-
-) {
-
-    if (!confirm(
-
-        "Reject this report?"
-
-    )) {
-
-        return;
-
-    }
-
-
-    fetch(
-
-        REPORT_API +
-
-        "/" +
-
-        reportId +
-
-        "/status?status=REJECTED",
-
-        {
-
-            method: "PUT"
-
-        }
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Report rejection failed"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(data) {
-
-            alert(
-
-                "Report rejected."
-
-            );
-
-
-            loadReports();
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            alert(
-
-                "Report could not be rejected."
-
-            );
-
-        });
-
-}
-
-
-// ==============================
-
-// DELETE REPORTED REVIEW
-
-// ==============================
-
-function deleteReportedReview(
-
-    reviewId,
-
-    reportId
-
-) {
-
-    if (!confirm(
-
-        "Delete this reported review?"
-
-    )) {
-
-        return;
-
-    }
-
-
-    fetch(
-
-        REPORT_API +
-
-        "/" +
-
-        reportId,
-
-        {
-
-            method: "DELETE"
-
-        }
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Report delete failed"
-
-                );
-
-            }
-
-
-            return fetch(
-
-                REVIEW_API +
-
-                "/" +
-
-                reviewId,
-
-                {
-
-                    method: "DELETE"
-
-                }
-
-            );
-
-        })
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Review delete failed"
-
-                );
-
-            }
-
-
-            alert(
-
-                "Review deleted successfully!"
-
-            );
-
-
-            loadReports();
-
-            loadDashboardMetrics();
-
-            loadModerationQueue();
-
-            loadHiddenReviews();
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            alert(
-
-                "Review could not be deleted."
-
-            );
-
-        });
-
-}
-
-
-// ==============================
-
-// LOAD BUSINESS CLAIMS
-
-// ==============================
-
-function loadBusinessClaims() {
-
-    fetch(
-
-        CLAIM_API
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Business Claim API Error"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(claims) {
-
-            displayBusinessClaims(
-
-                claims
-
-            );
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            document.getElementById(
-
-                "claimList"
-
-            ).innerHTML =
-
-                `<p class="error-message">
-
-                    Unable to load business claims.
-
-                </p>`;
-
-        });
-
-}
-
-
-// ==============================
-
-// DISPLAY BUSINESS CLAIMS
-
-// ==============================
-
-function displayBusinessClaims(
-
-    claims
-
-) {
-
-    const claimList =
-
-        document.getElementById(
-
-            "claimList"
-
-        );
-
-
-    claimList.innerHTML = "";
-
-
-    if (claims.length === 0) {
-
-        claimList.innerHTML =
-
-            `<p>No business claims found.</p>`;
-
-        return;
-
-    }
-
-
-    claims.forEach(function(claim) {
-
-        claimList.innerHTML += `
-
-            <div class="claim-card">
-
-                <p>
-
-                    <strong>Claim ID:</strong>
-
-                    ${claim.id}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Business ID:</strong>
-
-                    ${claim.businessId}
-
-                </p>
-
-
-                <p>
-
-                    <strong>User ID:</strong>
-
-                    ${claim.userId}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Status:</strong>
-
-                    ${escapeAdminHtml(
-
-                        claim.status || ""
-
-                    )}
-
-                </p>
-
-
-                <button
-
-                    onclick="approveClaim(
-
-                        ${claim.id}
-
-                    )">
-
-                    Approve
-
-                </button>
-
-
-                <button
-
-                    onclick="rejectClaim(
-
-                        ${claim.id}
-
-                    )">
-
-                    Reject
-
-                </button>
-
-
-                <button
-
-                    onclick="deleteBusinessClaim(
-
-                        ${claim.id}
-
-                    )">
-
-                    Delete Claim
-
-                </button>
-
-            </div>
-
-        `;
-
-    });
-
-}
-
-
-// ==============================
-
-// APPROVE BUSINESS CLAIM
-
-// ==============================
-
-function approveClaim(
-
-    claimId
-
-) {
-
-    if (!confirm(
-
-        "Approve this business claim?"
-
-    )) {
-
-        return;
-
-    }
-
-
-    fetch(
-
-        CLAIM_API +
-
-        "/" +
-
-        claimId +
-
-        "/status?status=APPROVED",
-
-        {
-
-            method: "PUT"
-
-        }
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Claim approval failed"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(data) {
-
-            alert(
-
-                "Business claim approved successfully!"
-
-            );
-
-
-            loadBusinessClaims();
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            alert(
-
-                "Business claim could not be approved."
-
-            );
-
-        });
-
-}
-
-
-// ==============================
-
-// REJECT BUSINESS CLAIM
-
-// ==============================
-
-function rejectClaim(
-
-    claimId
-
-) {
-
-    if (!confirm(
-
-        "Reject this business claim?"
-
-    )) {
-
-        return;
-
-    }
-
-
-    fetch(
-
-        CLAIM_API +
-
-        "/" +
-
-        claimId +
-
-        "/status?status=REJECTED",
-
-        {
-
-            method: "PUT"
-
-        }
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Claim rejection failed"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(data) {
-
-            alert(
-
-                "Business claim rejected!"
-
-            );
-
-
-            loadBusinessClaims();
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            alert(
-
-                "Business claim could not be rejected."
-
-            );
-
-        });
-
-}
-
-
-// ==============================
-
-// DELETE BUSINESS CLAIM
-
-// ==============================
-
-function deleteBusinessClaim(
-
-    claimId
-
-) {
-
-    if (!confirm(
-
-        "Delete this business claim?"
-
-    )) {
-
-        return;
-
-    }
-
-
-    fetch(
-
-        CLAIM_API +
-
-        "/" +
-
-        claimId,
-
-        {
-
-            method: "DELETE"
-
-        }
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Claim delete failed"
-
-                );
-
-            }
-
-
-            alert(
-
-                "Business claim deleted successfully!"
-
-            );
-
-
-            loadBusinessClaims();
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            alert(
-
-                "Business claim could not be deleted."
-
-            );
-
-        });
-
-}
-
-
-// ==============================
-
-// LOAD USERS
-
-// ==============================
-
-function loadUsers() {
-
-    fetch(
-
-        USER_API
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "User API Error"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(users) {
-
-            displayUsers(
-
-                users
-
-            );
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            const userList =
-
-                document.getElementById(
-
-                    "userList"
-
-                );
-
-
-            if (userList) {
-
-                userList.innerHTML =
-
-                    `<p class="error-message">
-
-                        Unable to load users.
-
-                    </p>`;
-
-            }
-
-        });
-
-}
-
-
-// ==============================
-
-// DISPLAY USERS
-
-// ==============================
-
-function displayUsers(
-
-    users
-
-) {
-
-    const userList =
-
-        document.getElementById(
-
-            "userList"
-
-        );
-
-
-    if (!userList) {
-
-        return;
-
-    }
-
-
-    userList.innerHTML = "";
-
-
-    if (users.length === 0) {
-
-        userList.innerHTML =
-
-            `<p>No users found.</p>`;
-
-        return;
-
-    }
-
-
-    users.forEach(function(user) {
-
-        userList.innerHTML += `
-
-            <div class="user-card">
-
-                <p>
-
-                    <strong>User ID:</strong>
-
-                    ${user.id}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Name:</strong>
-
-                    ${escapeAdminHtml(
-
-                        user.name || ""
-
-                    )}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Email:</strong>
-
-                    ${escapeAdminHtml(
-
-                        user.email || ""
-
-                    )}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Role:</strong>
-
-                    ${escapeAdminHtml(
-
-                        user.role || "USER"
-
-                    )}
-
-                </p>
-
-
-                <button
-
-                    onclick="deleteUser(
-
-                        ${user.id}
-
-                    )">
-
-                    Delete User
-
-                </button>
-
-            </div>
-
-        `;
-
-    });
-
-}
-
-
-// ==============================
-
-// DELETE USER
-
-// ==============================
-
-function deleteUser(
-
-    userId
-
-) {
-
-    if (!confirm(
-
-        "Delete this user?"
-
-    )) {
-
-        return;
-
-    }
-
-
-    fetch(
-
-        USER_API +
-
-        "/" +
-
-        userId,
-
-        {
-
-            method: "DELETE"
-
-        }
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "User delete failed"
-
-                );
-
-            }
-
-            return response.text();
-
-        })
-
-        .then(function(data) {
-
-            alert(
-
-                "User deleted successfully!"
-
-            );
-
-
-            loadUsers();
-
-            loadDashboardMetrics();
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            alert(
-
-                "User could not be deleted."
-
-            );
-
-        });
-
-}
-
-
-// ==============================
-
-// ESCAPE ADMIN HTML
-
-// ==============================
-
-function escapeAdminHtml(
-
-    value
-
-) {
-
-    if (
-
-        value === null ||
-
-        value === undefined
-
-    ) {
-
+function esc(value) {
+    if (value === null || value === undefined) {
         return "";
-
     }
-
 
     return String(value)
-
-        .replace(
-
-            /&/g,
-
-            "&amp;"
-
-        )
-
-        .replace(
-
-            /</g,
-
-            "&lt;"
-
-        )
-
-        .replace(
-
-            />/g,
-
-            "&gt;"
-
-        )
-
-        .replace(
-
-            /"/g,
-
-            "&quot;"
-
-        )
-
-        .replace(
-
-            /'/g,
-
-            "&#039;"
-
-        );
-
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 
+function toArray(data) {
+    if (Array.isArray(data)) {
+        return data;
+    }
 
-// ==============================
-
-// LOAD WEBSITES
-
-// ==============================
-
-function loadWebsites() {
-
-    fetch(
-
-        WEBSITE_API
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Website API Error"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(websites) {
-
-            displayWebsites(
-
-                websites
-
-            );
-
-
-            loadSeoWebsiteOptions(
-
-                websites
-
-            );
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            const websiteList =
-
-                document.getElementById(
-
-                    "websiteList"
-
-                );
-
-
-            if (websiteList) {
-
-                websiteList.innerHTML =
-
-                    `<p class="error-message">
-
-                        Unable to load websites.
-
-                    </p>`;
-
-            }
-
-        });
-
+    return data && Array.isArray(data.content) ? data.content : [];
 }
 
+function safeHref(url) {
+    const value = String(url || "").trim();
 
-// ==============================
-
-// DISPLAY WEBSITES
-
-// ==============================
-
-function displayWebsites(
-
-    websites
-
-) {
-
-    const websiteList =
-
-        document.getElementById(
-
-            "websiteList"
-
-        );
-
-
-    if (!websiteList) {
-
-        return;
-
+    if (/^https?:\/\//i.test(value)) {
+        return value;
     }
 
+    return "https://" + value;
+}
 
-    websiteList.innerHTML = "";
+function titleAttr(text) {
+    return text ? ' title="' + esc(text) + '"' : "";
+}
 
+function titleCase(text) {
+    const value = String(text || "").toLowerCase();
 
-    if (websites.length === 0) {
+    return value.charAt(0).toUpperCase() + value.slice(1);
+}
 
-        websiteList.innerHTML =
-
-            `<p>No websites found.</p>`;
-
-        return;
-
+function formatDateTime(value) {
+    if (!value) {
+        return "";
     }
 
+    const date = Array.isArray(value)
+        ? new Date(value[0], value[1] - 1, value[2], value[3] || 0, value[4] || 0)
+        : new Date(value);
 
-    websites.forEach(function(website) {
+    if (isNaN(date.getTime())) {
+        return String(value);
+    }
 
-        websiteList.innerHTML += `
+    return date.toLocaleString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false
+    });
+}
 
-            <div class="website-card">
-
-                <p>
-
-                    <strong>Website ID:</strong>
-
-                    ${website.id}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Name:</strong>
-
-                    ${escapeAdminHtml(
-
-                        website.name || ""
-
-                    )}
-
-                </p>
-
-
-                <p>
-
-                    <strong>URL:</strong>
-
-                    ${escapeAdminHtml(
-
-                        website.url || ""
-
-                    )}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Description:</strong>
-
-                    ${escapeAdminHtml(
-
-                        website.description || ""
-
-                    )}
-
-                </p>
-
-
-                <button
-
-                    onclick="deleteWebsite(
-
-                        ${website.id}
-
-                    )">
-
-                    Delete Website
-
-                </button>
-
-            </div>
-
-        `;
-
+function userName(id) {
+    const user = state.users.rows.find(function (item) {
+        return String(item.id) === String(id);
     });
 
+    return user ? (user.name || user.email || "") : "";
 }
 
-
-// ==============================
-
-// DELETE WEBSITE
-
-// ==============================
-
-function deleteWebsite(
-
-    websiteId
-
-) {
-
-    if (!confirm(
-
-        "Delete this website?"
-
-    )) {
-
-        return;
-
-    }
-
-
-    fetch(
-
-        WEBSITE_API +
-
-        "/" +
-
-        websiteId,
-
-        {
-
-            method: "DELETE"
-
-        }
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Website delete failed"
-
-                );
-
-            }
-
-            return response.text();
-
-        })
-
-        .then(function(data) {
-
-            alert(
-
-                "Website deleted successfully!"
-
-            );
-
-
-            loadWebsites();
-
-            loadDashboardMetrics();
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            alert(
-
-                "Website could not be deleted."
-
-            );
-
-        });
-
-}
-
-
-// ==============================
-
-// SEO WEBSITE OPTIONS
-
-// ==============================
-
-function loadSeoWebsiteOptions(
-
-    websites
-
-) {
-
-    const seoWebsite =
-
-        document.getElementById(
-
-            "seoWebsite"
-
-        );
-
-
-    if (!seoWebsite) {
-
-        return;
-
-    }
-
-
-    seoWebsite.innerHTML =
-
-        `<option value="">
-
-            Select a website
-
-        </option>`;
-
-
-    websites.forEach(function(website) {
-
-        const option =
-
-            document.createElement(
-
-                "option"
-
-            );
-
-
-        option.value =
-
-            website.id;
-
-
-        option.textContent =
-
-            website.name ||
-
-            website.url;
-
-
-        option.dataset.seoTitle =
-
-            website.seoTitle ||
-
-            "";
-
-
-        option.dataset.seoDescription =
-
-            website.seoDescription ||
-
-            "";
-
-
-        option.dataset.canonicalUrl =
-
-            website.canonicalUrl ||
-
-            "";
-
-
-        seoWebsite.appendChild(
-
-            option
-
-        );
-
+function websiteName(id) {
+    const website = state.websites.rows.find(function (item) {
+        return String(item.id) === String(id);
     });
 
+    return website ? (website.name || website.url || "") : "";
+}
+
+function getLoggedInUser() {
+    try {
+        return JSON.parse(localStorage.getItem("loggedInUser"));
+    } catch (error) {
+        return null;
+    }
+}
+
+let toastTimer = null;
+
+function toast(message) {
+    const element = $("toast");
+
+    element.textContent = message;
+    element.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer = setTimeout(function () {
+        element.classList.remove("show");
+    }, 3000);
+}
+
+function showGate() {
+    $("gate").hidden = false;
+}
+
+// Server se JSON mangwata hai. 401/403 par login wala popup dikhata hai.
+async function fetchJson(url, options) {
+    const response = await fetch(
+        url,
+        Object.assign({ credentials: "same-origin" }, options)
+    );
+
+    if (response.status === 401 || response.status === 403) {
+        showGate();
+        throw new Error("AUTH");
+    }
+
+    if (response.status === 429) {
+        throw new Error("RATE");
+    }
+
+    if (!response.ok) {
+        throw new Error("HTTP " + response.status);
+    }
+
+    const text = await response.text();
+
+    if (!text) {
+        return null;
+    }
+
+    try {
+        return JSON.parse(text);
+    } catch (error) {
+        return text;
+    }
 }
 
 
-// ==============================
+/* =========================================================
+   ROW HELPERS (local state update)
+   ========================================================= */
 
-// LOAD SELECTED SEO DATA
+function findRow(key, id) {
+    return state[key].rows.find(function (row) {
+        return String(row.id) === String(id);
+    });
+}
 
-// ==============================
+function removeRow(key, id) {
+    state[key].rows = state[key].rows.filter(function (row) {
+        return String(row.id) !== String(id);
+    });
+}
 
-function loadSelectedSeoData() {
+function replaceRow(key, id, data) {
+    state[key].rows = state[key].rows.map(function (row) {
+        return String(row.id) === String(id)
+            ? Object.assign({}, row, data)
+            : row;
+    });
+}
 
-    const seoWebsite =
-
-        document.getElementById(
-
-            "seoWebsite"
-
-        );
-
-
-    if (!seoWebsite) {
-
-        return;
-
-    }
-
-
-    const selectedOption =
-
-        seoWebsite.options[
-
-            seoWebsite.selectedIndex
-
-        ];
-
-
-    const seoTitle =
-
-        document.getElementById(
-
-            "seoTitle"
-
-        );
-
-
-    const seoDescription =
-
-        document.getElementById(
-
-            "seoDescription"
-
-        );
-
-
-    const canonicalUrl =
-
-        document.getElementById(
-
-            "canonicalUrl"
-
-        );
-
-
-    if (
-
-        !selectedOption ||
-
-        !selectedOption.value
-
-    ) {
-
-        seoTitle.value = "";
-
-        seoDescription.value = "";
-
-        canonicalUrl.value = "";
-
-        return;
-
-    }
-
-
-    seoTitle.value =
-
-        selectedOption.dataset.seoTitle ||
-
-        "";
-
-
-    seoDescription.value =
-
-        selectedOption.dataset.seoDescription ||
-
-        "";
-
-
-    canonicalUrl.value =
-
-        selectedOption.dataset.canonicalUrl ||
-
-        "";
-
+function dropReportsOfReview(reviewId) {
+    state.reports.rows = state.reports.rows.filter(function (report) {
+        return String(report.reviewId) !== String(reviewId);
+    });
 }
 
 
-// ==============================
+/* =========================================================
+   FILTER + PAGINATION
+   ========================================================= */
 
-// UPDATE SEO SETTINGS
+function searchText(key, row) {
+    let text = JSON.stringify(row);
 
-// ==============================
-
-function updateSeo() {
-
-    const seoWebsite =
-
-        document.getElementById(
-
-            "seoWebsite"
-
-        );
-
-
-    const seoTitle =
-
-        document.getElementById(
-
-            "seoTitle"
-
-        ).value;
-
-
-    const seoDescription =
-
-        document.getElementById(
-
-            "seoDescription"
-
-        ).value;
-
-
-    const canonicalUrl =
-
-        document.getElementById(
-
-            "canonicalUrl"
-
-        ).value;
-
-
-    const seoMessage =
-
-        document.getElementById(
-
-            "seoMessage"
-
-        );
-
-
-    if (!seoWebsite.value) {
-
-        seoMessage.textContent =
-
-            "Please select a website.";
-
-
-        seoMessage.className =
-
-            "message error-message";
-
-
-        return;
-
+    if (key === "queue" || key === "hidden") {
+        text += " " + userName(row.userId) + " " + websiteName(row.websiteId);
     }
 
-
-    const websiteId =
-
-        seoWebsite.value;
-
-
-    const params =
-
-        new URLSearchParams();
-
-
-    if (
-
-        seoTitle.trim() !== ""
-
-    ) {
-
-        params.append(
-
-            "seoTitle",
-
-            seoTitle
-
-        );
-
+    if (key === "reports") {
+        text += " " + userName(row.userId);
     }
 
+    return text.toLowerCase();
+}
 
-    if (
+function filteredRows(key) {
+    const rows = state[key].rows;
 
-        seoDescription.trim() !== ""
-
-    ) {
-
-        params.append(
-
-            "seoDescription",
-
-            seoDescription
-
-        );
-
+    if (!searchQuery) {
+        return rows;
     }
 
+    return rows.filter(function (row) {
+        return searchText(key, row).indexOf(searchQuery) !== -1;
+    });
+}
 
-    if (
+function pageOf(key) {
+    const all = filteredRows(key);
+    const pages = Math.max(1, Math.ceil(all.length / PAGE_SIZE));
+    const section = state[key];
 
-        canonicalUrl.trim() !== ""
-
-    ) {
-
-        params.append(
-
-            "canonicalUrl",
-
-            canonicalUrl
-
-        );
-
+    if (section.page > pages) {
+        section.page = pages;
     }
 
+    if (section.page < 1) {
+        section.page = 1;
+    }
 
-    fetch(
+    const start = (section.page - 1) * PAGE_SIZE;
 
-        WEBSITE_API +
+    return {
+        all: all,
+        pages: pages,
+        start: start,
+        items: all.slice(start, start + PAGE_SIZE)
+    };
+}
 
-        "/" +
+function pagerHtml(key, view) {
+    const page = state[key].page;
+    const from = view.start + 1;
+    const to = view.start + view.items.length;
 
-        websiteId +
+    return (
+        '<div class="pager">' +
+        "<span>Showing " + from + "-" + to + " of " + view.all.length + " " + SECTIONS[key].unit + "</span>" +
+        '<div class="pager-buttons">' +
+        '<button type="button" data-action="page" data-section="' + key + '" data-dir="-1" aria-label="Previous page"' +
+        (page <= 1 ? " disabled" : "") + ">&lsaquo;</button>" +
+        "<span>Page " + page + " of " + view.pages + "</span>" +
+        '<button type="button" data-action="page" data-section="' + key + '" data-dir="1" aria-label="Next page"' +
+        (page >= view.pages ? " disabled" : "") + ">&rsaquo;</button>" +
+        "</div></div>"
+    );
+}
 
-        "/seo?" +
 
-        params.toString(),
+/* =========================================================
+   HTML BUILDERS
+   ========================================================= */
 
-        {
+function badge(status) {
+    const value = String(status || "PENDING").toUpperCase();
+    let cls = "badge";
 
-            method: "PUT"
+    if (["APPROVED", "REVIEWED", "VERIFIED", "ACTIVE"].indexOf(value) !== -1) {
+        cls += " badge-ok";
+    } else if (["REJECTED", "HIDDEN", "DELETED", "BLOCKED", "SUSPENDED"].indexOf(value) !== -1) {
+        cls += " badge-bad";
+    }
 
+    return '<span class="' + cls + '">' + esc(value) + "</span>";
+}
+
+function roleBadge(role) {
+    const value = String(role || "USER").toUpperCase();
+    let cls = "badge";
+
+    if (value === "ADMIN") {
+        cls += " badge-admin";
+    } else if (value === "MODERATOR") {
+        cls += " badge-moderator";
+    }
+
+    return '<span class="' + cls + '">' + esc(value) + "</span>";
+}
+
+function actionButton(label, action, data, cls) {
+    const attrs = Object.keys(data).map(function (name) {
+        return " data-" + name + '="' + esc(data[name]) + '"';
+    }).join("");
+
+    return (
+        '<button type="button" class="btn btn-small ' + (cls || "btn-soft") +
+        '" data-action="' + action + '"' + attrs + ">" + esc(label) + "</button>"
+    );
+}
+
+function table(headers, rows) {
+    return (
+        '<div class="table-wrap"><table><thead><tr>' +
+        headers.map(function (header) {
+            return '<th scope="col">' + header + "</th>";
+        }).join("") +
+        "</tr></thead><tbody>" + rows.join("") + "</tbody></table></div>"
+    );
+}
+
+function ratingCell(rating) {
+    return (
+        '<span class="star" aria-hidden="true">&#9733;</span> ' + esc(rating) +
+        '<span class="sr-only"> out of 5</span>'
+    );
+}
+
+
+/* =========================================================
+   SECTION RENDERERS
+   ========================================================= */
+
+function renderQueue(items) {
+    return table(
+        ["Review", "User", "Website", "Rating", "Comment", "Status", "Actions"],
+        items.map(function (review) {
+            const id = review.id;
+
+            return (
+                "<tr>" +
+                "<td><strong>#" + esc(id) + "</strong></td>" +
+                "<td" + titleAttr(userName(review.userId)) + ">" + esc(review.userId) + "</td>" +
+                "<td" + titleAttr(websiteName(review.websiteId)) + ">" + esc(review.websiteId) + "</td>" +
+                "<td>" + ratingCell(review.rating) + "</td>" +
+                '<td class="comment-cell">' + esc(review.comment) + "</td>" +
+                "<td>" + badge(review.status) + "</td>" +
+                '<td><div class="actions">' +
+                actionButton("Approve", "review-status", { id: id, status: "APPROVED" }) +
+                actionButton("Reject", "review-status", { id: id, status: "REJECTED" }) +
+                actionButton("Hide", "review-status", { id: id, status: "HIDDEN" }) +
+                "</div></td></tr>"
+            );
+        })
+    );
+}
+
+function renderHidden(items) {
+    return '<ul class="list">' + items.map(function (review) {
+        return (
+            '<li class="list-row"><div class="list-main">' +
+            "<strong>Review #" + esc(review.id) + " &middot; " + esc(review.rating) + " of 5</strong>" +
+            (review.comment ? '<p class="list-text">' + esc(review.comment) + "</p>" : "") +
+            '<span class="meta"' + titleAttr(userName(review.userId)) + ">User " + esc(review.userId) +
+            " &middot; Website " + esc(review.websiteId) + "</span>" +
+            "</div>" +
+            actionButton("Restore", "restore", { id: review.id }) +
+            "</li>"
+        );
+    }).join("") + "</ul>";
+}
+
+function renderClaims(items) {
+    return '<ul class="list">' + items.map(function (claim) {
+        const status = String(claim.status || "").toUpperCase();
+        let buttons = "";
+
+        if (status !== "APPROVED") {
+            buttons += actionButton("Approve", "claim-status", { id: claim.id, status: "APPROVED" });
         }
 
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "SEO update failed"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(website) {
-
-            seoMessage.textContent =
-
-                "SEO settings updated successfully.";
-
-
-            seoMessage.className =
-
-                "message success-message";
-
-
-            const selectedOption =
-
-                seoWebsite.options[
-
-                    seoWebsite.selectedIndex
-
-                ];
-
-
-            selectedOption.dataset.seoTitle =
-
-                website.seoTitle ||
-
-                "";
-
-
-            selectedOption.dataset.seoDescription =
-
-                website.seoDescription ||
-
-                "";
-
-
-            selectedOption.dataset.canonicalUrl =
-
-                website.canonicalUrl ||
-
-                "";
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-
-            seoMessage.textContent =
-
-                "SEO settings could not be updated.";
-
-
-            seoMessage.className =
-
-                "message error-message";
-
-        });
-
-}
-
-
-// ==============================
-
-// LOAD AUDIT LOGS
-
-// ==============================
-
-function loadAuditLogs() {
-
-    fetch(
-
-        AUDIT_LOG_API
-
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-
-                    "Audit Log API Error"
-
-                );
-
-            }
-
-            return response.json();
-
-        })
-
-        .then(function(logs) {
-
-            displayAuditLogs(
-
-                logs
-
-            );
-
-        })
-
-        .catch(function(error) {
-
-            console.error(error);
-
-            const auditLogList =
-
-                document.getElementById(
-
-                    "auditLogList"
-
-                );
-
-
-            if (auditLogList) {
-
-                auditLogList.innerHTML =
-
-                    `<p class="error-message">
-
-                        Unable to load audit logs.
-
-                    </p>`;
-
-            }
-
-        });
-
-}
-
-
-// ==============================
-
-// DISPLAY AUDIT LOGS
-
-// ==============================
-
-function displayAuditLogs(
-
-    logs
-
-) {
-
-    const auditLogList =
-
-        document.getElementById(
-
-            "auditLogList"
-
+        if (status !== "REJECTED") {
+            buttons += actionButton("Reject", "claim-status", { id: claim.id, status: "REJECTED" });
+        }
+
+        buttons += actionButton("Delete claim", "claim-delete", { id: claim.id }, "btn-outline");
+
+        return (
+            '<li class="list-row"><div class="list-main">' +
+            "<strong>Claim #" + esc(claim.id) + " &middot; Business " + esc(claim.businessId) +
+            " &middot; User " + esc(claim.userId) + "</strong>" +
+            '<div class="actions mt">' + buttons + "</div>" +
+            "</div>" +
+            '<div class="list-side">' + badge(claim.status) + "</div>" +
+            "</li>"
         );
+    }).join("") + "</ul>";
+}
 
+function renderReports(items) {
+    return table(
+        ["Report", "Review", "Reported by", "Reason", "Status", "Actions"],
+        items.map(function (report) {
+            const status = String(report.status || "PENDING").toUpperCase();
+            let buttons = "";
 
-    if (!auditLogList) {
+            if (status === "PENDING") {
+                buttons += actionButton("Mark reviewed", "report-status", { id: report.id, status: "REVIEWED" });
+                buttons += actionButton("Reject report", "report-status", { id: report.id, status: "REJECTED" });
+            }
 
-        return;
+            buttons += actionButton("Delete review", "report-delete-review", { id: report.reviewId }, "btn-outline");
 
+            return (
+                "<tr>" +
+                "<td><strong>#" + esc(report.id) + "</strong></td>" +
+                "<td>#" + esc(report.reviewId) + "</td>" +
+                "<td" + titleAttr(userName(report.userId)) + ">User " + esc(report.userId) + "</td>" +
+                '<td class="comment-cell">' + esc(report.reason) + "</td>" +
+                "<td>" + badge(status) + "</td>" +
+                '<td><div class="actions">' + buttons + "</div></td>" +
+                "</tr>"
+            );
+        })
+    );
+}
+
+function renderUsers(items) {
+    return table(
+        ["User", "Role", "Actions"],
+        items.map(function (user) {
+            return (
+                "<tr>" +
+                '<td><span class="cell-title">' + esc(user.name || "No name") + "</span>" +
+                '<span class="cell-sub">' + esc(user.email) + " &middot; ID " + esc(user.id) + "</span></td>" +
+                "<td>" + roleBadge(user.role) + "</td>" +
+                '<td><div class="actions">' +
+                actionButton("Delete user", "user-delete", { id: user.id }, "btn-outline") +
+                "</div></td></tr>"
+            );
+        })
+    );
+}
+
+function renderWebsites(items) {
+    return table(
+        ["Website", "Description", "Actions"],
+        items.map(function (website) {
+            return (
+                "<tr>" +
+                '<td><span class="cell-title">' + esc(website.name || "Unnamed website") + "</span>" +
+                (website.url
+                    ? '<span class="cell-sub"><a href="' + esc(safeHref(website.url)) +
+                      '" target="_blank" rel="noopener noreferrer">' + esc(website.url) + "</a></span>"
+                    : "") +
+                "</td>" +
+                '<td class="comment-cell">' + esc(website.description) + "</td>" +
+                '<td><div class="actions">' +
+                actionButton("Delete website", "website-delete", { id: website.id }, "btn-outline") +
+                "</div></td></tr>"
+            );
+        })
+    );
+}
+
+function actionLabel(log) {
+    let action = String(log.action || "").toUpperCase();
+    const type = String(log.entityType || "").toUpperCase();
+
+    if (type && action.indexOf(type + "_") === 0) {
+        action = action.slice(type.length + 1);
     }
 
+    return action.toLowerCase().replace(/_/g, " ");
+}
 
-    auditLogList.innerHTML = "";
+function renderLogs(items) {
+    return '<ul class="list">' + items.map(function (log) {
+        const details = String(log.details || "").replace(/->/g, "\u2192");
+        const by = log.performedBy !== null && log.performedBy !== undefined
+            ? "performed by user #" + log.performedBy
+            : "performed by system";
+
+        return (
+            '<li class="list-row"><div class="list-main">' +
+            "<strong>" + esc(titleCase(String(log.entityType || "").replace(/_/g, " "))) + " #" + esc(log.entityId) +
+            " &middot; " + esc(actionLabel(log)) + "</strong>" +
+            (details ? '<p class="list-text">' + esc(details) + "</p>" : "") +
+            '<span class="meta">Log #' + esc(log.id) + " &middot; " + esc(by) + "</span>" +
+            "</div>" +
+            '<span class="list-time">' + esc(formatDateTime(log.createdAt)) + "</span>" +
+            "</li>"
+        );
+    }).join("") + "</ul>";
+}
 
 
-    if (logs.length === 0) {
+/* =========================================================
+   RENDER
+   ========================================================= */
 
-        auditLogList.innerHTML =
+function renderSection(key) {
+    const section = state[key];
+    const config = SECTIONS[key];
+    const body = $(config.body);
+    const pager = $(config.pager);
 
-            `<p>No audit logs found.</p>`;
-
+    if (!body || !pager) {
         return;
-
     }
 
+    if (section.status === "loading") {
+        body.innerHTML = '<p class="state">Loading...</p>';
+        pager.innerHTML = "";
+        return;
+    }
 
-    logs.forEach(function(log) {
+    if (section.status === "error") {
+        body.innerHTML =
+            '<p class="state error">' + esc(section.error) + " " +
+            '<button type="button" class="btn btn-small btn-outline" data-action="retry" data-section="' +
+            key + '">Retry</button></p>';
+        pager.innerHTML = "";
+        return;
+    }
 
-        auditLogList.innerHTML += `
+    const view = pageOf(key);
 
-            <div class="report-card">
+    if (view.all.length === 0) {
+        body.innerHTML =
+            '<p class="state">' +
+            esc(searchQuery && section.rows.length ? "Nothing matches your search." : config.empty) +
+            "</p>";
+        pager.innerHTML = "";
+        return;
+    }
 
-                <p>
+    body.innerHTML = config.render(view.items);
+    pager.innerHTML = pagerHtml(key, view);
+}
 
-                    <strong>Log ID:</strong>
+function setText(id, value) {
+    const element = $(id);
 
-                    ${log.id}
+    if (element) {
+        element.textContent = value;
+    }
+}
 
-                </p>
+function renderStats() {
+    const ready = function (key) {
+        return state[key].status === "ok";
+    };
 
+    setText("totalUsers", ready("users") ? state.users.rows.length : "-");
+    setText("totalWebsites", ready("websites") ? state.websites.rows.length : "-");
+    setText("totalReviews", totalReviews === null ? "-" : totalReviews);
+    setText("pendingReviews", ready("queue") ? state.queue.rows.length : "-");
 
-                <p>
+    setText("countQueue", ready("queue") ? state.queue.rows.length : 0);
+    setText("countHidden", ready("hidden") ? state.hidden.rows.length : 0);
+    setText("countClaims", ready("claims") ? state.claims.rows.length : 0);
+    setText("countReports", ready("reports") ? state.reports.rows.length : 0);
+    setText("countUsers", ready("users") ? state.users.rows.length : 0);
+    setText("countWebsites", ready("websites") ? state.websites.rows.length : 0);
 
-                    <strong>Action:</strong>
+    if (ready("queue")) {
+        const count = state.queue.rows.length;
 
-                    ${escapeAdminHtml(
+        setText(
+            "queueNote",
+            count + (count === 1 ? " review" : " reviews") + " waiting for a decision"
+        );
+    } else {
+        setText("queueNote", "");
+    }
+}
 
-                        log.action || ""
-
-                    )}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Entity Type:</strong>
-
-                    ${escapeAdminHtml(
-
-                        log.entityType || ""
-
-                    )}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Entity ID:</strong>
-
-                    ${log.entityId}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Performed By:</strong>
-
-                    ${log.performedBy}
-
-                </p>
-
-
-                <p>
-
-                    <strong>Details:</strong>
-
-                    ${escapeAdminHtml(
-
-                        log.details || ""
-
-                    )}
-
-                </p>
+function renderAll() {
+    Object.keys(SECTIONS).forEach(renderSection);
+    renderStats();
+    fillSeoSelect();
+}
 
 
-                <p>
+/* =========================================================
+   LOADING DATA
+   ========================================================= */
 
-                    <strong>Date & Time:</strong>
+async function loadSection(key) {
+    const section = state[key];
 
-                    ${escapeAdminHtml(
+    section.status = "loading";
+    renderSection(key);
 
-                        log.createdAt || ""
+    try {
+        const data = await fetchJson(section.url);
 
-                    )}
+        section.rows = toArray(data);
 
-                </p>
+        if (key === "logs") {
+            sortLogs();
+        }
 
-            </div>
+        section.status = "ok";
+        section.error = "";
+    } catch (error) {
+        if (error.message === "AUTH") {
+            return;
+        }
 
-        `;
+        section.status = "error";
+        section.error = error.message === "RATE"
+            ? "Too many requests. Please wait a minute and retry."
+            : "Unable to load " + SECTIONS[key].unit + ".";
+    }
 
+    renderSection(key);
+    renderStats();
+
+    if (key === "websites") {
+        fillSeoSelect();
+    }
+}
+
+function sortLogs() {
+    state.logs.rows.sort(function (a, b) {
+        return Number(b.id) - Number(a.id);
+    });
+}
+
+async function refreshLogs() {
+    try {
+        state.logs.rows = toArray(await fetchJson(API.logs));
+        sortLogs();
+        state.logs.status = "ok";
+        renderSection("logs");
+    } catch (error) {
+        /* logs refresh fail ho to purana data hi dikhta rahega */
+    }
+}
+
+async function loadTotalReviews() {
+    try {
+        const data = await fetchJson(API.allReviews);
+
+        if (data && typeof data.totalElements === "number") {
+            totalReviews = data.totalElements;
+        } else if (Array.isArray(data)) {
+            totalReviews = data.length;
+        }
+    } catch (error) {
+        totalReviews = null;
+    }
+
+    renderStats();
+}
+
+async function loadAll() {
+    await Promise.all(Object.keys(state).map(loadSection));
+
+    renderAll();
+    loadTotalReviews();
+}
+
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
+const FAIL_TEXT = {
+    "user-delete": "User could not be deleted. They may still have reviews or other data linked.",
+    "website-delete": "Website could not be deleted. It may still have reviews or a business linked."
+};
+
+const handlers = {
+
+    "review-status": async function (button) {
+        const id = Number(button.dataset.id);
+        const status = button.dataset.status;
+
+        const question = {
+            APPROVED: "Approve this review?",
+            HIDDEN: "Hide this review? It will no longer appear on the public page.",
+            REJECTED: "Reject this review? This permanently deletes the review, its votes and its reports."
+        }[status];
+
+        if (!id || !question || !confirm(question)) {
+            return;
+        }
+
+        const row = findRow("queue", id);
+        const result = await fetchJson(API.reviewStatus(id, status), { method: "PUT" });
+
+        removeRow("queue", id);
+
+        if (status === "HIDDEN") {
+            const hiddenRow = result && result.id
+                ? result
+                : Object.assign({}, row, { status: "HIDDEN" });
+
+            state.hidden.rows.unshift(hiddenRow);
+        }
+
+        if (status === "REJECTED") {
+            removeRow("hidden", id);
+            dropReportsOfReview(id);
+
+            if (totalReviews !== null && totalReviews > 0) {
+                totalReviews--;
+            }
+        }
+
+        toast({
+            APPROVED: "Review approved.",
+            HIDDEN: "Review hidden.",
+            REJECTED: "Review rejected and deleted."
+        }[status]);
+
+        afterChange();
+    },
+
+    "restore": async function (button) {
+        const id = Number(button.dataset.id);
+
+        if (!id || !confirm("Restore this review? It will appear on the public page again.")) {
+            return;
+        }
+
+        await fetchJson(API.reviewStatus(id, "APPROVED"), { method: "PUT" });
+
+        removeRow("hidden", id);
+        toast("Review restored.");
+        afterChange();
+    },
+
+    "report-status": async function (button) {
+        const id = Number(button.dataset.id);
+        const status = button.dataset.status;
+        const question = status === "REVIEWED" ? "Mark this report as reviewed?" : "Reject this report?";
+
+        if (!id || !confirm(question)) {
+            return;
+        }
+
+        const result = await fetchJson(API.reportStatus(id, status), { method: "PUT" });
+
+        replaceRow("reports", id, result && result.id ? result : { status: status });
+
+        toast(status === "REVIEWED" ? "Report marked as reviewed." : "Report rejected.");
+        afterChange();
+    },
+
+    "report-delete-review": async function (button) {
+        const reviewId = Number(button.dataset.id);
+
+        if (!reviewId || !confirm("Delete this reported review? This permanently deletes the review and every report about it.")) {
+            return;
+        }
+
+        await fetchJson(API.reviewStatus(reviewId, "REJECTED"), { method: "PUT" });
+
+        removeRow("queue", reviewId);
+        removeRow("hidden", reviewId);
+        dropReportsOfReview(reviewId);
+
+        if (totalReviews !== null && totalReviews > 0) {
+            totalReviews--;
+        }
+
+        toast("Review deleted.");
+        afterChange();
+    },
+
+    "claim-status": async function (button) {
+        const id = Number(button.dataset.id);
+        const status = button.dataset.status;
+        const question = status === "APPROVED" ? "Approve this business claim?" : "Reject this business claim?";
+
+        if (!id || !confirm(question)) {
+            return;
+        }
+
+        const result = await fetchJson(API.claimStatus(id, status), { method: "PUT" });
+
+        replaceRow("claims", id, result && result.id ? result : { status: status });
+
+        toast(status === "APPROVED" ? "Business claim approved." : "Business claim rejected.");
+        afterChange();
+    },
+
+    "claim-delete": async function (button) {
+        const id = Number(button.dataset.id);
+
+        if (!id || !confirm("Delete this business claim?")) {
+            return;
+        }
+
+        await fetchJson(BASE + "/business-claims/" + id, { method: "DELETE" });
+
+        removeRow("claims", id);
+        toast("Business claim deleted.");
+        afterChange();
+    },
+
+    "user-delete": async function (button) {
+        const id = Number(button.dataset.id);
+        const me = getLoggedInUser();
+
+        if (!id) {
+            return;
+        }
+
+        if (me && String(me.id) === String(id)) {
+            toast("You cannot delete your own account from the admin panel.");
+            return;
+        }
+
+        if (!confirm("Delete this user? This cannot be undone.")) {
+            return;
+        }
+
+        await fetchJson(BASE + "/users/" + id, { method: "DELETE" });
+
+        removeRow("users", id);
+        toast("User deleted.");
+        afterChange();
+    },
+
+    "website-delete": async function (button) {
+        const id = Number(button.dataset.id);
+
+        if (!id || !confirm("Delete this website? This cannot be undone.")) {
+            return;
+        }
+
+        await fetchJson(BASE + "/websites/" + id, { method: "DELETE" });
+
+        removeRow("websites", id);
+        toast("Website deleted.");
+        afterChange();
+    }
+};
+
+async function runAction(button) {
+    const action = button.dataset.action;
+    const handler = handlers[action];
+
+    if (!handler) {
+        return;
+    }
+
+    button.disabled = true;
+
+    try {
+        await handler(button);
+    } catch (error) {
+        if (error.message === "AUTH") {
+            return;
+        }
+
+        if (error.message === "RATE") {
+            toast("Too many requests. Please wait a minute and try again.");
+        } else {
+            toast(FAIL_TEXT[action] || "Action could not be completed. Please try again.");
+        }
+    } finally {
+        button.disabled = false;
+    }
+}
+
+function afterChange() {
+    renderAll();
+    refreshLogs();
+}
+
+function changePage(button) {
+    const key = button.dataset.section;
+    const direction = Number(button.dataset.dir);
+
+    if (!state[key]) {
+        return;
+    }
+
+    state[key].page += direction;
+    renderSection(key);
+
+    const target = document.querySelector(
+        '[data-action="page"][data-section="' + key + '"][data-dir="' + direction + '"]:not([disabled])'
+    ) || document.querySelector(
+        '[data-action="page"][data-section="' + key + '"]:not([disabled])'
+    );
+
+    if (target) {
+        target.focus();
+    }
+}
+
+
+/* =========================================================
+   SEO CONTROLS
+   ========================================================= */
+
+function setSeoMessage(text, type) {
+    const message = $("seoMessage");
+
+    message.textContent = text;
+    message.className = "form-message" + (type ? " " + type : "");
+}
+
+function fillSeoSelect() {
+    const select = $("seoWebsite");
+
+    if (!select) {
+        return;
+    }
+
+    const selected = select.value;
+
+    select.innerHTML = '<option value="">Select a website</option>' +
+        state.websites.rows.map(function (website) {
+            return '<option value="' + esc(website.id) + '">' +
+                esc(website.name || website.url || "Website " + website.id) + "</option>";
+        }).join("");
+
+    if (selected && findRow("websites", selected)) {
+        select.value = selected;
+    } else {
+        select.value = "";
+        fillSeoFields();
+    }
+}
+
+function fillSeoFields() {
+    const website = findRow("websites", $("seoWebsite").value);
+
+    $("seoTitle").value = website ? (website.seoTitle || "") : "";
+    $("seoDescription").value = website ? (website.seoDescription || "") : "";
+    $("canonicalUrl").value = website ? (website.canonicalUrl || "") : "";
+}
+
+async function saveSeo() {
+    const id = $("seoWebsite").value;
+    const button = $("seoSaveButton");
+
+    if (!id) {
+        setSeoMessage("Please select a website.", "error");
+        return;
+    }
+
+    const params = new URLSearchParams();
+    const values = {
+        seoTitle: $("seoTitle").value.trim(),
+        seoDescription: $("seoDescription").value.trim(),
+        canonicalUrl: $("canonicalUrl").value.trim()
+    };
+
+    Object.keys(values).forEach(function (name) {
+        if (values[name] !== "") {
+            params.append(name, values[name]);
+        }
     });
 
+    if (Array.from(params).length === 0) {
+        setSeoMessage("Enter at least one SEO value.", "error");
+        return;
+    }
+
+    button.disabled = true;
+    setSeoMessage("Saving...", "");
+
+    try {
+        const website = await fetchJson(
+            API.websiteSeo(id) + "?" + params.toString(),
+            { method: "PUT" }
+        );
+
+        replaceRow("websites", id, website && website.id ? website : values);
+        fillSeoFields();
+        setSeoMessage("SEO settings updated successfully.", "success");
+        refreshLogs();
+    } catch (error) {
+        if (error.message !== "AUTH") {
+            setSeoMessage("SEO settings could not be updated.", "error");
+        }
+    } finally {
+        button.disabled = false;
+    }
 }
 
 
-// ==============================
+/* =========================================================
+   ADMIN BOX, LOGOUT, NAVIGATION
+   ========================================================= */
 
-// PAGE LOAD
+function initials(name) {
+    const words = String(name).trim().split(/\s+/).filter(Boolean);
 
-// ==============================
-
-document.addEventListener(
-
-    "DOMContentLoaded",
-
-    function() {
-
-        loadDashboardMetrics();
-
-        loadModerationQueue();
-
-        loadHiddenReviews();
-
-        loadReports();
-
-        loadBusinessClaims();
-
-        loadUsers();
-
-        loadWebsites();
-
-        loadAuditLogs();
-
-
-        const seoWebsite =
-
-            document.getElementById(
-
-                "seoWebsite"
-
-            );
-
-
-        if (seoWebsite) {
-
-            seoWebsite.addEventListener(
-
-                "change",
-
-                loadSelectedSeoData
-
-            );
-
-        }
-
+    if (words.length >= 2) {
+        return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase();
     }
 
-);
+    return String(name).trim().slice(0, 2).toUpperCase() || "AD";
+}
+
+function setupAdminBox() {
+    const user = getLoggedInUser();
+    const name = (user && (user.name || user.email)) || "Admin";
+
+    setText("adminName", name);
+    setText("adminAvatar", initials(name));
+}
+
+async function logout() {
+    try {
+        await fetch(API.logout, { method: "POST", credentials: "same-origin" });
+    } catch (error) {
+        /* logout fail bhi ho to local data hata dete hain */
+    }
+
+    localStorage.removeItem("loggedInUser");
+    localStorage.removeItem("isAdmin");
+
+    window.location.href = "login.html";
+}
+
+let scrollTicking = false;
+
+function updateActiveNav() {
+    const links = Array.from(document.querySelectorAll(".nav-link"));
+    const ids = links.map(function (link) {
+        return link.dataset.target;
+    });
+
+    let current = ids[0];
+
+    ids.forEach(function (id) {
+        const section = $(id);
+
+        if (section && section.getBoundingClientRect().top <= 140) {
+            current = id;
+        }
+    });
+
+    if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 4) {
+        current = ids[ids.length - 1];
+    }
+
+    links.forEach(function (link) {
+        const active = link.dataset.target === current;
+
+        link.classList.toggle("active", active);
+
+        if (active) {
+            link.setAttribute("aria-current", "true");
+        } else {
+            link.removeAttribute("aria-current");
+        }
+    });
+
+    scrollTicking = false;
+}
+
+function setupEvents() {
+    document.addEventListener("click", function (event) {
+        const button = event.target.closest("[data-action]");
+
+        if (!button || button.disabled) {
+            return;
+        }
+
+        const action = button.dataset.action;
+
+        if (action === "page") {
+            changePage(button);
+        } else if (action === "retry") {
+            loadSection(button.dataset.section);
+        } else {
+            runAction(button);
+        }
+    });
+
+    $("logoutButton").addEventListener("click", logout);
+    $("seoWebsite").addEventListener("change", fillSeoFields);
+    $("seoSaveButton").addEventListener("click", saveSeo);
+
+    let searchTimer = null;
+
+    $("globalSearch").addEventListener("input", function (event) {
+        clearTimeout(searchTimer);
+
+        searchTimer = setTimeout(function () {
+            searchQuery = event.target.value.trim().toLowerCase();
+
+            Object.keys(state).forEach(function (key) {
+                state[key].page = 1;
+            });
+
+            Object.keys(SECTIONS).forEach(renderSection);
+        }, 150);
+    });
+
+    window.addEventListener("scroll", function () {
+        if (!scrollTicking) {
+            scrollTicking = true;
+            requestAnimationFrame(updateActiveNav);
+        }
+    }, { passive: true });
+}
+
+
+/* =========================================================
+   PAGE LOAD
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+    setupAdminBox();
+    setupEvents();
+    loadAll();
+});

@@ -23,14 +23,12 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-
         return new BCryptPasswordEncoder();
     }
 
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration configuration) throws Exception {
-
         return configuration.getAuthenticationManager();
     }
 
@@ -181,7 +179,8 @@ public class SecurityConfig {
                 // Static resources
                 .requestMatchers(
                         "/css/**",
-                        "/js/**"
+                        "/js/**",
+                        "/images/**" // <-- Images path added here
                 )
                 .permitAll()
 

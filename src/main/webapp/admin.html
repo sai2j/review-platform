@@ -8,71 +8,199 @@
 <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
-	<div class="admin-container">
-		<h1>Admin Panel</h1>
-		<p class="admin-subtitle">Admin Dashboard</p>
-		<hr>
-		<h2>Dashboard Overview</h2>
-		<div class="dashboard-cards">
-			<div class="dashboard-card">
-				<h3>Total Users</h3>
-				<p id="totalUsers">Loading...</p>
-			</div>
-			<div class="dashboard-card">
-				<h3>Total Websites</h3>
-				<p id="totalWebsites">Loading...</p>
-			</div>
 
-			<div class="dashboard-card">
-				<h3>Total Reviews</h3>
-				<p id="totalReviews">Loading...</p>
-			</div>
-			<div class="dashboard-card">
-				<h3>Pending Reviews</h3>
-				<p id="pendingReviews">Loading...</p>
-			</div>
+<div class="app">
 
+	<!-- ============ SIDEBAR ============ -->
+	<aside class="sidebar">
+		<div class="brand"><span class="brand-name">Review<span>Platform</span></span><small>Admin</small></div>
+
+		<nav class="side-nav" aria-label="Admin sections">
+			<a href="#overview" class="nav-link active" data-target="overview">Overview</a>
+			<a href="#queueSection" class="nav-link" data-target="queueSection">Review Queue <span class="count" id="countQueue">0</span></a>
+			<a href="#hiddenSection" class="nav-link" data-target="hiddenSection">Hidden Reviews <span class="count" id="countHidden">0</span></a>
+			<a href="#claimsSection" class="nav-link" data-target="claimsSection">Business Claims <span class="count" id="countClaims">0</span></a>
+			<a href="#reportsSection" class="nav-link" data-target="reportsSection">Reported Reviews <span class="count" id="countReports">0</span></a>
+			<a href="#usersSection" class="nav-link" data-target="usersSection">Users <span class="count" id="countUsers">0</span></a>
+			<a href="#websitesSection" class="nav-link" data-target="websitesSection">Websites <span class="count" id="countWebsites">0</span></a>
+			<a href="#seoSection" class="nav-link" data-target="seoSection">SEO Controls</a>
+			<a href="#logsSection" class="nav-link" data-target="logsSection">Audit Logs</a>
+		</nav>
+
+		<div class="side-user">
+			<div class="side-user-info">
+				<div class="avatar" id="adminAvatar" aria-hidden="true">AD</div>
+				<div class="side-user-text">
+					<strong id="adminName">Admin</strong>
+					<span>Admin access</span>
+				</div>
+			</div>
+			<button type="button" class="btn btn-small btn-outline" id="logoutButton">Log out</button>
 		</div>
-		<hr>
-		<h2>Review Moderation Queue</h2>
-		<div id="moderationList">Loading pending reviews...</div>
-		<hr>
-		<h2>Hidden Reviews</h2>
-		<div id="hiddenReviewList">Loading hidden reviews...</div>
-		<hr>
-		<h2>Business Claims</h2>
-		<div id="claimList">Loading claims...</div>
-		<hr>
-		<h2>Manage Users</h2>
-		<div id="userList">Loading users...</div>
-		<hr>
-		<h2>Manage Websites</h2>
-		<div id="websiteList">Loading websites...</div>
-		<hr>
-		<h2>Admin SEO Controls</h2>
-		<div class="seo-card">
-			<label for="seoWebsite"> Select Website </label> <select
-				id="seoWebsite">
-				<option value="">Select a website</option>
-			</select> <label for="seoTitle"> SEO Title </label> <input type="text"
-				id="seoTitle" placeholder="Enter SEO title"> <label
-				for="seoDescription"> SEO Description </label>
-			<textarea id="seoDescription" placeholder="Enter SEO description"
-				rows="4"></textarea>
-			<label for="canonicalUrl"> Canonical URL </label> <input type="text"
-				id="canonicalUrl" placeholder="Enter canonical URL">
-			<button class="seo-save-button" onclick="updateSeo()">Save
-				SEO Settings</button>
-			<p id="seoMessage" class="message"></p>
+	</aside>
+
+	<!-- ============ MAIN CONTENT ============ -->
+	<main class="content">
+
+		<header class="page-head" id="overview">
+			<div>
+				<h1>Admin Dashboard</h1>
+				<p>Moderate reviews, manage users and websites, and track every change.</p>
+			</div>
+			<label class="search">
+				<span class="sr-only">Search</span>
+				<input type="search" id="globalSearch" placeholder="Search reviews, users, websites" autocomplete="off">
+			</label>
+		</header>
+
+		<!-- Stat cards -->
+		<section class="stats" aria-label="Overview">
+			<div class="stat">
+				<span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg></span>
+				<div><span class="stat-label">Total Users</span><strong class="stat-value" id="totalUsers">-</strong></div>
+			</div>
+			<div class="stat">
+				<span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span>
+				<div><span class="stat-label">Total Websites</span><strong class="stat-value" id="totalWebsites">-</strong></div>
+			</div>
+			<div class="stat">
+				<span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.5A8 8 0 1 1 21 12z"/></svg></span>
+				<div><span class="stat-label">Total Reviews</span><strong class="stat-value" id="totalReviews">-</strong></div>
+			</div>
+			<div class="stat">
+				<span class="stat-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+				<div><span class="stat-label">Pending Reviews</span><strong class="stat-value" id="pendingReviews">-</strong></div>
+			</div>
+		</section>
+
+		<!-- Review Moderation Queue -->
+		<section class="card" id="queueSection">
+			<div class="card-head">
+				<h2>Review Moderation Queue</h2>
+				<span class="card-note" id="queueNote"></span>
+			</div>
+			<div id="queueBody"></div>
+			<div id="queuePager"></div>
+		</section>
+
+		<!-- Hidden Reviews + Business Claims -->
+		<div class="grid-2">
+			<section class="card" id="hiddenSection">
+				<div class="card-head">
+					<div>
+						<h2>Hidden Reviews</h2>
+						<p class="card-sub">Hidden from the public page, can be restored</p>
+					</div>
+				</div>
+				<div id="hiddenBody"></div>
+				<div id="hiddenPager"></div>
+			</section>
+
+			<section class="card" id="claimsSection">
+				<div class="card-head">
+					<div>
+						<h2>Business Claims</h2>
+						<p class="card-sub">Ownership requests from business users</p>
+					</div>
+				</div>
+				<div id="claimsBody"></div>
+				<div id="claimsPager"></div>
+			</section>
 		</div>
-		<hr>
-		<h2>Reported Reviews</h2>
-		<div id="reportList">Loading reports...</div>
-		<hr>
-		<h2>Audit Logs</h2>
-		<div id="auditLogList">Loading audit logs...</div>
-		<br> <a href="index.html"> ← Back to Home </a>
+
+		<!-- Reported Reviews -->
+		<section class="card" id="reportsSection">
+			<div class="card-head">
+				<div>
+					<h2>Reported Reviews</h2>
+					<p class="card-sub">Reviews flagged by other users</p>
+				</div>
+			</div>
+			<div id="reportsBody"></div>
+			<div id="reportsPager"></div>
+		</section>
+
+		<!-- Users + Websites -->
+		<div class="grid-2">
+			<section class="card" id="usersSection">
+				<div class="card-head">
+					<div>
+						<h2>Manage Users</h2>
+						<p class="card-sub">Accounts and their roles</p>
+					</div>
+				</div>
+				<div id="usersBody"></div>
+				<div id="usersPager"></div>
+			</section>
+
+			<section class="card" id="websitesSection">
+				<div class="card-head">
+					<div>
+						<h2>Manage Websites</h2>
+						<p class="card-sub">Listed websites and their profiles</p>
+					</div>
+				</div>
+				<div id="websitesBody"></div>
+				<div id="websitesPager"></div>
+			</section>
+		</div>
+
+		<!-- SEO + Audit Logs -->
+		<div class="grid-2">
+			<section class="card" id="seoSection">
+				<div class="card-head">
+					<div>
+						<h2>Admin SEO Controls</h2>
+						<p class="card-sub">Set how a website appears in search results</p>
+					</div>
+				</div>
+				<div class="form">
+					<label for="seoWebsite">Select website</label>
+					<select id="seoWebsite">
+						<option value="">Select a website</option>
+					</select>
+
+					<label for="seoTitle">SEO title</label>
+					<input type="text" id="seoTitle" placeholder="Enter SEO title">
+
+					<label for="seoDescription">SEO description</label>
+					<textarea id="seoDescription" rows="4" placeholder="Enter SEO description"></textarea>
+
+					<label for="canonicalUrl">Canonical URL</label>
+					<input type="text" id="canonicalUrl" placeholder="Enter canonical URL">
+
+					<button type="button" class="btn btn-primary" id="seoSaveButton">Save SEO settings</button>
+					<p id="seoMessage" class="form-message" role="status"></p>
+				</div>
+			</section>
+
+			<section class="card" id="logsSection">
+				<div class="card-head">
+					<div>
+						<h2>Audit Logs</h2>
+						<p class="card-sub">Latest actions taken by admins and moderators</p>
+					</div>
+				</div>
+				<div id="logsBody"></div>
+				<div id="logsPager"></div>
+			</section>
+		</div>
+
+	</main>
+</div>
+
+<!-- Shown when the visitor is not logged in as admin -->
+<div class="gate" id="gate" hidden>
+	<div class="gate-card" role="alertdialog" aria-labelledby="gateTitle">
+		<h2 id="gateTitle">Admin access required</h2>
+		<p>Please log in with an admin account to use this panel.</p>
+		<a class="btn btn-primary" href="login.html">Log in</a>
+		<a class="btn" href="index.html">Back to Home</a>
 	</div>
-	<script src="js/admin.js"></script>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="js/admin.js"></script>
 </body>
 </html>

@@ -66,7 +66,8 @@ public class UserController {
 
         User savedUser = userService.registerUser(
                 user.getEmail(),
-                user.getPassword());
+                user.getPassword(),
+                user.getName());
 
         return toUserResponseDTO(savedUser);
     }

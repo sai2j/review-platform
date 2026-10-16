@@ -1,4 +1,3 @@
-
 package com.nit.dto;
 
 import java.time.LocalDateTime;
@@ -8,6 +7,7 @@ public class ReviewResponseDTO {
 	private Integer rating;
 	private String comment;
 	private Long userId;
+	private String userName;
 	private Long websiteId;
 	private String status;
 	private String verificationStatus;
@@ -81,6 +81,14 @@ public class ReviewResponseDTO {
 
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 	public Long getWebsiteId() {

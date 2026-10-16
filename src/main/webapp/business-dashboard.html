@@ -1,93 +1,114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, follow">
-<title>Business Dashboard - Review Platform</title>
-<link rel="stylesheet" href="css/business-dashboard.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Dashboard | Review Platform</title>
+    <link rel="stylesheet" href="css/business-dashboard.css">
 </head>
-
 <body>
-	<header class="dashboard-navbar">
-		<div class="dashboard-navbar-container">
-			<a href="index.html" class="dashboard-brand"> <span
-				class="brand-star"> ★ </span> <span> Review <span
-					class="brand-highlight"> Platform </span>
-			</span>
-			</a>
-			<nav class="dashboard-nav-links">
-				<a href="index.html"> Home </a> <a href="user-dashboard.html">
-					My Dashboard </a>
-				<button type="button" id="logoutButton" class="logout-button">
-					Logout</button>
-			</nav>
-		</div>
-	</header>
-	<div class="dashboard-container">
-		<div class="dashboard-heading">
-			<div>
-				<h1>Business Dashboard</h1>
-				<p class="dashboard-subtitle">Manage your business and view
-					customer reviews</p>
-			</div>
-			<div class="dashboard-heading-actions">
-				<a href="subscription.html" class="dashboard-link"> Subscription
-				</a> <a href="user-dashboard.html" class="dashboard-link"> My
-					Dashboard </a> <a href="index.html" class="dashboard-link"> Home </a>
-			</div>
-		</div>
-		<hr>
-		<section class="dashboard-section">
-			<h2>Business Information</h2>
-			<div id="businessInfo">Loading business information...</div>
-		</section>
-		<hr>
-		<section class="dashboard-section">
-			<h2>Subscription</h2>
-			<div id="subscriptionInfo">Loading subscription information...
-			</div>
-		</section>
-		<hr>
-		<section class="dashboard-section">
-			<h2>Website Information</h2>
-			<div id="websiteInfo">Loading website information...</div>
-		</section>
-		<hr>
-		<section class="dashboard-section">
-			<h2>Review Summary</h2>
-			<div class="summary-box">
-				<div class="summary-card">
-					<h3>Average Rating</h3>
-					<p id="averageRating">0.0</p>
-				</div>
-				<div class="summary-card">
-					<h3>Total Reviews</h3>
-					<p id="reviewCount">0</p>
-				</div>
-				<div class="summary-card">
-					<h3>Response Rate</h3>
-					<p id="responseRate">0.0%</p>
-				</div>
-			</div>
-		</section>
-		<hr>
-		<section class="dashboard-section">
-			<h2>Rating Trend</h2>
-			<div id="ratingTrend">Loading rating trend...</div>
-		</section>
-		<hr>
-		<section class="dashboard-section">
-			<h2>Customer Reviews</h2>
-			<div id="reviewList">Loading reviews...</div>
-		</section>
-		<br>
-		<div class="dashboard-bottom-links">
-			<a href="subscription.html"> Manage Subscription </a> <a
-				href="user-dashboard.html"> ← Back to My Dashboard </a> <a
-				href="index.html"> Back to Home </a>
-		</div>
-	</div>
-	<script src="js/business-dashboard.js"></script>
+
+    <!-- TOP NAVIGATION -->
+    <header class="navbar">
+        <div class="nav-brand">Review Platform</div>
+        <div class="nav-links">
+            <a href="index.html">Home</a>
+            <a href="user-dashboard.html">My Dashboard</a>
+            <button id="logoutBtn" class="btn-logout">Logout</button>
+        </div>
+    </header>
+
+    <div class="dashboard-container">
+        <!-- HEADER SECTION -->
+        <div class="dashboard-header">
+            <div>
+                <h1>Business Dashboard</h1>
+                <p>Manage your business and view customer reviews.</p>
+            </div>
+            <div class="header-actions">
+                <a href="subscription.html" class="btn-outline">Subscription</a>
+                <a href="user-dashboard.html" class="btn-outline">My Dashboard</a>
+                <a href="index.html" class="btn-outline">Home</a>
+            </div>
+        </div>
+
+        <!-- BUSINESS INFORMATION -->
+        <section class="dashboard-section">
+            <h2>Business Information</h2>
+            <div class="info-card" id="businessInfoCard">
+                <p><strong>Business ID:</strong> <span id="bizId">-</span></p>
+                <p><strong>Name:</strong> <span id="bizName">-</span></p>
+                <p><strong>Description:</strong> <span id="bizDesc">-</span></p>
+                <p><strong>Official URL:</strong> <a id="bizUrl" href="#" target="_blank">-</a></p>
+                <p><strong>Status:</strong> <span id="bizStatus" class="badge-verified">-</span></p>
+            </div>
+        </section>
+
+        <!-- SUBSCRIPTION -->
+        <section class="dashboard-section">
+            <h2>Subscription</h2>
+            <div class="info-card">
+                <p id="subscriptionStatusText">No active subscription found.</p>
+                <a href="subscription.html" class="link-action">Choose a Plan</a>
+            </div>
+        </section>
+
+        <!-- WEBSITE INFORMATION -->
+        <section class="dashboard-section">
+            <h2>Website Information</h2>
+            <div class="info-card" id="websiteInfoCard">
+                <p><strong>Website ID:</strong> <span id="webId">-</span></p>
+                <p><strong>Name:</strong> <span id="webName">-</span></p>
+                <p><strong>URL:</strong> <a id="webUrl" href="#" target="_blank">-</a></p>
+                <p><strong>Description:</strong> <span id="webDesc">-</span></p>
+                <p><strong>Domain:</strong> <span id="webDomain">-</span></p>
+            </div>
+        </section>
+
+        <!-- REVIEW SUMMARY -->
+        <section class="dashboard-section">
+            <h2>Review Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-box">
+                    <span class="summary-label">Average Rating</span>
+                    <span class="summary-value" id="avgRating">0.0</span>
+                </div>
+                <div class="summary-box">
+                    <span class="summary-label">Total Reviews</span>
+                    <span class="summary-value" id="totalReviews">0</span>
+                </div>
+                <div class="summary-box">
+                    <span class="summary-label">Response Rate</span>
+                    <span class="summary-value" id="responseRate">0%</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- CUSTOMER REVIEWS WITH PAGINATION (5 per view) -->
+        <section class="dashboard-section">
+            <h2>Customer Reviews</h2>
+            <div id="customerReviewsContainer" class="reviews-grid-slides">
+                <!-- Dynamic Reviews injected via JS -->
+            </div>
+            
+            <!-- Pagination Dots & Controls -->
+            <div class="reviews-pagination" id="reviewsPagination">
+                <button id="prevReviewBtn" class="pagination-arrow" disabled>&larr;</button>
+                <div class="pagination-dots" id="paginationDots"></div>
+                <button id="nextReviewBtn" class="pagination-arrow">Next &rarr;</button>
+            </div>
+        </section>
+
+        <!-- FOOTER LINKS -->
+        <footer class="dashboard-footer">
+            <a href="subscription.html">Manage Subscriptions</a>
+            <span>•</span>
+            <a href="user-dashboard.html">Back to My Dashboard</a>
+            <span>•</span>
+            <a href="index.html">Back to Home</a>
+        </footer>
+    </div>
+
+    <script src="js/business-dashboard.js"></script>
 </body>
 </html>

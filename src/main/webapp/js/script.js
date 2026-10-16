@@ -908,10 +908,13 @@ function displayRecentReviews(
                     : "";
 
             const userName =
-                review.userId
-                    ? "User #" +
-                    review.userId
-                    : "User";
+                review.userName &&
+                review.userName.trim()
+                    ? review.userName.trim()
+                    : (review.userId
+                        ? "User #" +
+                        review.userId
+                        : "User");
 
             const initial =
                 getWebsiteInitial(

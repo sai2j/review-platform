@@ -39,6 +39,11 @@ public class BusinessClaimcontroller {
 		return businessClaimService.getApprovedClaimByUserId(userId);
 	}
 
+	@GetMapping("/user/{userId}/pending")
+	public BusinessClaim getPendingClaimByUserId(@PathVariable Long userId) {
+		return businessClaimService.getPendingClaimByUserId(userId);
+	}
+
 	@GetMapping("/business/{businessId}/approved")
 	public BusinessClaim getApprovedClaimByBusinessId(@PathVariable Long businessId) {
 		return businessClaimService.getApprovedClaimByBusinessId(businessId);

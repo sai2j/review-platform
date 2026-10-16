@@ -1,443 +1,265 @@
-* {
-	box-sizing: border-box;
-	margin: 0;
-	padding: 0;
-}
-html {
-	scroll-behavior: smooth;
+*, *::before, *::after {
+    box-sizing: border-box;
 }
 
 body {
-	margin: 0;
-	font-family: Arial, Helvetica, sans-serif;
-	background: #eaf7ff;
-	color: #111827;
-	min-height: 100vh;
-}
-.top-navbar {
-	width: 100%;
-	background: #0b1117;
-	border-bottom: 1px solid #24313d;
-	position: sticky;
-	top: 0;
-	z-index: 1000;
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f0f7ff; /* Light blue background */
+    color: #0b1117;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
-.navbar-container {
-	width: 100%;
-	max-width: 1200px;
-	min-height: 72px;
-	margin: 0 auto;
-	padding: 0 24px;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 20px;
+/* NAVBAR */
+.auth-navbar {
+    background: #0b1117;
+    color: #ffffff;
+    padding: 16px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.brand-logo {
-	text-decoration: none;
-	color: #ffffff;
-	font-size: 24px;
-	font-weight: 700;
-	display: inline-flex;
-	align-items: center;
+.nav-brand {
+    font-weight: 700;
+    font-size: 20px;
+    color: #ffffff;
 }
 
-.brand-star {
-	display: none;
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 24px;
 }
 
-.brand-highlight {
-	color: #46a8df;
-	margin-left: 5px;
+.nav-right a {
+    color: #cbd5e1;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
 }
 
-.navbar-links {
-	display: flex;
-	align-items: center;
-	gap: 24px;
+.nav-right a:hover {
+    color: #ffffff;
 }
 
-.navbar-links a {
-	text-decoration: none;
-	color: #ffffff;
-	font-size: 15px;
-	font-weight: 600;
-	transition: color 0.2s ease;
+/* CONTAINER */
+.signup-container {
+    max-width: 680px;
+    margin: 40px auto;
+    padding: 0 20px;
+    width: 100%;
 }
 
-.navbar-links a:hover {
-	color: #a9defa;
+.signup-header-badge {
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-block;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
 }
 
-.business-signup-page {
-	width: 100%;
-	min-height: calc(100vh - 72px);
-	padding: 55px 20px 70px;
-	background: #eaf7ff;
+.signup-container h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 8px 0;
+    color: #0b1117;
 }
 
-.business-signup-section {
-	width: 100%;
-	max-width: 920px;
-	margin: 0 auto;
+.signup-subtext {
+    font-size: 14px;
+    color: #475569;
+    margin-bottom: 30px;
+    line-height: 1.5;
 }
 
-
-.business-signup-intro {
-	text-align: center;
-	margin-bottom: 32px;
+/* CARD */
+.signup-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 25px rgba(11, 17, 23, 0.04);
+    margin-bottom: 24px;
 }
 
-.business-badge {
-	display: inline-block;
-	margin-bottom: 15px;
-	padding: 7px 14px;
-	border: 1px solid #cfe8f7;
-	border-radius: 20px;
-	background: #f4fbff;
-	color: #153b50;
-	font-size: 12px;
-	font-weight: 700;
-	letter-spacing: 0.8px;
-}
-
-.business-signup-intro h1 {
-	margin: 0 0 13px;
-	color: #0b1117;
-	font-size: 38px;
-	line-height: 1.2;
-	font-weight: 700;
-}
-
-.business-signup-intro p {
-	max-width: 650px;
-	margin: 0 auto;
-	color: #5f7282;
-	font-size: 15px;
-	line-height: 1.7;
-}
-
-.business-signup-card {
-	width: 100%;
-	padding: 34px;
-	background: #ffffff;
-	border: 1px solid #cfe8f7;
-	border-radius: 18px;
-	box-shadow: 0 10px 28px rgba(11, 17, 23, 0.08);
-}
-
-.business-signup-card h2 {
-	margin: 0 0 28px;
-	color: #0b1117;
-	font-size: 23px;
-	font-weight: 700;
+.section-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #0b1117;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
 }
 
 .form-group {
-	margin-bottom: 22px;
+    margin-bottom: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
 }
 
 .form-group label {
-	display: block;
-	margin-bottom: 8px;
-	color: #17212b;
-	font-size: 14px;
-	font-weight: 700;
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #0b1117;
+    margin-bottom: 6px;
 }
 
-.form-group input, .form-group textarea {
-	width: 100%;
-	padding: 13px 14px;
-	border: 1px solid #bcdbea;
-	border-radius: 9px;
-	background: #ffffff;
-	color: #111827;
-	font-size: 15px;
-	outline: none;
-	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    background: #ffffff;
+    color: #0b1117;
+    transition: all 0.2s;
 }
 
-.form-group input {
-	height: 49px;
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: #0b1117;
+    box-shadow: 0 0 0 3px rgba(11, 17, 23, 0.1);
 }
 
-.form-group textarea {
-	min-height: 145px;
-	resize: vertical;
-	line-height: 1.5;
+.form-hint {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 4px;
+    display: block;
 }
 
-.form-group input:focus, .form-group textarea:focus {
-	border-color: #46a8df;
-	box-shadow: 0 0 0 3px rgba(70, 168, 223, 0.16);
+.char-count {
+    font-size: 11px;
+    color: #64748b;
+    text-align: right;
+    display: block;
+    margin-top: 4px;
 }
 
-.form-group input::placeholder, .form-group textarea::placeholder {
-	color: #9aaab5;
+/* ACTIONS */
+.form-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 30px;
 }
 
-.form-group small {
-	display: block;
-	margin-top: 7px;
-	color: #71808c;
-	font-size: 12px;
-	line-height: 1.5;
+.btn-create {
+    width: 100%;
+    background: #38bdf8; /* Light blue accent matching original button */
+    color: #0b1117;
+    border: none;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
-.business-signup-message {
-	min-height: 24px;
-	margin: 4px 0 18px;
-	font-size: 14px;
-	line-height: 1.6;
+.btn-create:hover {
+    background: #0ea5e9;
+    color: #ffffff;
 }
 
-.business-signup-message.error {
-	color: #a63c34;
+.btn-cancel {
+    width: 100%;
+    background: #ffffff;
+    color: #0b1117;
+    border: 1px solid #cbd5e1;
+    padding: 14px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.2s;
 }
 
-.business-signup-message.success {
-	color: #1f6b48;
+.btn-cancel:hover {
+    background: #f1f5f9;
 }
 
-.business-signup-message.loading {
-	color: #5f7282;
+.auth-footer-text {
+    text-align: center;
+    font-size: 14px;
+    color: #475569;
+    margin-top: 24px;
 }
 
-.create-business-button {
-	width: 100%;
-	height: 50px;
-	border: 1px solid #46a8df;
-	border-radius: 10px;
-	background: #a9defa;
-	color: #0b1117;
-	font-size: 15px;
-	font-weight: 700;
-	cursor: pointer;
-	transition: background 0.2s ease, transform 0.1s ease, opacity 0.2s ease;
+.auth-footer-text a {
+    color: #0b1117;
+    text-decoration: none;
+    font-weight: 700;
 }
 
-.create-business-button:hover {
-	background: #46a8df;
-	color: #ffffff;
+.auth-footer-text a:hover {
+    text-decoration: underline;
 }
 
-.create-business-button:active {
-	transform: translateY(1px);
+/* WHAT HAPPENS NEXT CARD */
+.next-steps-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 20px;
+    padding: 30px 40px;
+    box-shadow: 0 10px 25px rgba(11, 17, 23, 0.04);
+    margin-bottom: 40px;
 }
 
-.create-business-button:disabled {
-	opacity: 0.65;
-	cursor: not-allowed;
+.next-steps-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0b1117;
+    margin-top: 0;
+    margin-bottom: 16px;
 }
 
-.cancel-button {
-	display: block;
-	width: 100%;
-	margin-top: 12px;
-	padding: 14px;
-	border: 1px solid #bcdbea;
-	border-radius: 10px;
-	background: #ffffff;
-	color: #153b50;
-	text-align: center;
-	text-decoration: none;
-	font-size: 15px;
-	font-weight: 600;
-	transition: background 0.2s ease, border-color 0.2s ease;
+.step-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.cancel-button:hover {
-	background: #eaf7ff;
-	border-color: #46a8df;
-	color: #0b1117;
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: #334155;
+    font-weight: 600;
 }
 
-.login-info {
-	margin: 22px 0 0;
-	text-align: center;
-	color: #5f7282;
-	font-size: 14px;
-	line-height: 1.6;
-}
-
-.login-info a {
-	color: #46a8df;
-	font-weight: 700;
-	text-decoration: none;
-}
-
-.login-info a:hover {
-	color: #0b1117;
-	text-decoration: underline;
-}
-
-.business-signup-note {
-	margin-top: 24px;
-	padding: 25px;
-	background: #ffffff;
-	border: 1px solid #cfe8f7;
-	border-radius: 16px;
-	box-shadow: 0 8px 22px rgba(11, 17, 23, 0.05);
-}
-
-.business-signup-note h3 {
-	margin: 0 0 20px;
-	color: #0b1117;
-	font-size: 19px;
-	font-weight: 700;
-}
-
-/* =========================================================
-   NEXT STEP
-========================================================= */
-.next-step {
-	display: flex;
-	align-items: center;
-	gap: 13px;
-	margin-bottom: 15px;
-	padding: 8px 0;
-	color: #4f6574;
-	font-size: 14px;
-	line-height: 1.5;
-}
-
-.next-step:last-child {
-	margin-bottom: 0;
-}
-
-/* =========================================================
-   STEP NUMBER
-========================================================= */
 .step-number {
-	width: 32px;
-	height: 32px;
-	flex-shrink: 0;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	border: 1px solid #46a8df;
-	border-radius: 50%;
-	background: #a9defa;
-	color: #0b1117;
-	font-size: 13px;
-	font-weight: 700;
+    width: 24px;
+    height: 24px;
+    background: #e0f2fe;
+    color: #0369a1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
 }
 
-/* =========================================================
-   FOOTER
-========================================================= */
-.site-footer {
-	width: 100%;
-	margin-top: 0;
-	padding: 22px 20px;
-	border-top: 1px solid #24313d;
-	background: #0b1117;
-	text-align: center;
-}
-
-.site-footer p {
-	margin: 0;
-	color: #93a6b4;
-	font-size: 13px;
-}
-
-/* =========================================================
-   RESPONSIVE - 768px
-========================================================= */
-@media ( max-width : 768px) {
-	.navbar-container {
-		min-height: 65px;
-		padding: 14px 16px;
-	}
-	.brand-logo {
-		font-size: 20px;
-	}
-	.navbar-links {
-		gap: 14px;
-	}
-	.navbar-links a {
-		font-size: 13px;
-	}
-	.business-signup-page {
-		padding: 38px 15px 55px;
-	}
-	.business-signup-intro h1 {
-		font-size: 31px;
-	}
-	.business-signup-intro p {
-		font-size: 14px;
-	}
-	.business-signup-card {
-		padding: 26px 22px;
-	}
-	.business-signup-note {
-		padding: 21px;
-	}
-}
-
-/* =========================================================
-   RESPONSIVE - 560px
-========================================================= */
-@media ( max-width : 560px) {
-	.navbar-container {
-		flex-direction: column;
-		justify-content: center;
-		gap: 10px;
-	}
-	.navbar-links {
-		flex-wrap: wrap;
-		justify-content: center;
-	}
-	.business-signup-page {
-		padding-top: 28px;
-	}
-	.business-signup-intro h1 {
-		font-size: 28px;
-	}
-	.business-signup-intro p {
-		font-size: 14px;
-	}
-	.business-signup-card {
-		padding: 21px 16px;
-		border-radius: 14px;
-	}
-	.business-signup-card h2 {
-		margin-bottom: 23px;
-		font-size: 21px;
-	}
-	.form-group input {
-		height: 47px;
-	}
-	.form-group textarea {
-		min-height: 130px;
-	}
-	.business-signup-note {
-		padding: 19px 16px;
-	}
-	.business-signup-note h3 {
-		font-size: 17px;
-	}
-}
-
-@media ( max-width : 400px) {
-	.navbar-links {
-		gap: 11px;
-	}
-	.navbar-links a {
-		font-size: 12px;
-	}
-	.business-signup-intro h1 {
-		font-size: 25px;
-	}
-	.business-signup-card {
-		padding: 18px 14px;
-	}
-	.business-signup-note {
-		padding: 17px 14px;
-	}
-	.next-step {
-		align-items: flex-start;
-	}
+@media(max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    .signup-container {
+        padding: 0 15px;
+    }
 }

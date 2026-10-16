@@ -53,6 +53,15 @@ const SUBSCRIPTION_API =
 
 
 /* =========================
+   PAGINATION VARIABLES
+========================= */
+let allReviews = [];
+let allResponses = [];
+let currentPage = 1;
+const itemsPerPage = 5;
+
+
+/* =========================
    LOGOUT
 ========================= */
 
@@ -91,11 +100,6 @@ function loadBusiness() {
 
         .then(function(business) {
 
-            /*
-             * Save the currently loaded business.
-             * Subscription page uses this business ID.
-             */
-
             if (business && business.id) {
 
                 localStorage.setItem(
@@ -106,11 +110,6 @@ function loadBusiness() {
             }
 
             displayBusiness(business);
-
-            /*
-             * Load subscription after business
-             * information is available.
-             */
 
             if (business && business.id) {
 
@@ -132,7 +131,7 @@ function loadBusiness() {
 
             const businessInfo =
                 document.getElementById(
-                    "businessInfo"
+                    "businessInfoCard"
                 );
 
             if (businessInfo) {
@@ -155,97 +154,29 @@ function loadBusiness() {
 
 function displayBusiness(business) {
 
-    const businessInfo =
-        document.getElementById(
-            "businessInfo"
-        );
-
-    if (!businessInfo) {
-
-        return;
-
-    }
+    const bizId = document.getElementById("bizId");
+    const bizName = document.getElementById("bizName");
+    const bizDesc = document.getElementById("bizDesc");
+    const bizUrl = document.getElementById("bizUrl");
+    const bizStatus = document.getElementById("bizStatus");
 
     if (!business) {
-
-        businessInfo.innerHTML =
-            "<p>No approved business found.</p>";
-
         return;
-
     }
-
-
-    /*
-     * Keep business information available
-     * for the subscription page.
-     */
 
     localStorage.setItem(
         "myBusiness",
         JSON.stringify(business)
     );
 
-
-    businessInfo.innerHTML = `
-
-        <div class="info-card">
-
-            <p>
-
-                <strong>Business ID:</strong>
-
-                ${Number(business.id) || 0}
-
-            </p>
-
-            <p>
-
-                <strong>Name:</strong>
-
-                ${escapeHtml(
-                    business.name ||
-                    "Not available"
-                )}
-
-            </p>
-
-            <p>
-
-                <strong>Description:</strong>
-
-                ${escapeHtml(
-                    business.description ||
-                    "Not available"
-                )}
-
-            </p>
-
-            <p>
-
-                <strong>Official URL:</strong>
-
-                ${escapeHtml(
-                    business.officialUrl ||
-                    "Not available"
-                )}
-
-            </p>
-
-            <p>
-
-                <strong>Status:</strong>
-
-                ${escapeHtml(
-                    business.status ||
-                    "Not available"
-                )}
-
-            </p>
-
-        </div>
-
-    `;
+    if (bizId) bizId.textContent = Number(business.id) || 0;
+    if (bizName) bizName.textContent = business.name || "Not available";
+    if (bizDesc) bizDesc.textContent = business.description || "Not available";
+    if (bizUrl) {
+        bizUrl.href = business.officialUrl || "#";
+        bizUrl.textContent = business.officialUrl || "Not available";
+    }
+    if (bizStatus) bizStatus.textContent = business.status || "Not available";
 
 }
 
@@ -256,20 +187,16 @@ function displayBusiness(business) {
 
 function loadSubscription(businessId) {
 
-    const subscriptionInfo =
+    const subscriptionStatusText =
         document.getElementById(
-            "subscriptionInfo"
+            "subscriptionStatusText"
         );
 
-    if (!subscriptionInfo) {
+    if (!subscriptionStatusText) {
 
         return;
 
     }
-
-    subscriptionInfo.innerHTML =
-        "<p>Loading subscription information...</p>";
-
 
     fetch(
         SUBSCRIPTION_API
@@ -277,11 +204,6 @@ function loadSubscription(businessId) {
     )
 
         .then(function(response) {
-
-            /*
-             * 404 means business does not have
-             * a subscription yet.
-             */
 
             if (response.status === 404) {
 
@@ -303,10 +225,6 @@ function loadSubscription(businessId) {
 
         .then(function(subscription) {
 
-            /*
-             * No subscription found.
-             */
-
             if (!subscription) {
 
                 displayNoSubscription();
@@ -314,12 +232,6 @@ function loadSubscription(businessId) {
                 return;
 
             }
-
-
-            /*
-             * Only ACTIVE subscription should
-             * be displayed as current plan.
-             */
 
             if (
                 !subscription.status ||
@@ -333,7 +245,6 @@ function loadSubscription(businessId) {
 
             }
 
-
             displaySubscription(
                 subscription
             );
@@ -344,24 +255,10 @@ function loadSubscription(businessId) {
 
             console.error(error);
 
-            if (subscriptionInfo) {
+            if (subscriptionStatusText) {
 
-                subscriptionInfo.innerHTML = `
-
-                    <div class="info-card">
-
-                        <p>
-                            Unable to load subscription information.
-                        </p>
-
-                        <p>
-                            <a href="subscription.html">
-                                Manage Subscription
-                            </a>
-                        </p>
-
-                    </div>
-
+                subscriptionStatusText.innerHTML = `
+                    Unable to load subscription information.
                 `;
 
             }
@@ -379,109 +276,26 @@ function displaySubscription(
     subscription
 ) {
 
-    const subscriptionInfo =
+    const subscriptionStatusText =
         document.getElementById(
-            "subscriptionInfo"
+            "subscriptionStatusText"
         );
 
-    if (!subscriptionInfo) {
+    if (!subscriptionStatusText) {
 
         return;
 
     }
 
-
     const planName =
         subscription.planName ||
-        "Not available";
-
-    const status =
-        subscription.status ||
-        "Not available";
-
-    const billingCycle =
-        subscription.billingCycle ||
         "Not available";
 
     const amount =
         Number(subscription.amount || 0);
 
-
-    const startDate =
-        formatSubscriptionDate(
-            subscription.startDate
-        );
-
-    const endDate =
-        formatSubscriptionDate(
-            subscription.endDate
-        );
-
-
-    subscriptionInfo.innerHTML = `
-
-        <div class="info-card">
-
-            <p>
-
-                <strong>Current Plan:</strong>
-
-                ${escapeHtml(planName)}
-
-            </p>
-
-            <p>
-
-                <strong>Status:</strong>
-
-                ${escapeHtml(status)}
-
-            </p>
-
-            <p>
-
-                <strong>Billing Cycle:</strong>
-
-                ${escapeHtml(billingCycle)}
-
-            </p>
-
-            <p>
-
-                <strong>Amount:</strong>
-
-                ₹${amount.toFixed(2)}
-
-            </p>
-
-            <p>
-
-                <strong>Start Date:</strong>
-
-                ${escapeHtml(startDate)}
-
-            </p>
-
-            <p>
-
-                <strong>End Date:</strong>
-
-                ${escapeHtml(endDate)}
-
-            </p>
-
-            <p>
-
-                <a href="subscription.html">
-
-                    Manage Subscription
-
-                </a>
-
-            </p>
-
-        </div>
-
+    subscriptionStatusText.innerHTML = `
+        <strong>Current Plan:</strong> ${escapeHtml(planName)} (₹${amount.toFixed(2)})
     `;
 
 }
@@ -493,77 +307,18 @@ function displaySubscription(
 
 function displayNoSubscription() {
 
-    const subscriptionInfo =
+    const subscriptionStatusText =
         document.getElementById(
-            "subscriptionInfo"
+            "subscriptionStatusText"
         );
 
-    if (!subscriptionInfo) {
+    if (!subscriptionStatusText) {
 
         return;
 
     }
 
-
-    subscriptionInfo.innerHTML = `
-
-        <div class="info-card">
-
-            <p>
-                No active subscription found.
-            </p>
-
-            <p>
-
-                <a href="subscription.html">
-
-                    Choose a Plan
-
-                </a>
-
-            </p>
-
-        </div>
-
-    `;
-
-}
-
-
-/* =========================
-   FORMAT SUBSCRIPTION DATE
-========================= */
-
-function formatSubscriptionDate(
-    dateValue
-) {
-
-    if (!dateValue) {
-
-        return "Not available";
-
-    }
-
-
-    const date =
-        new Date(dateValue);
-
-
-    if (Number.isNaN(date.getTime())) {
-
-        return "Not available";
-
-    }
-
-
-    return date.toLocaleDateString(
-        "en-IN",
-        {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        }
-    );
+    subscriptionStatusText.textContent = "No active subscription found.";
 
 }
 
@@ -600,14 +355,14 @@ function loadWebsite() {
 
             console.error(error);
 
-            const websiteInfo =
+            const websiteInfoCard =
                 document.getElementById(
-                    "websiteInfo"
+                    "websiteInfoCard"
                 );
 
-            if (websiteInfo) {
+            if (websiteInfoCard) {
 
-                websiteInfo.innerHTML =
+                websiteInfoCard.innerHTML =
                     "<p>Unable to load website information.</p>";
 
             }
@@ -623,86 +378,24 @@ function loadWebsite() {
 
 function displayWebsite(website) {
 
-    const websiteInfo =
-        document.getElementById(
-            "websiteInfo"
-        );
-
-    if (!websiteInfo) {
-
-        return;
-
-    }
+    const webId = document.getElementById("webId");
+    const webName = document.getElementById("webName");
+    const webUrl = document.getElementById("webUrl");
+    const webDesc = document.getElementById("webDesc");
+    const webDomain = document.getElementById("webDomain");
 
     if (!website) {
-
-        websiteInfo.innerHTML =
-            "<p>No matching website found.</p>";
-
         return;
-
     }
 
-
-    websiteInfo.innerHTML = `
-
-        <div class="info-card">
-
-            <p>
-
-                <strong>Website ID:</strong>
-
-                ${Number(website.id) || 0}
-
-            </p>
-
-            <p>
-
-                <strong>Name:</strong>
-
-                ${escapeHtml(
-                    website.name ||
-                    "Not available"
-                )}
-
-            </p>
-
-            <p>
-
-                <strong>URL:</strong>
-
-                ${escapeHtml(
-                    website.url ||
-                    "Not available"
-                )}
-
-            </p>
-
-            <p>
-
-                <strong>Description:</strong>
-
-                ${escapeHtml(
-                    website.description ||
-                    "Not available"
-                )}
-
-            </p>
-
-            <p>
-
-                <strong>Domain:</strong>
-
-                ${escapeHtml(
-                    website.canonicalDomain ||
-                    "Not available"
-                )}
-
-            </p>
-
-        </div>
-
-    `;
+    if (webId) webId.textContent = Number(website.id) || 0;
+    if (webName) webName.textContent = website.name || "Not available";
+    if (webUrl) {
+        webUrl.href = website.url || "#";
+        webUrl.textContent = website.url || "Not available";
+    }
+    if (webDesc) webDesc.textContent = website.description || "Not available";
+    if (webDomain) webDomain.textContent = website.canonicalDomain || "Not available";
 
 }
 
@@ -731,7 +424,6 @@ function loadReviews() {
 
             }),
 
-
         fetch(BUSINESS_API)
 
             .then(function(response) {
@@ -752,12 +444,9 @@ function loadReviews() {
 
     .then(function(results) {
 
-        const reviews =
-            results[0];
+        allReviews = results[0] || [];
 
-        const business =
-            results[1];
-
+        const business = results[1];
 
         if (!business || !business.id) {
 
@@ -767,22 +456,15 @@ function loadReviews() {
 
         }
 
-
-        /*
-         * Keep business information synchronized.
-         */
-
         localStorage.setItem(
             "myBusiness",
             JSON.stringify(business)
         );
 
-
         const businessResponseAPI =
             RESPONSE_API
             + "/business/"
             + business.id;
-
 
         return fetch(
             businessResponseAPI
@@ -804,13 +486,12 @@ function loadReviews() {
 
             .then(function(responses) {
 
-                displayReviews(
-                    reviews,
-                    responses
-                );
+                allResponses = responses || [];
+
+                renderReviewsPaginated();
 
                 calculateSummary(
-                    reviews
+                    allReviews
                 );
 
             });
@@ -823,7 +504,7 @@ function loadReviews() {
 
         const reviewList =
             document.getElementById(
-                "reviewList"
+                "customerReviewsContainer"
             );
 
         if (reviewList) {
@@ -877,24 +558,10 @@ function loadDashboardMetrics() {
                     "responseRate"
                 );
 
-            const ratingTrend =
-                document.getElementById(
-                    "ratingTrend"
-                );
-
-
             if (responseRate) {
 
                 responseRate.textContent =
                     "0.0%";
-
-            }
-
-
-            if (ratingTrend) {
-
-                ratingTrend.innerHTML =
-                    "<p>Unable to load rating trend.</p>";
 
             }
 
@@ -917,12 +584,10 @@ function displayDashboardMetrics(
 
     }
 
-
     const responseRate =
         document.getElementById(
             "responseRate"
         );
-
 
     if (responseRate) {
 
@@ -934,171 +599,123 @@ function displayDashboardMetrics(
 
     }
 
-
-    const averageRating =
+    const avgRating =
         document.getElementById(
-            "averageRating"
+            "avgRating"
         );
 
+    if (avgRating) {
 
-    if (averageRating) {
-
-        averageRating.textContent =
+        avgRating.textContent =
             Number(
                 metrics.averageRating || 0
             ).toFixed(1);
 
     }
 
-
-    const reviewCount =
+    const totalReviews =
         document.getElementById(
-            "reviewCount"
+            "totalReviews"
         );
 
+    if (totalReviews) {
 
-    if (reviewCount) {
-
-        reviewCount.textContent =
+        totalReviews.textContent =
             Number(
                 metrics.reviewCount || 0
             );
 
     }
 
-
-    displayRatingTrend(
-        metrics.ratingTrend || []
-    );
-
 }
 
 
 /* =========================
-   DISPLAY RATING TREND
+   RENDER REVIEWS PAGINATED (5 per view)
 ========================= */
 
-function displayRatingTrend(trend) {
+function renderReviewsPaginated() {
 
-    const ratingTrend =
+    const container =
         document.getElementById(
-            "ratingTrend"
+            "customerReviewsContainer"
+        );
+
+    const dotsContainer =
+        document.getElementById(
+            "paginationDots"
+        );
+
+    const prevBtn =
+        document.getElementById(
+            "prevReviewBtn"
+        );
+
+    const nextBtn =
+        document.getElementById(
+            "nextReviewBtn"
         );
 
 
-    if (!ratingTrend) {
+    if (!container) {
 
         return;
 
     }
 
 
-    if (!trend || trend.length === 0) {
-
-        ratingTrend.innerHTML =
-            "<p>No rating trend data available yet.</p>";
-
-        return;
-
-    }
+    container.innerHTML = "";
 
 
-    ratingTrend.innerHTML = "";
+    if (!allReviews || allReviews.length === 0) {
 
+        container.innerHTML =
+            "<div class=\"info-card\"><p>No customer reviews found.</p></div>";
 
-    trend.forEach(function(item) {
-
-        ratingTrend.innerHTML += `
-
-            <div class="info-card">
-
-                <p>
-
-                    <strong>Month:</strong>
-
-                    ${escapeHtml(
-                        item.month || ""
-                    )}
-
-                </p>
-
-                <p>
-
-                    <strong>Average Rating:</strong>
-
-                    ${Number(
-                        item.averageRating || 0
-                    ).toFixed(1)}
-
-                    / 5
-
-                </p>
-
-                <p>
-
-                    <strong>Reviews:</strong>
-
-                    ${Number(
-                        item.reviewCount || 0
-                    )}
-
-                </p>
-
-            </div>
-
-        `;
-
-    });
-
-}
-
-
-/* =========================
-   DISPLAY REVIEWS
-========================= */
-
-function displayReviews(
-    reviews,
-    responses
-) {
-
-    const reviewList =
-        document.getElementById(
-            "reviewList"
-        );
-
-
-    if (!reviewList) {
+        if (dotsContainer) dotsContainer.innerHTML = "";
+        if (prevBtn) prevBtn.style.display = "none";
+        if (nextBtn) nextBtn.style.display = "none";
 
         return;
 
     }
 
 
-    reviewList.innerHTML = "";
+    if (prevBtn) prevBtn.style.display = "inline-block";
+    if (nextBtn) nextBtn.style.display = "inline-block";
 
 
-    if (!reviews || reviews.length === 0) {
+    const totalPages =
+        Math.ceil(allReviews.length / itemsPerPage);
 
-        reviewList.innerHTML =
-            "<p>No customer reviews found.</p>";
 
-        return;
+    if (currentPage > totalPages) {
+
+        currentPage = totalPages;
+
+    }
+
+    if (currentPage < 1) {
+
+        currentPage = 1;
 
     }
 
 
-    if (!responses) {
+    const start =
+        (currentPage - 1) * itemsPerPage;
 
-        responses = [];
+    const end =
+        start + itemsPerPage;
 
-    }
+    const paginatedReviews =
+        allReviews.slice(start, end);
 
 
-    reviews.forEach(function(review) {
+    paginatedReviews.forEach(function(review) {
 
         const response =
-            responses.find(function(item) {
+            allResponses.find(function(item) {
 
                 return Number(
                     item.reviewId
@@ -1114,10 +731,8 @@ function displayReviews(
         const reviewId =
             Number(review.id) || 0;
 
-
         const userId =
             Number(review.userId) || 0;
-
 
         const rating =
             Number(review.rating) || 0;
@@ -1179,9 +794,9 @@ function displayReviews(
         }
 
 
-        reviewList.innerHTML += `
+        container.innerHTML += `
 
-            <div class="review-card">
+            <div class="review-card info-card" style="margin-bottom: 12px;">
 
                 <h3>
                     ⭐ ${rating}/5
@@ -1220,6 +835,77 @@ function displayReviews(
 
     });
 
+
+    /* RENDER DOTS */
+
+    if (dotsContainer) {
+
+        dotsContainer.innerHTML = "";
+
+        for (let i = 1; i <= totalPages; i++) {
+
+            const dot =
+                document.createElement("div");
+
+            dot.className =
+                `dot ${i === currentPage ? "active" : ""}`;
+
+            dot.onclick = function() {
+
+                currentPage = i;
+
+                renderReviewsPaginated();
+
+            };
+
+            dotsContainer.appendChild(dot);
+
+        }
+
+    }
+
+
+    /* BUTTON STATES */
+
+    if (prevBtn) {
+
+        prevBtn.disabled =
+            currentPage === 1;
+
+        prevBtn.onclick = function() {
+
+            if (currentPage > 1) {
+
+                currentPage--;
+
+                renderReviewsPaginated();
+
+            }
+
+        };
+
+    }
+
+
+    if (nextBtn) {
+
+        nextBtn.disabled =
+            currentPage === totalPages;
+
+        nextBtn.onclick = function() {
+
+            if (currentPage < totalPages) {
+
+                currentPage++;
+
+                renderReviewsPaginated();
+
+            }
+
+        };
+
+    }
+
 }
 
 
@@ -1234,18 +920,15 @@ function calculateSummary(reviews) {
             ? reviews.length
             : 0;
 
-
     const reviewCountElement =
         document.getElementById(
-            "reviewCount"
+            "totalReviews"
         );
-
 
     const averageRatingElement =
         document.getElementById(
-            "averageRating"
+            "avgRating"
         );
-
 
     if (reviewCountElement) {
 
@@ -1253,7 +936,6 @@ function calculateSummary(reviews) {
             reviewCount;
 
     }
-
 
     if (reviewCount === 0) {
 
@@ -1268,9 +950,7 @@ function calculateSummary(reviews) {
 
     }
 
-
     let totalRating = 0;
-
 
     reviews.forEach(function(review) {
 
@@ -1281,10 +961,8 @@ function calculateSummary(reviews) {
 
     });
 
-
     const averageRating =
         totalRating / reviewCount;
-
 
     if (averageRatingElement) {
 
@@ -1337,7 +1015,6 @@ function escapeHtml(value) {
 
     }
 
-
     return String(value)
 
         .replace(
@@ -1378,9 +1055,8 @@ document.addEventListener(
 
         const logoutButton =
             document.getElementById(
-                "logoutButton"
+                "logoutBtn"
             );
-
 
         if (logoutButton) {
 
@@ -1390,7 +1066,6 @@ document.addEventListener(
             );
 
         }
-
 
         loadBusiness();
 

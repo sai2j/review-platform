@@ -2,6 +2,7 @@ const registerForm =document.getElementById("registerForm");
 registerForm.addEventListener("submit",
     async function(event) {
         event.preventDefault();
+        const name =document.getElementById("fullName").value.trim();
         const email =document.getElementById("email").value.trim();
         const password =document.getElementById("password").value;
         const message =document.getElementById("message");
@@ -16,6 +17,7 @@ registerForm.addEventListener("submit",
                                 "application/json"
                         },
                         body: JSON.stringify({
+                            name: name,
                             email: email,
                             password: password
                         })

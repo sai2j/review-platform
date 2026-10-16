@@ -1890,7 +1890,7 @@ public class ReviewService {
             return null;
         }
 
-        return new ReviewResponseDTO(
+        ReviewResponseDTO dto = new ReviewResponseDTO(
                 review.getId(),
                 review.getRating(),
                 review.getComment(),
@@ -1904,6 +1904,14 @@ public class ReviewService {
                 review.getProductRating(),
                 review.getPricingRating(),
                 review.getCreatedAt());
+
+        // Reviewer ka naam (sirf name, email/password kabhi nahi)
+        if (review.getUserId() != null) {
+            userRepository.findById(review.getUserId())
+                    .ifPresent(user -> dto.setUserName(user.getName()));
+        }
+
+        return dto;
     }
 
     // ==============================

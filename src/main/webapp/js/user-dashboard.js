@@ -233,21 +233,68 @@ function showNoBusiness() {
     updateStats(null);
 }
 
+function readClaimResponse(response) {
+    if (!response.ok) {
+        return null;
+    }
+
+    return response.text().then(function(text) {
+        if (!text) {
+            return null;
+        }
+
+        try {
+            return JSON.parse(text);
+        } catch (error) {
+            return null;
+        }
+    });
+}
+
 function loadMyBusiness() {
     fetch(CLAIM_API + "/user/" + USER_ID + "/approved")
-        .then(function(response) {
-            if (!response.ok) {
-                throw new Error("No approved business claim found.");
+        .then(readClaimResponse)
+        .then(function(claim) {
+            if (claim && claim.businessId) {
+                loadBusiness(claim.businessId);
+                return;
             }
 
-            return response.json();
+            // No approved claim: check for a pending ownership request.
+            loadPendingBusiness();
         })
+        .catch(function(error) {
+            console.error(error);
+            showNoBusiness();
+        });
+}
+
+
+/* =========================
+   LOAD PENDING BUSINESS
+   (ownership request waiting for admin approval)
+========================= */
+
+function loadPendingBusiness() {
+    fetch(CLAIM_API + "/user/" + USER_ID + "/pending")
+        .then(readClaimResponse)
         .then(function(claim) {
             if (!claim || !claim.businessId) {
-                throw new Error("No approved business claim found.");
+                showNoBusiness();
+                return;
             }
 
-            loadBusiness(claim.businessId);
+            return fetch(BUSINESS_API + "/" + claim.businessId)
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error("Business could not be loaded.");
+                    }
+
+                    return response.json();
+                })
+                .then(function(business) {
+                    displayPendingBusiness(business);
+                });
         })
         .catch(function(error) {
             console.error(error);
@@ -299,6 +346,63 @@ function setText(id, value) {
     }
 }
 
+function displayPendingBusiness(business) {
+    if (!business) {
+        showNoBusiness();
+        return;
+    }
+
+    if (businessMessage) {
+        businessMessage.innerHTML = "";
+    }
+
+    if (businessEmpty) {
+        businessEmpty.style.display = "none";
+    }
+
+    if (businessInfo) {
+        businessInfo.style.display = "block";
+
+        const actions = businessInfo.querySelector(".dashboard-actions");
+
+        if (actions) {
+            actions.style.display = "none";
+        }
+    }
+
+    // Verification and dashboard unlock only after admin approval.
+    if (verificationSection) {
+        verificationSection.style.display = "none";
+    }
+
+    setText("businessId", business.id || "N/A");
+    setText("businessName", business.name || "N/A");
+    setText("officialUrl", business.officialUrl || "N/A");
+
+    const businessStatus = document.getElementById("businessStatus");
+
+    if (businessStatus) {
+        businessStatus.textContent = "PENDING APPROVAL";
+        updateBusinessStatusClass(businessStatus, "PENDING");
+    }
+
+    if (statBusinesses) {
+        statBusinesses.textContent = "0";
+    }
+
+    if (statVerification) {
+        statVerification.textContent = "0/3";
+    }
+
+    if (statStatus) {
+        statStatus.textContent = "pending";
+    }
+
+    showDashboardSuccess(
+        "Your business profile is created. Your ownership request is waiting for admin approval."
+    );
+}
+
 function displayBusiness(business) {
     if (businessMessage) {
         businessMessage.innerHTML = "";
@@ -310,6 +414,12 @@ function displayBusiness(business) {
 
     if (businessInfo) {
         businessInfo.style.display = "block";
+
+        const actions = businessInfo.querySelector(".dashboard-actions");
+
+        if (actions) {
+            actions.style.display = "";
+        }
     }
 
     if (verificationSection) {

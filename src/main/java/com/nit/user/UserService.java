@@ -36,6 +36,10 @@ public class UserService {
     }
 
     public User registerUser(String email, String password) {
+        return registerUser(email, password, null);
+    }
+
+    public User registerUser(String email, String password, String name) {
         String normalizedEmail = email == null
                 ? ""
                 : email.trim().toLowerCase();
@@ -51,6 +55,18 @@ public class UserService {
         User user = new User();
         user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(password));
+
+        // Optional display name given at registration.
+        if (name != null && !name.isBlank()) {
+            String trimmedName = name.trim();
+
+            if (trimmedName.length() > 255) {
+                throw new RuntimeException(
+                        "Display name cannot exceed 255 characters");
+            }
+
+            user.setName(trimmedName);
+        }
 
         // Public registration always creates a normal user.
         user.setRole("USER");

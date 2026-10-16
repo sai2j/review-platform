@@ -10,8 +10,9 @@ const REVIEWS_PER_PAGE = 5;
 const REVIEWS_FETCH_SIZE = 100;     
 const SHOW_BUSINESS_RESPONSES = true; 
 
+// URL se 'websiteId' ya 'id' dono ko check karne ka smart fix
 const urlParams = new URLSearchParams(window.location.search);
-const websiteId = urlParams.get("websiteId");
+let websiteId = urlParams.get("websiteId") || urlParams.get("id");
 
 let currentWebsiteForStructuredData = null;
 let currentReviewsForStructuredData = [];
@@ -1810,8 +1811,37 @@ function setupAccountNavigation() {
    PAGE LOAD
    ========================================================= */
 
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", async function () {
     setupAccountNavigation();
+
+    // Agar URL mein ID na ho, toh logged-in user ka business ID fetch kar lo
+    let loggedInUser = null;
+    try {
+        loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+    } catch (e) {
+        loggedInUser = null;
+    }
+
+    if (!websiteId && loggedInUser && loggedInUser.id) {
+        try {
+            const bizResp = await fetch(`/review-platform/business-dashboard/user/${loggedInUser.id}`);
+            if (bizResp.ok) {
+                const bizData = await bizResp.json();
+                let targetBusiness = null;
+                if (Array.isArray(bizData) && bizData.length > 0) {
+                    targetBusiness = bizData[0];
+                } else if (bizData && (bizData.id || bizData.businessId || bizData.websiteId)) {
+                    targetBusiness = bizData;
+                }
+
+                if (targetBusiness) {
+                    websiteId = targetBusiness.id || targetBusiness.businessId || targetBusiness.websiteId;
+                }
+            }
+        } catch (err) {
+            console.error("Error fetching user business for review page:", err);
+        }
+    }
 
     loadWebsiteInfo();
     loadRatingSummary();

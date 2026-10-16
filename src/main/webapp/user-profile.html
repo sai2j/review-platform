@@ -1,99 +1,128 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="robots" content="noindex, follow">
-<title>My Profile - Review Platform</title>
-<link rel="stylesheet" href="css/user-profile.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile | Review Platform</title>
+    <link rel="stylesheet" href="css/user-profile.css">
 </head>
 <body>
-	<div class="profile-container">
-		<header class="profile-header">
-			<div>
-				<h1>My Profile</h1>
-				<p>Manage your public profile information.</p>
-			</div>
 
-			<button type="button" class="back-button" onclick="goToDashboard()">
-				Back to Dashboard</button>
-		</header>
+    <div class="dashboard-layout">
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">Review Platform</div>
+            
+            <nav class="sidebar-menu">
+                <a href="index.html" class="menu-item">
+                    <span class="icon">🏠</span> Home
+                </a>
+                <a href="review.html" class="menu-item">
+                    <span class="icon">✏️</span> Write a Review
+                </a>
+                <a href="browse.html" class="menu-item">
+                    <span class="icon">🌐</span> Browse Websites
+                </a>
+                <a href="user-profile.html" class="menu-item active">
+                    <span class="icon">👤</span> My Profile
+                </a>
+                <a href="user-dashboard.html" class="menu-item">
+                    <span class="icon">🏢</span> My Business
+                </a>
+                <a href="business-claim.html" class="menu-item">
+                    <span class="icon">🛡️</span> Claim Business
+                </a>
+                <a href="business-dashboard.html" class="menu-item">
+                    <span class="icon">📊</span> Business Dashboard
+                </a>
+            </nav>
 
-		<main class="profile-card">
-			<div class="profile-intro">
-				<div class="profile-avatar" id="profileAvatar">U</div>
+            <div class="sidebar-footer">
+                <div class="user-pill">
+                    <div class="user-avatar" id="sidebarInitial">V</div>
+                    <div class="user-text">
+                        <small>Logged in as</small>
+                        <strong id="loggedUserEmail">validationtest2026@gmail.com</strong>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logoutButton">
+                    <span>🚪</span> Logout
+                </button>
+            </div>
+        </aside>
 
-				<div>
-					<h2 id="profileDisplayName">Loading profile...</h2>
-					<p id="profileDisplayEmail"></p>
-					<span id="profileVisibilityBadge" class="visibility-badge">
-						Loading... </span>
-				</div>
-			</div>
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+            <header class="content-header">
+                <div>
+                    <h1>My Profile</h1>
+                    <p>Manage your public profile information.</p>
+                </div>
+                <a href="user-dashboard.html" class="btn-back">Back to Dashboard</a>
+            </header>
 
-			<section class="avatar-upload-section">
-				<h3>Profile Photo</h3>
+            <div class="profile-card-box">
+                <!-- INSTAGRAM STYLE AVATAR SECTION -->
+                <div class="profile-user-row">
+                    <div class="avatar-wrapper">
+                        <div class="user-avatar-large" id="avatarInitial">U</div>
+                        <label for="avatarInput" class="avatar-edit-badge" title="Change profile photo">
+                            ✏️
+                        </label>
+                        <input type="file" id="avatarInput" accept="image/png, image/jpeg, image/webp" style="display: none;">
+                    </div>
+                    <div class="user-meta-info">
+                        <h2 id="userNameDisplay">User</h2>
+                        <span id="userEmailSub">validationtest2026@gmail.com</span>
+                        <span class="badge-public">PUBLIC PROFILE</span>
+                    </div>
+                </div>
 
-				<label for="avatarFile">Choose a photo</label> <input type="file"
-					id="avatarFile" name="file"
-					accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                <!-- PROFILE FORM -->
+                <form id="profileForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="fullNameInput" placeholder="Enter your name">
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="emailInput" readonly class="input-disabled" placeholder="validationtest2026@gmail.com">
+                            <small class="form-hint">Your registered email address cannot be changed here.</small>
+                        </div>
+                    </div>
 
-				<small>JPG, PNG or WebP. Maximum size: 2 MB.</small>
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <textarea id="bioInput" rows="4" maxlength="500" placeholder="Tell people a little about yourself"></textarea>
+                        <div class="char-count"><span id="charCount">0</span>/500 characters</div>
+                    </div>
 
-				<button type="button" id="uploadAvatarButton">Upload Photo
-				</button>
-			</section>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Country</label>
+                            <input type="text" id="countryInput" placeholder="Enter your country">
+                        </div>
+                        <div class="form-group">
+                            <label>Profile Visibility</label>
+                            <select id="visibilitySelect">
+                                <option value="PUBLIC">Public - Anyone can view my profile</option>
+                                <option value="PRIVATE">Private - Restricted by backend</option>
+                            </select>
+                            <small class="form-hint">Private profiles should be restricted by the backend.</small>
+                        </div>
+                    </div>
 
-			<div id="profileMessage" class="message" role="status"
-				aria-live="polite"></div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-dark">Save Changes</button>
+                        <a href="user-dashboard.html" class="btn-light">Cancel</a>
+                    </div>
+                </form>
+                <div id="profileMessage" style="margin-top: 15px; font-weight: 600; font-size: 14px;"></div>
+            </div>
+        </main>
+    </div>
 
-			<form id="profileForm">
-				<div class="form-group">
-					<label for="profileName">Full Name</label> <input type="text"
-						id="profileName" name="name" maxlength="100"
-						placeholder="Enter your name" required>
-				</div>
-
-				<div class="form-group">
-					<label for="profileEmail">Email Address</label> <input type="email"
-						id="profileEmail" name="email" readonly> <small>Your
-						registered email address cannot be changed here.</small>
-				</div>
-
-				<div class="form-group">
-					<label for="profileBio">Bio</label>
-					<textarea id="profileBio" name="bio" maxlength="500" rows="5"
-						placeholder="Tell people a little about yourself"></textarea>
-					<small><span id="bioCount">0</span>/500 characters</small>
-				</div>
-
-				<div class="form-group">
-					<label for="profileCountry">Country</label> <input type="text"
-						id="profileCountry" name="country" maxlength="100"
-						placeholder="Enter your country">
-				</div>
-
-				<div class="form-group">
-					<label for="profileVisibility">Profile Visibility</label> <select
-						id="profileVisibility" name="profilePublic">
-						<option value="true">Public - Anyone can view my profile</option>
-						<option value="false">Private - Keep my profile private</option>
-					</select> <small> Private profiles should be restricted by the
-						backend. </small>
-				</div>
-
-				<div class="form-actions">
-					<button type="submit" id="saveProfileButton">Save Changes
-					</button>
-
-					<button type="button" class="cancel-button"
-						onclick="goToDashboard()">Cancel</button>
-				</div>
-			</form>
-		</main>
-	</div>
-
-	<script src="js/user-profile.js"></script>
+    <script src="js/user-profile.js"></script>
 </body>
 </html>

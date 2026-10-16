@@ -74,6 +74,28 @@ public class BusinessClamService {
 		return claim.orElse(null);
 	}
 
+	public BusinessClaim getPendingClaimByUserId(Long userId) {
+
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+		String loggedInEmail = authentication.getName();
+
+		User loggedInUser = userRepository.findByEmail(loggedInEmail);
+
+		if (loggedInUser == null) {
+			throw new RuntimeException("User not found");
+		}
+
+		if (!loggedInUser.getId().equals(userId)) {
+			throw new AccessDeniedException("You can access only your own business claim");
+		}
+
+		Optional<BusinessClaim> claim = businessClaimRepository.findFirstByUserIdAndStatusOrderByIdDesc(userId,
+				"PENDING");
+
+		return claim.orElse(null);
+	}
+
 	public BusinessClaim getApprovedClaimByBusinessId(Long businessId) {
 		Optional<BusinessClaim> claim = businessClaimRepository.findByBusinessIdAndStatus(businessId, "APPROVED");
 		return claim.orElse(null);

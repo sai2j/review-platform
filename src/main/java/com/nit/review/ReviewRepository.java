@@ -108,7 +108,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             SELECT AVG(r.rating)
             FROM Review r
             WHERE r.websiteId = :websiteId
-            AND UPPER(r.status) = 'APPROVED'
+            AND UPPER(r.status) IN ('APPROVED', 'PENDING')
             """)
     Double findAverageCountedRating(
             @Param("websiteId") Long websiteId);
@@ -121,7 +121,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             SELECT COUNT(r)
             FROM Review r
             WHERE r.websiteId = :websiteId
-            AND UPPER(r.status) = 'APPROVED'
+            AND UPPER(r.status) IN ('APPROVED', 'PENDING')
             """)
     Long countCountedReviews(
             @Param("websiteId") Long websiteId);
@@ -134,7 +134,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             SELECT COUNT(r)
             FROM Review r
             WHERE r.websiteId = :websiteId
-            AND UPPER(r.status) = 'APPROVED'
+            AND UPPER(r.status) IN ('APPROVED', 'PENDING')
             AND r.rating = :rating
             """)
     Long countCountedReviewsByRating(
@@ -207,4 +207,3 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             LocalDateTime endDateTime,
             Pageable pageable);
 }
-

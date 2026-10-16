@@ -3,11 +3,215 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description"
-	content="Read website reviews, ratings, experiences, and frequently asked questions.">
+<meta name="description" content="Read website reviews, ratings, experiences, and frequently asked questions.">
 <meta name="robots" content="index, follow">
-<title>Website Reviews</title>
+<title>Website Reviews | ReviewPlatform</title>
 <link rel="stylesheet" href="css/review.css">
+<style>
+    /* MODERNIZED STYLING & MODAL OVERRIDES */
+    body {
+        background: #f0f7ff;
+        color: #0b1117;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* Modern Write Review Section Card */
+    .write-review-section {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 20px;
+        padding: 40px;
+        max-width: 900px;
+        margin: 30px auto;
+        box-shadow: 0 10px 25px rgba(11, 17, 23, 0.04);
+    }
+
+    .write-review-section h2 {
+        font-size: 22px;
+        font-weight: 700;
+        color: #0b1117;
+        margin-top: 0;
+        margin-bottom: 6px;
+    }
+
+    .section-description {
+        font-size: 14px;
+        color: #475569;
+        margin-bottom: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #0b1117;
+        margin-bottom: 8px;
+    }
+
+    .form-group select, 
+    .form-group textarea {
+        width: 100%;
+        padding: 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 12px;
+        font-size: 14px;
+        outline: none;
+        background: #ffffff;
+        color: #0b1117;
+        transition: all 0.2s;
+    }
+
+    .form-group select:focus, 
+    .form-group textarea:focus {
+        border-color: #0b1117;
+        box-shadow: 0 0 0 3px rgba(11, 17, 23, 0.1);
+    }
+
+    .form-group textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    /* Modern Submit Review Button */
+    .submit-review-button {
+        background: #0b1117;
+        color: #ffffff;
+        border: none;
+        padding: 14px 28px;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.2s;
+        width: 100%;
+    }
+
+    .submit-review-button:hover {
+        background: #1e293b;
+    }
+
+    /* Modernized Report Form Container */
+    .report-form {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        padding: 20px;
+        margin-top: 15px;
+        box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
+    }
+
+    .report-form label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        color: #475569;
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .report-form select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        font-size: 13px;
+        outline: none;
+        background: #ffffff;
+        color: #0b1117;
+        margin-bottom: 12px;
+    }
+
+    .submit-report-button {
+        background: #ef4444;
+        color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .submit-report-button:hover {
+        background: #dc2626;
+    }
+
+    /* MODERN EDIT MODAL STYLING */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(11, 17, 23, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+    }
+
+    .modal-card {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 20px;
+        padding: 30px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 20px 40px rgba(11, 17, 23, 0.15);
+    }
+
+    .modal-card h3 {
+        margin-top: 0;
+        font-size: 20px;
+        color: #0b1117;
+        margin-bottom: 20px;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    .btn-modal-save {
+        flex: 1;
+        background: #0b1117;
+        color: #ffffff;
+        border: none;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .btn-modal-save:hover {
+        background: #1e293b;
+    }
+
+    .btn-modal-cancel {
+        flex: 1;
+        background: #ffffff;
+        color: #0b1117;
+        border: 1px solid #cbd5e1;
+        padding: 12px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .btn-modal-cancel:hover {
+        background: #f1f5f9;
+    }
+</style>
 </head>
 <body>
 
@@ -47,11 +251,10 @@
 			</div>
 		</section>
 
-		<!-- WRITE REVIEW (button dabane par khulta hai) -->
+		<!-- WRITE REVIEW SECTION -->
 		<section class="write-review-section">
 			<h2>Share your experience</h2>
-			<p class="section-description">Have you used this website? Share
-				your experience with other users.</p>
+			<p class="section-description">Have you used this website? Share your experience with other users.</p>
 			<form id="reviewForm">
 				<div class="form-group">
 					<label for="rating"> Your rating </label>
@@ -70,10 +273,10 @@
 				</div>
 				<button type="submit" class="submit-review-button">Submit Review</button>
 			</form>
-			<p id="message"></p>
+			<p id="message" style="margin-top: 15px; font-weight: 600; font-size: 13px;"></p>
 		</section>
 
-		<!-- TWO COLUMNS: left = rating, details, FAQ | right = reviews -->
+		<!-- TWO COLUMNS -->
 		<div class="layout">
 
 			<section class="card score-card">
@@ -119,28 +322,23 @@
 			<section class="card faq-section">
 				<div class="faq-heading">
 					<h2>Frequently Asked Questions</h2>
-					<p>Find answers to common questions about this website profile
-						and reviews.</p>
+					<p>Find answers to common questions about this website profile and reviews.</p>
 				</div>
 				<div class="faq-item">
 					<h3>What is this website profile?</h3>
-					<p>This profile provides information, ratings, and reviews about
-						the website.</p>
+					<p>This profile provides information, ratings, and reviews about the website.</p>
 				</div>
 				<div class="faq-item">
 					<h3>How is the website rating calculated?</h3>
-					<p>The rating is based on reviews submitted by users of the
-						website.</p>
+					<p>The rating is based on reviews submitted by users of the website.</p>
 				</div>
 				<div class="faq-item">
 					<h3>Can I submit a review?</h3>
-					<p>Yes. Logged-in users can share their experience by submitting
-						a review and rating.</p>
+					<p>Yes. Logged-in users can share their experience by submitting a review and rating.</p>
 				</div>
 				<div class="faq-item">
 					<h3>Can I report a review?</h3>
-					<p>Yes. Users can report a review when they believe it violates
-						the platform's review guidelines.</p>
+					<p>Yes. Users can report a review when they believe it violates the platform's review guidelines.</p>
 				</div>
 			</section>
 
@@ -151,20 +349,13 @@
 						<p>Read experiences shared by other users.</p>
 					</div>
 					<div class="reviews-tools">
-						<div class="filter-chips" role="group"
-							aria-label="Filter reviews by rating">
-							<button type="button" class="filter-chip active" data-filter="0"
-								aria-pressed="true">All</button>
-							<button type="button" class="filter-chip" data-filter="5"
-								aria-pressed="false">5★</button>
-							<button type="button" class="filter-chip" data-filter="4"
-								aria-pressed="false">4★</button>
-							<button type="button" class="filter-chip" data-filter="3"
-								aria-pressed="false">3★</button>
-							<button type="button" class="filter-chip" data-filter="2"
-								aria-pressed="false">2★</button>
-							<button type="button" class="filter-chip" data-filter="1"
-								aria-pressed="false">1★</button>
+						<div class="filter-chips" role="group" aria-label="Filter reviews by rating">
+							<button type="button" class="filter-chip active" data-filter="0" aria-pressed="true">All</button>
+							<button type="button" class="filter-chip" data-filter="5" aria-pressed="false">5★</button>
+							<button type="button" class="filter-chip" data-filter="4" aria-pressed="false">4★</button>
+							<button type="button" class="filter-chip" data-filter="3" aria-pressed="false">3★</button>
+							<button type="button" class="filter-chip" data-filter="2" aria-pressed="false">2★</button>
+							<button type="button" class="filter-chip" data-filter="1" aria-pressed="false">1★</button>
 						</div>
 						<select id="reviewSort" class="sort-select" aria-label="Sort reviews">
 							<option value="recent">Most recent</option>
@@ -191,6 +382,619 @@
 
 	<div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-	<script src="js/review.js"></script>
+	<!-- RESTORED FULL FUNCTIONALITY SCRIPT WITH MODERN EDIT MODAL -->
+	<script>
+		const REVIEW_API = "/review-platform/reviews";
+		const WEBSITE_API = "/review-platform/websites";
+		const REPORT_API = "/review-platform/reports";
+		const RESPONSE_API = "/review-platform/business-responses";
+		const VOTE_API = "/review-platform/review-votes";
+		const BUSINESS_API = "/review-platform/businesses";
+		const BUSINESS_CLAIM_API = "/review-platform/business-claims";
+
+		const REVIEWS_PER_PAGE = 5;         
+		const REVIEWS_FETCH_SIZE = 100;     
+		const SHOW_BUSINESS_RESPONSES = true; 
+
+		const urlParams = new URLSearchParams(window.location.search);
+		let websiteId = urlParams.get("websiteId") || urlParams.get("id");
+
+		let currentWebsiteForStructuredData = null;
+		let currentReviewsForStructuredData = [];
+		let currentBusinessForClaim = null;
+		let currentSummary = null;
+		let websiteRequest = null;
+
+		let allReviews = [];
+		let businessResponses = {};
+		let reviewFilter = 0;
+		let reviewSort = "recent";
+		let visibleReviewCount = REVIEWS_PER_PAGE;
+
+		function getLoggedInUser() {
+			try {
+				return JSON.parse(localStorage.getItem("loggedInUser"));
+			} catch (error) {
+				return null;
+			}
+		}
+
+		function getUserId() {
+			const user = getLoggedInUser();
+			return (user && user.id) ? Number(user.id) : null;
+		}
+
+		function escapeHtml(value) {
+			if (value === null || value === undefined) return "";
+			return String(value)
+				.replace(/&/g, "&amp;")
+				.replace(/</g, "&lt;")
+				.replace(/>/g, "&gt;")
+				.replace(/"/g, "&quot;")
+				.replace(/'/g, "&#039;");
+		}
+
+		function safeHref(url) {
+			const value = String(url || "").trim();
+			if (/^https?:\/\//i.test(value)) return value;
+			if (/^[\w-]+(\.[\w-]+)+/i.test(value)) return "https://" + value;
+			return "#";
+		}
+
+		function starText(score) {
+			const value = Number(score) || 0;
+			const full = Math.floor(value);
+			const half = value - full >= 0.5 ? 1 : 0;
+			return "★".repeat(full) + (half ? "½" : "") + "☆".repeat(5 - full - half);
+		}
+
+		function formatDate(value) {
+			if (!value) return "";
+			let date = Array.isArray(value) ? new Date(value[0], (value[1] || 1) - 1, value[2] || 1) : new Date(value);
+			if (isNaN(date.getTime())) return "";
+			return date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+		}
+
+		function calculatePercentage(count, total) {
+			return (!total || total === 0) ? 0 : Math.round((count / total) * 100);
+		}
+
+		let toastTimer = null;
+		function showToast(message) {
+			const toast = document.getElementById("toast");
+			if (!toast) return;
+			toast.textContent = message;
+			toast.classList.add("show");
+			clearTimeout(toastTimer);
+			toastTimer = setTimeout(() => toast.classList.remove("show"), 2600);
+		}
+
+		function fetchWebsite() {
+			if (!websiteId) return Promise.reject(new Error("Website ID not found"));
+			if (!websiteRequest) {
+				websiteRequest = fetch(WEBSITE_API + "/" + websiteId).then(res => {
+					if (!res.ok) throw new Error("Website not found");
+					return res.json();
+				});
+			}
+			return websiteRequest;
+		}
+
+		function loadWebsiteInfo() {
+			const websiteInfo = document.getElementById("websiteInfo");
+			if (!websiteId) {
+				if (websiteInfo) websiteInfo.innerHTML = '<p class="error-message">Website ID not found.</p>';
+				return;
+			}
+
+			fetchWebsite().then(website => {
+				currentWebsiteForStructuredData = website;
+				const nameElement = document.getElementById("websiteName");
+				if (nameElement) nameElement.textContent = website.name || "Website";
+
+				const visitButton = document.getElementById("visitWebsiteButton");
+				if (visitButton && website.url) {
+					visitButton.href = safeHref(website.url);
+					visitButton.hidden = false;
+				}
+
+				if (websiteInfo) {
+					websiteInfo.innerHTML = (website.description ? "<p>" + escapeHtml(website.description) + "</p>" : "") + '<div id="claimStatus">Checking business verification...</div>';
+				}
+				renderCompanyDetails();
+			}).catch(err => {
+				if (websiteInfo) websiteInfo.innerHTML = '<p class="error-message">Unable to load website information.</p>';
+			});
+		}
+
+		function renderCompanyDetails() {
+			const list = document.getElementById("websiteDetails");
+			if (!list) return;
+			const website = currentWebsiteForStructuredData;
+			let html = "";
+			if (website && website.url) {
+				html += `<dt>Website</dt><dd><a href="${safeHref(website.url)}" target="_blank">${escapeHtml(website.url)}</a></dd>`;
+			}
+			if (currentSummary) {
+				html += `<dt>Total reviews</dt><dd>${Number(currentSummary.totalReview || 0)}</dd>`;
+			}
+			list.innerHTML = html;
+		}
+
+		function loadRatingSummary() {
+			if (!websiteId) return;
+			fetch(REVIEW_API + "/website/" + websiteId + "/summary").then(res => res.ok ? res.json() : Promise.reject()).then(summary => {
+				currentSummary = summary;
+				renderRatingSummary(summary);
+				renderCompanyDetails();
+			}).catch(err => console.error(err));
+		}
+
+		function renderRatingSummary(summary) {
+			const averageRating = Number(summary.averageRating || 0);
+			const totalReview = Number(summary.totalReview || 0);
+			const counts = {
+				five: Number(summary.fivestar ?? summary.fiveStar ?? 0),
+				four: Number(summary.fourStar || 0),
+				three: Number(summary.threeStar || 0),
+				two: Number(summary.twoStar || 0),
+				one: Number(summary.oneStar || 0)
+			};
+
+			const averageElement = document.getElementById("averageRating");
+			if (averageElement) averageElement.innerHTML = `<span class="score-number">${averageRating.toFixed(1)}</span><span class="score-out-of">/5</span>`;
+
+			const scoreStars = document.getElementById("scoreStars");
+			if (scoreStars) scoreStars.textContent = starText(averageRating);
+
+			const totalElement = document.getElementById("totalReviews");
+			if (totalElement) totalElement.textContent = "Based on " + totalReview + " review" + (totalReview === 1 ? "" : "s");
+
+			const headRating = document.getElementById("headRating");
+			if (headRating) {
+				headRating.innerHTML = `<span class="stars">${starText(averageRating)}</span><strong>${averageRating.toFixed(1)}</strong><span>· ${totalReview} reviews</span>`;
+			}
+
+			Object.keys(counts).forEach(name => {
+				const countElement = document.getElementById(name + "StarCount");
+				const barElement = document.getElementById(name + "StarBar");
+				if (countElement) countElement.textContent = counts[name];
+				if (barElement) barElement.style.width = calculatePercentage(counts[name], totalReview) + "%";
+			});
+		}
+
+		function loadBusinessResponses() {
+			if (!SHOW_BUSINESS_RESPONSES) return Promise.resolve({});
+			return fetch(RESPONSE_API).then(res => res.ok ? res.json() : []).then(data => {
+				const list = Array.isArray(data) ? data : (data.content || []);
+				const map = {};
+				list.forEach(item => {
+					if (item && item.reviewId !== undefined && item.response) {
+						map[Number(item.reviewId)] = item.response;
+					}
+				});
+				return map;
+			}).catch(() => ({}));
+		}
+
+		function loadReviews() {
+			if (!websiteId) return;
+			Promise.all([
+				fetch(REVIEW_API + "/website/" + websiteId + "?page=0&size=" + REVIEWS_FETCH_SIZE).then(res => res.ok ? res.json() : []),
+				loadBusinessResponses()
+			]).then(([revData, respMap]) => {
+				allReviews = Array.isArray(revData) ? revData : (revData.content || []);
+				businessResponses = respMap;
+				displayReviews();
+			}).catch(err => console.error(err));
+		}
+
+		function getReviewTime(review) {
+			const value = review.createdAt || review.reviewDate || review.date;
+			if (!value) return 0;
+			const time = Array.isArray(value) ? new Date(value[0], (value[1] || 1) - 1, value[2] || 1).getTime() : Date.parse(value);
+			return isNaN(time) ? 0 : time;
+		}
+
+		function getFilteredReviews() {
+			const list = reviewFilter ? allReviews.filter(r => Number(r.rating) === reviewFilter) : allReviews.slice();
+			const sorters = {
+				recent: (a, b) => getReviewTime(b) - getReviewTime(a) || Number(b.id) - Number(a.id),
+				high: (a, b) => Number(b.rating) - Number(a.rating) || Number(b.id) - Number(a.id),
+				low: (a, b) => Number(a.rating) - Number(b.rating) || Number(b.id) - Number(a.id)
+			};
+			return list.sort(sorters[reviewSort] || sorters.recent);
+		}
+
+		function displayReviews() {
+			const reviewList = document.getElementById("reviewList");
+			const shownText = document.getElementById("reviewsShown");
+			const loadMore = document.getElementById("loadMoreButton");
+			if (!reviewList) return;
+
+			if (!allReviews.length) {
+				reviewList.innerHTML = '<p class="no-review">No reviews available yet.</p>';
+				if (shownText) shownText.textContent = "";
+				if (loadMore) loadMore.hidden = true;
+				return;
+			}
+
+			const list = getFilteredReviews();
+			if (!list.length) {
+				reviewList.innerHTML = '<p class="no-review">No reviews with this rating.</p>';
+				if (shownText) shownText.textContent = "";
+				if (loadMore) loadMore.hidden = true;
+				return;
+			}
+
+			const visible = list.slice(0, visibleReviewCount);
+			reviewList.innerHTML = visible.map(buildReviewCard).join("");
+
+			visible.forEach(review => loadVoteCounts(review.id));
+
+			if (shownText) shownText.textContent = "Showing " + visible.length + " of " + list.length + " reviews";
+			if (loadMore) loadMore.hidden = list.length <= visible.length;
+		}
+
+		function buildReviewMenu(review) {
+			const id = review.id;
+			return `
+				<div class="menu-wrap">
+					<button type="button" class="menu-toggle" data-action="toggle-menu" data-review-id="${id}" aria-expanded="false">•••</button>
+					<div class="review-menu" role="menu" hidden>
+						<button type="button" role="menuitem" data-action="edit" data-review-id="${id}">Edit review</button>
+						<button type="button" role="menuitem" data-action="delete" data-review-id="${id}">Delete review</button>
+						<button type="button" role="menuitem" data-action="show-report" data-review-id="${id}">Report review</button>
+					</div>
+				</div>
+			`;
+		}
+
+		function buildReviewCard(review) {
+			const id = review.id;
+			const rating = Number(review.rating) || 0;
+			const name = String(review.userName || review.username || review.reviewerName || "Customer");
+			const dateText = formatDate(review.createdAt || review.reviewDate || review.date);
+			const reply = businessResponses[Number(id)];
+
+			return `
+				<article class="review-card" id="review-${id}" data-review-id="${id}">
+					<div class="review-head">
+						<div class="avatar">${escapeHtml(name.charAt(0).toUpperCase())}</div>
+						<div class="review-who">
+							<strong>${escapeHtml(name)}</strong>
+							${dateText ? `<div class="review-date">${escapeHtml(dateText)}</div>` : ""}
+						</div>
+						${buildReviewMenu(review)}
+					</div>
+					<div class="rating">
+						<span class="stars">${starText(rating)}</span>
+						<strong>${rating}/5</strong>
+					</div>
+					${review.comment ? `<div class="comment">${escapeHtml(review.comment)}</div>` : ""}
+					${reply ? `<div class="business-response"><strong>Business Response</strong><p>${escapeHtml(reply)}</p></div>` : ""}
+					
+					<div class="review-actions">
+						<button type="button" class="review-btn" data-action="helpful" data-review-id="${id}">Helpful · <span id="helpful-${id}">0</span></button>
+						<button type="button" class="review-btn" data-action="not-helpful" data-review-id="${id}">Not Helpful · <span id="not-helpful-${id}">0</span></button>
+						<button type="button" class="review-btn" data-action="share" data-review-id="${id}">Share</button>
+					</div>
+
+					<div id="reportForm-${id}" class="report-form" style="display: none;">
+						<label>Report Reason</label>
+						<select id="reportReason-${id}">
+							<option value="">Select reason</option>
+							<option value="Spam">Spam</option>
+							<option value="Fake Review">Fake Review</option>
+							<option value="Offensive Content">Offensive Content</option>
+							<option value="Other">Other</option>
+						</select>
+						<button type="button" class="submit-report-button" data-action="submit-report" data-review-id="${id}">Submit Report</button>
+						<p id="reportMessage-${id}" class="report-message"></p>
+					</div>
+				</article>
+			`;
+		}
+
+		/* VOTES HANDLING */
+		function submitVote(reviewId, voteType) {
+			const userId = getUserId();
+			if (!userId) {
+				alert("Please login before voting.");
+				return;
+			}
+			fetch(VOTE_API, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ reviewId: Number(reviewId), userId: Number(userId), voteType })
+			}).then(res => { if (res.ok) loadVoteCounts(reviewId); }).catch(err => console.error(err));
+		}
+
+		function loadVoteCounts(reviewId) {
+			fetch(VOTE_API + "/" + reviewId + "/count").then(res => res.ok ? res.json() : {}).then(data => {
+				const helpfulEl = document.getElementById("helpful-" + reviewId);
+				const notHelpfulEl = document.getElementById("not-helpful-" + reviewId);
+				if (helpfulEl) helpfulEl.textContent = data.helpful || 0;
+				if (notHelpfulEl) notHelpfulEl.textContent = data.notHelpful || 0;
+			}).catch(() => {});
+		}
+
+		function shareReview(reviewId) {
+			const url = window.location.origin + window.location.pathname + window.location.search + "#review-" + reviewId;
+			if (navigator.clipboard && navigator.clipboard.writeText) {
+				navigator.clipboard.writeText(url).then(() => showToast("Link copied to clipboard."));
+			} else {
+				window.prompt("Copy link:", url);
+			}
+		}
+
+		/* MODERN MODAL EDIT FUNCTION */
+		function openEditModal(reviewId) {
+			const userId = getUserId();
+			if (!userId) {
+				alert("Please login before editing a review.");
+				return;
+			}
+
+			const current = allReviews.find(item => Number(item.id) === Number(reviewId));
+			if (current && Number(current.userId) !== Number(userId)) {
+				alert("You can edit only your own review.");
+				return;
+			}
+			const oldRating = current ? current.rating : 5;
+			const oldComment = current ? (current.comment || "") : "";
+
+			const modalOverlay = document.createElement("div");
+			modalOverlay.className = "modal-overlay";
+			modalOverlay.innerHTML = `
+				<div class="modal-card">
+					<h3>Edit Your Review</h3>
+					<div class="form-group">
+						<label>Rating</label>
+						<select id="modalEditRating">
+							<option value="1" ${oldRating == 1 ? 'selected' : ''}>1 - Bad</option>
+							<option value="2" ${oldRating == 2 ? 'selected' : ''}>2 - Poor</option>
+							<option value="3" ${oldRating == 3 ? 'selected' : ''}>3 - Average</option>
+							<option value="4" ${oldRating == 4 ? 'selected' : ''}>4 - Good</option>
+							<option value="5" ${oldRating == 5 ? 'selected' : ''}>5 - Excellent</option>
+						</select>
+					</div>
+					<div class="form-group">
+						<label>Your Review</label>
+						<textarea id="modalEditComment">${escapeHtml(oldComment)}</textarea>
+					</div>
+					<div class="modal-actions">
+						<button type="button" id="modalCancelBtn" class="btn-modal-cancel">Cancel</button>
+						<button type="button" id="modalSaveBtn" class="btn-modal-save">Save Changes</button>
+					</div>
+				</div>
+			`;
+			document.body.appendChild(modalOverlay);
+
+			document.getElementById("modalCancelBtn").addEventListener("click", () => modalOverlay.remove());
+			document.getElementById("modalSaveBtn").addEventListener("click", () => {
+				const newRating = Number(document.getElementById("modalEditRating").value);
+				const newComment = document.getElementById("modalEditComment").value.trim();
+
+				if (!newComment) {
+					alert("Review cannot be empty.");
+					return;
+				}
+
+				const reviewPayload = {
+					id: Number(reviewId),
+					rating: newRating,
+					comment: newComment,
+					userId: Number(userId),
+					websiteId: Number(websiteId)
+				};
+
+				fetch(REVIEW_API + "/" + reviewId, {
+					method: "PUT",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(reviewPayload)
+				}).then(res => {
+					if (!res.ok) {
+						return res.text().then(text => {
+							let msg = "Review could not be updated (error " + res.status + ").";
+							if (res.status === 401 || res.status === 403) {
+								msg = "Login session expired. Please logout, login again and try once more.";
+							} else if (res.status === 429) {
+								msg = "Too many requests. Please wait a minute and try again.";
+							} else {
+								try {
+									const data = JSON.parse(text);
+									if (data.message) msg = data.message;
+								} catch (e) {}
+							}
+							throw new Error(msg);
+						});
+					}
+					return res.json().catch(() => ({}));
+				}).then(() => {
+					modalOverlay.remove();
+					showToast("Review updated successfully!");
+					loadReviews();
+					loadRatingSummary();
+				}).catch(err => {
+					console.error(err);
+					alert(err.message || "Review could not be updated.");
+				});
+			});
+		}
+
+		function deleteReview(reviewId) {
+			const userId = getUserId();
+			if (!userId) {
+				alert("Please login before deleting.");
+				return;
+			}
+			if (!confirm("Are you sure you want to delete this review?")) return;
+
+			fetch(REVIEW_API + "/" + reviewId, { method: "DELETE" }).then(res => {
+				if (!res.ok) throw new Error("Delete failed");
+				showToast("Review deleted successfully!");
+				loadReviews();
+				loadRatingSummary();
+			}).catch(() => alert("Could not delete review."));
+		}
+
+		function showReportForm(reviewId) {
+			const form = document.getElementById("reportForm-" + reviewId);
+			if (form) form.style.display = form.style.display === "block" ? "none" : "block";
+		}
+
+		function submitReport(reviewId) {
+			const reason = document.getElementById("reportReason-" + reviewId).value;
+			const msg = document.getElementById("reportMessage-" + reviewId);
+			const userId = getUserId();
+
+			if (!reason) {
+				msg.innerHTML = '<span class="error-message">Please select a reason.</span>';
+				return;
+			}
+			if (!userId) {
+				msg.innerHTML = '<span class="error-message">Please login to report.</span>';
+				return;
+			}
+
+			fetch(REPORT_API, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ userId: Number(userId), reviewId: Number(reviewId), reason })
+			}).then(res => {
+				if (!res.ok) throw new Error();
+				msg.innerHTML = '<span class="success-message">Report submitted!</span>';
+			}).catch(() => {
+				msg.innerHTML = '<span class="error-message">Failed to submit report.</span>';
+			});
+		}
+
+		// Comprehensive Event Handling & Page Initialization
+		document.addEventListener("DOMContentLoaded", async function () {
+			let loggedInUser = null;
+			try { loggedInUser = JSON.parse(localStorage.getItem("loggedInUser")); } catch (e) {}
+
+			if (!websiteId && loggedInUser && loggedInUser.id) {
+				try {
+					const bizResp = await fetch(`/review-platform/business-dashboard/user/${loggedInUser.id}`);
+					if (bizResp.ok) {
+						const bizData = await bizResp.json();
+						let targetBusiness = Array.isArray(bizData) ? bizData[0] : bizData;
+						if (targetBusiness) websiteId = targetBusiness.id || targetBusiness.businessId || targetBusiness.websiteId;
+					}
+				} catch (err) {}
+			}
+
+			loadWebsiteInfo();
+			loadRatingSummary();
+			loadReviews();
+
+			// Filter Chips
+			const chips = document.querySelectorAll(".filter-chip");
+			chips.forEach(chip => {
+				chip.addEventListener("click", () => {
+					reviewFilter = Number(chip.dataset.filter);
+					visibleReviewCount = REVIEWS_PER_PAGE;
+					chips.forEach(c => {
+						const active = c === chip;
+						c.classList.toggle("active", active);
+						c.setAttribute("aria-pressed", String(active));
+					});
+					displayReviews();
+				});
+			});
+
+			// Sort Select
+			const sortSelect = document.getElementById("reviewSort");
+			if (sortSelect) {
+				sortSelect.addEventListener("change", () => {
+					reviewSort = sortSelect.value;
+					displayReviews();
+				});
+			}
+
+			// Load More Button
+			const loadMore = document.getElementById("loadMoreButton");
+			if (loadMore) {
+				loadMore.addEventListener("click", () => {
+					visibleReviewCount += REVIEWS_PER_PAGE;
+					displayReviews();
+				});
+			}
+
+			// Write Review Form Submission
+			const reviewForm = document.getElementById("reviewForm");
+			if (reviewForm) {
+				reviewForm.addEventListener("submit", function (e) {
+					e.preventDefault();
+					const rating = Number(document.getElementById("rating").value);
+					const comment = document.getElementById("comment").value.trim();
+					const message = document.getElementById("message");
+					const user = getLoggedInUser();
+
+					if (!user || !user.id) {
+						message.innerHTML = '<span class="error-message">Please login before submitting a review.</span>';
+						return;
+					}
+
+					if (!websiteId) {
+						message.innerHTML = '<span class="error-message">Website ID is missing.</span>';
+						return;
+					}
+
+					fetch(REVIEW_API, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({ rating, comment, userId: Number(user.id), websiteId: Number(websiteId) })
+					}).then(res => {
+						if (!res.ok) throw new Error();
+						return res.json();
+					}).then(() => {
+						message.innerHTML = '<span class="success-message">Review added successfully!</span>';
+						reviewForm.reset();
+						loadReviews();
+						loadRatingSummary();
+					}).catch(() => {
+						message.innerHTML = '<span class="error-message">Review could not be added.</span>';
+					});
+				});
+			}
+
+			// Global Event Delegation for Dynamic Actions (Edit, Delete, Vote, Share, Report, Menus)
+			document.addEventListener("click", function (event) {
+				const toggleBtn = event.target.closest(".menu-toggle");
+				if (toggleBtn) {
+					const menu = toggleBtn.nextElementSibling;
+					document.querySelectorAll(".review-menu").forEach(m => { if (m !== menu) m.hidden = true; });
+					if (menu) menu.hidden = !menu.hidden;
+					return;
+				}
+
+				const actionBtn = event.target.closest("button[data-action]");
+				if (actionBtn) {
+					const action = actionBtn.dataset.action;
+					const reviewId = actionBtn.dataset.reviewId;
+					if (action === "edit") openEditModal(reviewId);
+					if (action === "delete") deleteReview(reviewId);
+					if (action === "show-report") showReportForm(reviewId);
+					if (action === "submit-report") submitReport(reviewId);
+					if (action === "helpful") submitVote(reviewId, "HELPFUL");
+					if (action === "not-helpful") submitVote(reviewId, "NOT_HELPFUL");
+					if (action === "share") shareReview(reviewId);
+				}
+
+				if (!event.target.closest(".menu-wrap")) {
+					document.querySelectorAll(".review-menu").forEach(m => m.hidden = true);
+				}
+			});
+
+			document.getElementById("writeReviewButton").addEventListener("click", () => {
+				const section = document.querySelector(".write-review-section");
+				section.classList.add("show");
+				section.scrollIntoView({ behavior: "smooth" });
+			});
+		});
+	</script>
 </body>
 </html>

@@ -256,7 +256,6 @@
             <a href="business-signup.html" class="get-started-btn">Get Started</a>
         </div>
         <div class="growth-graphics">
-            <!-- Image ko ek clean card container mein daal diya hai -->
             <div class="growth-image-card">
                 <img src="images/growth-chart.png" alt="Business Growth Chart" class="growth-chart-img">
             </div>
@@ -494,13 +493,14 @@
                             fetch(
                                 "/review-platform/users/logout",
                                 {
-                                    method: "POST"
+                                    method: "POST",
+                                    credentials: "include"
                                 }
                             )
                             .catch(
                                 function (error) {
                                     console.error(
-                                        "Logout API error:",
+                                        "Logout API error (ignored):",
                                         error
                                     );
                                 }

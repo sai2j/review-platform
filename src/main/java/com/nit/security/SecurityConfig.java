@@ -139,6 +139,8 @@ public class SecurityConfig {
                         "/index.html",
                         "/login.html",
                         "/register.html",
+                        "/browse.html",
+                        "/category.html",
                         "/review.html",
                         "/website.html",
                         "/business-signup.html",

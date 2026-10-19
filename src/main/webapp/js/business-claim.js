@@ -108,16 +108,30 @@ if (businessId) {
     businessIdInput.value =
         businessId;
 
-} else {
+		} else {
 
-    message.innerHTML =
-        '<span class="error-message">' +
-        'Business information is missing.' +
-        '</span>';
+		    message.innerHTML =
+		        '<span class="error-message">' +
+		        'Business information is missing.' +
+		        '</span>';
 
-    claimForm.style.display = "none";
+		    claimForm.style.display = "none";
 
-}
+		    if (businessDetails) {
+
+		        businessDetails.innerHTML =
+		            '<p class="loading-text">' +
+		            'No business selected. Open a business profile from ' +
+		            'Browse Websites and click Claim to submit your claim.' +
+		            '</p>' +
+		            '<p style="text-align:center; margin-top:12px;">' +
+		            '<a href="browse.html" class="claim-browse-link">' +
+		            'Browse Websites' +
+		            '</a></p>';
+
+		    }
+
+		}
 
 
 /* =========================================================

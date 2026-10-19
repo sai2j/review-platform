@@ -670,3 +670,11 @@ svg {
         width: 100%;
     }
 }
+/* Colourful emoji icons in the sidebar (same as My Profile page) */
+.side-icon {
+    flex: 0 0 20px;
+    width: 20px;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1;
+}

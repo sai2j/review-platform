@@ -33,15 +33,16 @@
         window.location.pathname.split("/").pop() || "index.html"
     ).toLowerCase();
 
+    // Same colourful icons as the My Profile page sidebar
     var ICONS = {
-        home: '<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/>',
-        write: '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/>',
-        browse: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a14 14 0 010 18M12 3a14 14 0 000 18"/>',
-        profile: '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
-        business: '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 8h2M13 8h2M9 12h2M13 12h2M10 21v-4h4v4"/>',
-        claim: '<path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>',
-        dashboard: '<rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/>',
-        logout: '<path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/>'
+        home: "🏠",
+        write: "✏️",
+        browse: "🌐",
+        profile: "👤",
+        business: "🏢",
+        claim: "🛡️",
+        dashboard: "📊",
+        logout: "🚪"
     };
 
     var LINKS = [
@@ -63,7 +64,7 @@
     }
 
     function icon(name) {
-        return '<svg viewBox="0 0 24 24" aria-hidden="true">' + ICONS[name] + "</svg>";
+        return '<span class="rp-icon" aria-hidden="true">' + ICONS[name] + "</span>";
     }
 
     function buildSidebarHtml() {

@@ -135,6 +135,13 @@ function openMyProfile() {
     window.location.href = "user-profile.html";
 }
 
+function openMyBusinessPage() {
+    window.location.href = "user-dashboard.html";
+}
+
+function openClaimBusinessPage() {
+    window.location.href = "business-claim.html";
+}
 function scrollToBusiness() {
     scrollToElement("myBusinessSection");
 }

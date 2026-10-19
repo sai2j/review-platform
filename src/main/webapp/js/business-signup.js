@@ -44,36 +44,34 @@ function getLoggedInUser() {
 SHOW MESSAGE
 
 ========================================================= */
-
 function showMessage(message, type) {
 
 	const messageElement =
-
-		document.getElementById(
-
-			"businessSignupMessage"
-
-		);
+		document.getElementById("businessSignupMessage");
 
 	if (!messageElement) {
-
 		return;
+	}
 
+	// Backend error JSON ho to sirf "message" dikhao
+	let text = message;
+
+	try {
+		const parsed = JSON.parse(message);
+
+		if (parsed && parsed.message) {
+			text = parsed.message;
+		}
+	} catch (e) {
+		// plain text hai, jaisa hai waisa dikhao
 	}
 
 	messageElement.className =
+		"business-signup-message " + (type || "");
 
-		"business-signup-message " +
-
-		(type || "");
-
-	messageElement.textContent =
-
-		message;
+	messageElement.textContent = text;
 
 }
-
-
 /* =========================================================
 
 CREATE WEBSITE
@@ -666,22 +664,25 @@ function setupBusinessSignupForm() {
 			}
 
 
+			let validUrl = true;
+
 			try {
+				const parsedUrl = new URL(normalizedUrl);
 
-				new URL(normalizedUrl);
-
+				// space nahi hona chahiye aur domain mein dot hona chahiye
+				if (/\s/.test(url) || parsedUrl.hostname.indexOf(".") === -1) {
+					validUrl = false;
+				}
 			} catch (error) {
+				validUrl = false;
+			}
 
+			if (!validUrl) {
 				showMessage(
-
-					"Please enter a valid business website URL.",
-
+					"Please enter a valid website URL, for example https://travelcarrental.com",
 					"error"
-
 				);
-
 				return;
-
 			}
 
 

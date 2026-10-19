@@ -32,6 +32,21 @@ const API = {
 
 const PAGE_SIZE = 5;    // har table / list mein ek page par kitne rows
 
+// Har section ki "poore 5 rows wali" height yaad rakhta hai,
+// taaki rows kam hone par bhi card chhota na ho.
+const sectionHeights = {};
+
+// Jab tak koi poora page nahi dekha, tab tak ka andaaza (px).
+const DEFAULT_SECTION_HEIGHTS = {
+    queue: 300,
+    hidden: 400,
+    claims: 400,
+    reports: 300,
+    users: 330,
+    websites: 330,
+    logs: 400
+};
+
 
 /* =========================================================
    STATE
@@ -577,11 +592,50 @@ function renderSection(key) {
             esc(searchQuery && section.rows.length ? "Nothing matches your search." : config.empty) +
             "</p>";
         pager.innerHTML = "";
+        keepSectionHeight(key, 0);
         return;
     }
 
     body.innerHTML = config.render(view.items);
     pager.innerHTML = pagerHtml(key, view);
+    keepSectionHeight(key, view.items.length);
+}
+
+// Rows kam ho ya na ho, section ki height pehle jaisi hi rakhta hai.
+function keepSectionHeight(key, rowCount) {
+    const body = $(SECTIONS[key].body);
+
+    if (!body) {
+        return;
+    }
+
+    body.style.minHeight = "";
+
+    const naturalHeight = body.offsetHeight;
+
+    if (rowCount >= PAGE_SIZE) {
+        sectionHeights[key] = Math.max(sectionHeights[key] || 0, naturalHeight);
+    } else if (rowCount > 0) {
+        const rows = body.querySelectorAll("tbody tr, .list-row");
+
+        if (rows.length) {
+            let total = 0;
+
+            rows.forEach(function (row) {
+                total += row.offsetHeight;
+            });
+
+            const estimated = naturalHeight + (PAGE_SIZE - rowCount) * (total / rows.length);
+
+            sectionHeights[key] = Math.max(sectionHeights[key] || 0, estimated);
+        }
+    }
+
+    const target = sectionHeights[key] || DEFAULT_SECTION_HEIGHTS[key] || 0;
+
+    if (target) {
+        body.style.minHeight = Math.ceil(target) + "px";
+    }
 }
 
 function setText(id, value) {

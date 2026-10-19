@@ -7,27 +7,157 @@
 <title>Claim Business - Review Platform</title>
 <link rel="stylesheet" href="css/business-claim.css">
 <link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="css/navbar.css">
+<style>
+*, *::before, *::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: Arial, Helvetica, sans-serif;
+	background: #f0f7ff;
+	color: #0b1117;
+	display: flex;
+	min-height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+	width: 260px;
+	background: #ffffff;
+	border-right: 1px solid #e2e8f0;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 100;
+}
+
+.sidebar-top {
+	padding: 24px;
+}
+
+.sidebar-brand {
+	font-size: 20px;
+	font-weight: 800;
+	color: #0b1117;
+	margin-bottom: 30px;
+}
+
+.sidebar-brand span {
+	color: #00b67a;
+}
+
+.sidebar-menu {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.sidebar-item {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	padding: 12px 16px;
+	color: #475569;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: 600;
+	border-radius: 10px;
+	transition: all 0.2s;
+}
+
+.sidebar-item:hover {
+	background: #f1f5f9;
+	color: #0b1117;
+}
+
+.sidebar-item.active {
+	background: #0b1117;
+	color: #ffffff;
+}
+
+.sidebar-footer {
+	padding: 20px 24px;
+	border-top: 1px solid #e2e8f0;
+}
+
+.user-info-box {
+	font-size: 13px;
+	color: #475569;
+	margin-bottom: 12px;
+	word-break: break-all;
+	background: #f8fafc;
+	padding: 10px;
+	border-radius: 8px;
+	border: 1px solid #e2e8f0;
+}
+
+.logout-btn {
+	width: 100%;
+	background: #0b1117;
+	color: #ffffff;
+	border: none;
+	padding: 10px;
+	border-radius: 8px;
+	font-weight: 600;
+	cursor: pointer;
+	text-align: center;
+}
+
+.logout-btn:hover {
+	background: #1e293b;
+}
+
+/* MAIN CONTENT */
+.main-content {
+	margin-left: 260px;
+	flex: 1;
+	padding: 40px;
+}
+</style>
 </head>
 <body>
-	<nav class="navbar">
-		<div class="navbar-inner">
-			<a href="index.html" class="logo"> Review <span> Platform
-			</span>
-			</a>
-			<div class="nav-links">
-				<a href="index.html"> Home </a> <a href="business-signup.html">
-					For Businesses </a> <a href="login.html"> Login </a>
+
+	<!-- LEFT SIDEBAR -->
+	<aside class="sidebar">
+		<div class="sidebar-top">
+			<div class="sidebar-brand">
+				Review<span>Platform</span>
+			</div>
+			<div class="sidebar-menu">
+				<a href="index.html" class="sidebar-item"><span
+					style="color: #f97316;">🏠</span> Home</a> <a href="review.html"
+					class="sidebar-item"><span style="color: #3b82f6;">✏️</span>
+					Write a Review</a> <a href="browse.html" class="sidebar-item"><span
+					style="color: #06b6d4;">🌐</span> Browse Websites</a> <a
+					href="user-profile.html" class="sidebar-item"><span
+					style="color: #8b5cf6;">👤</span> My Profile</a> <a
+					href="business-signup.html" class="sidebar-item"><span
+					style="color: #10b981;">🏢</span> My Business</a> <a
+					href="business-claim.html" class="sidebar-item active"><span
+					style="color: #6366f1;">🛡️</span> Claim Business</a> <a
+					href="business-dashboard.html" class="sidebar-item"><span
+					style="color: #ec4899;">📊</span> Business Dashboard</a>
 			</div>
 		</div>
-	</nav>
-	<main class="claim-page">
+		<div class="sidebar-footer">
+			<div class="user-info-box" id="userInfoText">Logged in</div>
+			<button type="button" id="sidebarLogoutBtn" class="logout-btn">Logout</button>
+		</div>
+	</aside>
+
+	<main class="main-content">
 		<section class="claim-container">
 			<div class="claim-header">
 				<div class="claim-badge">BUSINESS PROFILE</div>
 				<h1>Claim Your Business</h1>
 				<p>Claim this business profile to manage your business
 					information and respond to customer reviews.</p>
-
 			</div>
 			<div class="claim-card">
 				<section class="business-details-section">
@@ -100,36 +230,37 @@
 			</section>
 		</section>
 	</main>
-	<footer class="site-footer">
-		<div class="footer-content">
-			<div class="footer-brand">
-				<h2>
-					Review <span> Platform </span>
-				</h2>
-				<p>Read reviews, share experiences, and discover websites you
-					can trust.</p>
-			</div>
-			<div class="footer-column">
-				<h3>Review Platform</h3>
-				<a href="index.html"> Home </a> <a href="browse.html"> Browse
-					Websites </a> <a href="index.html#categoryList"> Categories </a>
-			</div>
-			<div class="footer-column">
-				<h3>Community</h3>
-				<a href="login.html"> Login </a> <a href="register.html">
-					Register </a> <a href="index.html#websiteList"> Reviews </a>
-			</div>
-			<div class="footer-column">
-				<h3>For Businesses</h3>
-				<a href="business-signup.html"> Create Business Profile </a> <a
-					href="business-claim.html"> Claim Your Business </a> <a
-					href="business-dashboard.html"> Business Dashboard </a>
-			</div>
-		</div>
-		<div class="footer-bottom">
-			<p>© 2026 Review Platform. All rights reserved.</p>
-		</div>
-	</footer>
+
+	<script>
+		document
+				.addEventListener(
+						"DOMContentLoaded",
+						function() {
+							let loggedInUser = null;
+							try {
+								loggedInUser = JSON.parse(localStorage
+										.getItem("loggedInUser"));
+							} catch (e) {
+								loggedInUser = null;
+							}
+							const userInfoText = document
+									.getElementById("userInfoText");
+							if (loggedInUser && loggedInUser.email) {
+								userInfoText.innerHTML = `<strong>Logged in as</strong><br>${loggedInUser.email}`;
+							} else {
+								userInfoText.textContent = "Not logged in";
+							}
+							const logoutBtn = document
+									.getElementById("sidebarLogoutBtn");
+							if (logoutBtn) {
+								logoutBtn.addEventListener("click", function() {
+									localStorage.removeItem("loggedInUser");
+									localStorage.removeItem("myBusiness");
+									window.location.href = "index.html";
+								});
+							}
+						});
+	</script>
 	<script src="js/business-claim.js"></script>
 </body>
 </html>

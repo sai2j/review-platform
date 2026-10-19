@@ -1,0 +1,226 @@
+/* =========================================================
+   SIDEBAR LAYOUT - used with js/sidebar-layout.js
+   Same look as the sidebar on My Business / My Profile.
+========================================================= */
+
+/* Old black top navbar is hidden for logged-in users */
+html.rp-has-sidebar body .navbar,
+html.rp-has-sidebar body .top-navbar,
+html.rp-has-sidebar body .auth-navbar {
+    display: none !important;
+}
+
+html.rp-has-sidebar body {
+    margin: 0;
+}
+
+.rp-shell {
+    display: flex;
+    align-items: flex-start;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.rp-main {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+/* ---------- Sidebar ---------- */
+
+.rp-sidebar {
+    --rp-ink: #0b1117;
+    --rp-muted: #4b5b68;
+    --rp-line: #d3e8f7;
+    --rp-bg: #eaf6ff;
+    --rp-sky: #a8dcfa;
+    --rp-soft: #d6eeff;
+
+    flex: 0 0 260px;
+    width: 260px;
+    align-self: flex-start;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 28px 20px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border-right: 1px solid var(--rp-line);
+    color: var(--rp-ink);
+    font-family: system-ui, -apple-system, "Segoe UI", "Helvetica Neue", sans-serif;
+    line-height: 1.5;
+}
+
+.rp-brand {
+    padding: 0 14px 20px;
+    font-size: 23px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: #000000;
+}
+
+.rp-brand span {
+    color: #299bd7;
+}
+
+.rp-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.rp-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 44px;
+    padding: 0 14px;
+    box-sizing: border-box;
+    border-radius: 12px;
+    background: transparent;
+    color: var(--rp-ink);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s ease;
+}
+
+.rp-link:hover {
+    background: var(--rp-soft);
+}
+
+.rp-link.active {
+    background: var(--rp-ink);
+    color: #ffffff;
+    font-weight: 700;
+}
+
+.rp-link svg,
+.rp-logout svg {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+/* ---------- Footer (user + logout) ---------- */
+
+.rp-footer {
+    margin-top: auto;
+    padding-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.rp-user-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border-radius: 16px;
+    background: var(--rp-bg);
+}
+
+.rp-avatar {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--rp-sky);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.rp-user-text {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.rp-user-label {
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.rp-user-email {
+    font-size: 12px;
+    color: var(--rp-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.rp-logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    border: none;
+    border-radius: 24px;
+    background: var(--rp-ink);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.rp-logout:hover {
+    background: #17212b;
+}
+
+/* ---------- Mobile: sidebar goes on top ---------- */
+
+@media (max-width: 800px) {
+
+    .rp-shell {
+        flex-direction: column;
+    }
+
+    .rp-sidebar {
+        flex: none;
+        width: 100%;
+        height: auto;
+        position: static;
+        padding: 16px;
+        border-right: none;
+        border-bottom: 1px solid var(--rp-line);
+    }
+
+    .rp-brand {
+        padding-bottom: 10px;
+    }
+
+    .rp-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .rp-link {
+        width: auto;
+    }
+
+    .rp-footer {
+        margin-top: 8px;
+        padding-top: 8px;
+    }
+
+    .rp-main {
+        width: 100%;
+    }
+}

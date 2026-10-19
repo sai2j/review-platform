@@ -321,7 +321,17 @@ button {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px;
-    align-items: start;
+    align-items: stretch;   /* side-by-side cards hamesha same height */
+}
+
+/* Pager hamesha card ke neeche rahe, chahe rows kam hon */
+.grid-2 > .card {
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-2 > .card > [id$="Pager"] {
+    margin-top: auto;
 }
 
 /* =========================

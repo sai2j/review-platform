@@ -7,6 +7,9 @@
 <meta name="robots" content="index, follow">
 <title>Website Reviews | ReviewPlatform</title>
 <link rel="stylesheet" href="css/review.css">
+<link rel="stylesheet" href="css/navbar.css">
+
+
 <style>
     /* MODERNIZED STYLING & MODAL OVERRIDES */
     body {
@@ -211,6 +214,38 @@
     .btn-modal-cancel:hover {
         background: #f1f5f9;
     }
+
+    /* WRITE REVIEW POPUP (same look as Edit Review popup) */
+    #writeReviewOverlay {
+        display: none;
+    }
+
+    #writeReviewOverlay.open {
+        display: flex;
+    }
+
+    .modal-overlay .write-review-section {
+        display: block;
+        width: 100%;
+        max-width: 500px;
+        margin: 0;
+        padding: 30px;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 40px rgba(11, 17, 23, 0.15);
+    }
+
+    .modal-overlay .write-review-section h2 {
+        font-size: 20px;
+        margin-bottom: 6px;
+    }
+
+    .modal-actions .submit-review-button {
+        flex: 1;
+        width: auto;
+        padding: 12px;
+        border-radius: 10px;
+    }
 </style>
 </head>
 <body>
@@ -252,6 +287,7 @@
 		</section>
 
 		<!-- WRITE REVIEW SECTION -->
+		<div id="writeReviewOverlay" class="modal-overlay">
 		<section class="write-review-section">
 			<h2>Share your experience</h2>
 			<p class="section-description">Have you used this website? Share your experience with other users.</p>
@@ -271,10 +307,14 @@
 					<label for="comment"> Your review </label>
 					<textarea id="comment" placeholder="Share your experience..." required></textarea>
 				</div>
-				<button type="submit" class="submit-review-button">Submit Review</button>
+				<div class="modal-actions">
+					<button type="button" id="writeReviewCancelBtn" class="btn-modal-cancel">Cancel</button>
+					<button type="submit" class="submit-review-button">Submit Review</button>
+				</div>
 			</form>
 			<p id="message" style="margin-top: 15px; font-weight: 600; font-size: 13px;"></p>
 		</section>
+		</div>
 
 		<!-- TWO COLUMNS -->
 		<div class="layout">
@@ -870,6 +910,23 @@
 			});
 		}
 
+		/* WRITE REVIEW POPUP */
+		function openWriteReviewModal() {
+			const overlay = document.getElementById("writeReviewOverlay");
+			const message = document.getElementById("message");
+			if (message) message.innerHTML = "";
+			if (overlay) overlay.classList.add("open");
+			const ratingSelect = document.getElementById("rating");
+			if (ratingSelect) {
+				setTimeout(function () { ratingSelect.focus(); }, 50);
+			}
+		}
+
+		function closeWriteReviewModal() {
+			const overlay = document.getElementById("writeReviewOverlay");
+			if (overlay) overlay.classList.remove("open");
+		}
+
 		// Comprehensive Event Handling & Page Initialization
 		document.addEventListener("DOMContentLoaded", async function () {
 			let loggedInUser = null;
@@ -955,6 +1012,7 @@
 						reviewForm.reset();
 						loadReviews();
 						loadRatingSummary();
+						setTimeout(closeWriteReviewModal, 1200);
 					}).catch(() => {
 						message.innerHTML = '<span class="error-message">Review could not be added.</span>';
 					});
@@ -989,10 +1047,21 @@
 				}
 			});
 
-			document.getElementById("writeReviewButton").addEventListener("click", () => {
-				const section = document.querySelector(".write-review-section");
-				section.classList.add("show");
-				section.scrollIntoView({ behavior: "smooth" });
+			// Write a review popup: open, Cancel, outside click, Esc key
+			document.getElementById("writeReviewButton").addEventListener("click", openWriteReviewModal);
+
+			const writeCancelBtn = document.getElementById("writeReviewCancelBtn");
+			if (writeCancelBtn) writeCancelBtn.addEventListener("click", closeWriteReviewModal);
+
+			const writeOverlay = document.getElementById("writeReviewOverlay");
+			if (writeOverlay) {
+				writeOverlay.addEventListener("click", function (event) {
+					if (event.target === writeOverlay) closeWriteReviewModal();
+				});
+			}
+
+			document.addEventListener("keydown", function (event) {
+				if (event.key === "Escape") closeWriteReviewModal();
 			});
 		});
 	</script>

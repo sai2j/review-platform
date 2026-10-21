@@ -1619,6 +1619,112 @@ function searchWebsites() {
 /* =========================================================
    DISPLAY SEARCH RESULT
 ========================================================= */
+function clearSearchResults() {
+
+    const searchInput =
+        document.getElementById(
+            "searchInput"
+        );
+
+    const websiteList =
+        document.getElementById(
+            "websiteList"
+        );
+
+    if (searchInput) {
+
+        searchInput.value = "";
+    }
+
+    if (websiteList) {
+
+        websiteList.innerHTML = "";
+    }
+
+    updateSearchUrl(
+        ""
+    );
+
+    if (searchInput) {
+
+        searchInput.focus();
+    }
+}
+
+function buildSearchResultsHeader(
+    keyword,
+    infoText
+) {
+
+    return `
+        <div class="search-results-header">
+
+            <div class="search-results-heading">
+
+                <h2>
+                    Results for
+                    <span class="search-keyword">"${escapeHtml(keyword || '')}"</span>
+                </h2>
+
+                <p class="search-results-count">
+                    ${escapeHtml(infoText)}
+                </p>
+
+            </div>
+
+            <button
+                type="button"
+                class="search-clear-button"
+                aria-label="Clear search"
+                title="Clear search"
+            >
+                <svg
+                    viewBox="0 0 24 24"
+                    width="16"
+                    height="16"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    aria-hidden="true"
+                >
+                    <path d="M6 6l12 12M18 6L6 18"></path>
+                </svg>
+            </button>
+
+        </div>
+    `;
+}
+
+function attachSearchClearButton() {
+
+    const clearButton =
+        document.querySelector(
+            "#websiteList .search-clear-button"
+        );
+
+    if (clearButton) {
+
+        clearButton.addEventListener(
+            "click",
+            clearSearchResults
+        );
+    }
+}
+
+function getSearchResultHost(url) {
+
+    try {
+
+        return new URL(url)
+            .hostname
+            .replace(/^www\./, "");
+
+    } catch (error) {
+
+        return url || "";
+    }
+}
 
 function displaySearchResults(
     results,
@@ -1634,16 +1740,16 @@ function displaySearchResults(
         return;
     }
 
-    websiteList.innerHTML = `
-        <h2>
-            Search results for "${escapeHtml(keyword || '')}"
-        </h3>
-    `;
-
     if (
         !results ||
         results.length === 0
     ) {
+
+        websiteList.innerHTML =
+            buildSearchResultsHeader(
+                keyword,
+                "0 websites found"
+            );
 
         websiteList.innerHTML += `
             <p>
@@ -1651,34 +1757,54 @@ function displaySearchResults(
             </p>
         `;
 
+        attachSearchClearButton();
+
         return;
     }
 
     const result =
         results[0];
 
-    websiteList.innerHTML += `
-        <div class="website-card">
+    const resultCountText =
+        results.length === 1
+            ? "1 website found"
+            : "Showing the top match";
 
-            <h3>
-                ${escapeHtml(
+    const initial =
+        (result.title || "")
+            .trim()
+            .charAt(0)
+            .toUpperCase() || "W";
+
+    websiteList.innerHTML =
+        buildSearchResultsHeader(
+            keyword,
+            resultCountText
+        );
+
+    websiteList.innerHTML += `
+        <div class="search-result-card">
+
+            <div class="search-result-avatar">
+                ${escapeHtml(initial)}
+            </div>
+
+            <div class="search-result-info">
+
+                <h3>
+                    ${escapeHtml(
         result.title
     )}
-            </h3>
+                </h3>
 
-            <p>
-                ${escapeHtml(
+                <p>
+                    ${escapeHtml(
         result.description || ""
     )}
-            </p>
-
-            <p>
-
-                <strong>
-                    URL:
-                </strong>
+                </p>
 
                 <a
+                    class="search-result-url"
                     href="${escapeAttribute(
         result.url
     )}"
@@ -1686,11 +1812,11 @@ function displaySearchResults(
                     rel="noopener noreferrer"
                 >
                     ${escapeHtml(
-        result.url
+        getSearchResultHost(result.url)
     )}
                 </a>
 
-            </p>
+            </div>
 
             <button
                 type="button"
@@ -1705,13 +1831,14 @@ function displaySearchResults(
         result.description || ""
     )}"
             >
-                View Website & Review
+                View website and review &rarr;
             </button>
 
         </div>
     `;
-}
 
+    attachSearchClearButton();
+}
 /* =========================================================
    OPEN WEBSITE FOR REVIEW
 ========================================================= */

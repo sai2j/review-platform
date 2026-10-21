@@ -8,7 +8,8 @@
 <title>Website Reviews | ReviewPlatform</title>
 <link rel="stylesheet" href="css/review.css">
 <link rel="stylesheet" href="css/navbar.css">
-
+<link rel="stylesheet" href="css/sidebar-layout.css">
+<script src="js/sidebar-layout.js"></script>
 </head>
 
 <style>
@@ -521,6 +522,40 @@
 			return websiteRequest;
 		}
 
+		function showWebsiteLogo(website) {
+			const logoBox = document.querySelector(".website-logo");
+			if (!logoBox || !website) return;
+
+			let domain = website.canonicalDomain || "";
+			if (!domain && website.url) {
+				try {
+					domain = new URL(website.url).hostname.replace(/^www\./, "");
+				} catch (error) {
+					domain = "";
+				}
+			}
+
+			const initial = (website.name || "W").trim().charAt(0).toUpperCase() || "W";
+
+			logoBox.textContent = initial;
+			if (!domain) return;
+
+			const image = new Image();
+			image.alt = (website.name || "Website") + " logo";
+			image.style.width = "48px";
+			image.style.height = "48px";
+			image.style.objectFit = "contain";
+
+			image.addEventListener("load", function () {
+				if (image.naturalWidth >= 32) {
+					logoBox.textContent = "";
+					logoBox.appendChild(image);
+				}
+			});
+
+			image.src = "https://www.google.com/s2/favicons?sz=128&domain=" + encodeURIComponent(domain);
+		}
+
 		function loadWebsiteInfo() {
 			const websiteInfo = document.getElementById("websiteInfo");
 			if (!websiteId) {
@@ -530,6 +565,7 @@
 
 			fetchWebsite().then(website => {
 				currentWebsiteForStructuredData = website;
+				showWebsiteLogo(website);
 				const nameElement = document.getElementById("websiteName");
 				if (nameElement) nameElement.textContent = website.name || "Website";
 
@@ -1067,4 +1103,3 @@
 		});
 	</script>
 </body>
-</html>

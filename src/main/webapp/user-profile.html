@@ -38,13 +38,13 @@
 
             <div class="sidebar-footer">
                 <div class="user-pill">
-                    <div class="user-avatar" id="sidebarInitial">V</div>
+                    <div class="user-avatar" id="sidebarInitial">U</div>
                     <div class="user-text">
                         <small>Logged in as</small>
-                        <strong id="loggedUserEmail">validationtest2026@gmail.com</strong>
+                        <strong id="loggedUserEmail">Loading user...</strong>
                     </div>
                 </div>
-                <button class="logout-btn" id="logoutButton">
+                <button type="button" class="logout-btn" id="logoutButton">
                     <span>🚪</span> Logout
                 </button>
             </div>
@@ -123,5 +123,38 @@
     </div>
 
     <script src="js/user-profile.js"></script>
+    <script>
+        /* Sidebar: logged-in user + logout (same as My Business page) */
+        document.addEventListener("DOMContentLoaded", function () {
+            var user = null;
+
+            try {
+                user = JSON.parse(localStorage.getItem("loggedInUser"));
+            } catch (error) {
+                user = null;
+            }
+
+            var email = user && user.email ? String(user.email) : "";
+            var emailElement = document.getElementById("loggedUserEmail");
+            var initialElement = document.getElementById("sidebarInitial");
+            var logoutButton = document.getElementById("logoutButton");
+
+            if (emailElement) {
+                emailElement.textContent = email || "Not logged in";
+            }
+
+            if (initialElement) {
+                initialElement.textContent = (email.charAt(0) || "U").toUpperCase();
+            }
+
+            if (logoutButton) {
+                logoutButton.addEventListener("click", function () {
+                    localStorage.removeItem("loggedInUser");
+                    localStorage.removeItem("myBusiness");
+                    window.location.href = "login.html";
+                });
+            }
+        });
+    </script>
 </body>
 </html>

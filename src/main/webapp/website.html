@@ -1,228 +1,238 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Website Details | ReviewPlatform</title>
-    <link rel="stylesheet" href="css/navbar.css">
-    <link rel="stylesheet" href="css/navbar.css">
-<link rel="stylesheet" href="css/sidebar-layout.css">
-<script src="js/sidebar-layout.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Website Details | ReviewPlatform</title>
+<link rel="stylesheet" href="css/navbar.css">
+<link rel="stylesheet" href="css/navbar.css">
+/*<link rel="stylesheet" href="css/sidebar-layout.css">
+<script src="js/sidebar-layout.js"></script>*/
 </head>
-    
-    <style>
-        *, *::before, *::after {
-            box-sizing: border-box;
-        }
 
-        body {
-            margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f0f7ff;
-            color: #0b1117;
-            padding-bottom: 50px;
-        }
+<style>
+*, *::before, *::after {
+	box-sizing: border-box;
+}
 
-        /* NAVBAR */
-        .auth-navbar {
-            background: #0b1117;
-            color: #ffffff;
-            padding: 16px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+body {
+	margin: 0;
+	font-family: Arial, Helvetica, sans-serif;
+	background: #f0f7ff;
+	color: #0b1117;
+	padding-bottom: 50px;
+}
 
-        .nav-brand {
-            font-weight: 700;
-            font-size: 20px;
-            color: #ffffff;
-        }
+/* NAVBAR */
+.auth-navbar {
+	background: #0b1117;
+	color: #ffffff;
+	padding: 16px 40px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
 
-        .nav-right {
-            display: flex;
-            align-items: center;
-            gap: 24px;
-        }
+.nav-brand {
+	font-weight: 700;
+	font-size: 20px;
+	color: #ffffff;
+}
 
-        .nav-right a {
-            color: #cbd5e1;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-        }
+.nav-right {
+	display: flex;
+	align-items: center;
+	gap: 24px;
+}
 
-        .nav-right a:hover {
-            color: #ffffff;
-        }
+.nav-right a {
+	color: #cbd5e1;
+	text-decoration: none;
+	font-size: 14px;
+	font-weight: 600;
+}
 
-        /* CONTAINER */
-        .dashboard-container {
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
+.nav-right a:hover {
+	color: #ffffff;
+}
 
-        .breadcrumb-nav {
-            font-size: 13px;
-            color: #475569;
-            margin-bottom: 20px;
-        }
+/* CONTAINER */
+.dashboard-container {
+	max-width: 900px;
+	margin: 30px auto;
+	padding: 0 20px;
+}
 
-        .breadcrumb-nav a {
-            color: #0369a1;
-            text-decoration: none;
-            font-weight: 600;
-        }
+.breadcrumb-nav {
+	font-size: 13px;
+	color: #475569;
+	margin-bottom: 20px;
+}
 
-        .breadcrumb-nav a:hover {
-            text-decoration: underline;
-        }
+.breadcrumb-nav a {
+	color: #0369a1;
+	text-decoration: none;
+	font-weight: 600;
+}
 
-        .dashboard-section {
-            margin-bottom: 30px;
-        }
+.breadcrumb-nav a:hover {
+	text-decoration: underline;
+}
 
-        .dashboard-section h2 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #0b1117;
-            margin-bottom: 12px;
-        }
+.dashboard-section {
+	margin-bottom: 30px;
+}
 
-        /* CARDS */
-        .info-card {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(11, 17, 23, 0.03);
-            margin-bottom: 16px;
-        }
+.dashboard-section h2 {
+	font-size: 18px;
+	font-weight: 700;
+	color: #0b1117;
+	margin-bottom: 12px;
+}
 
-        .info-card h2 {
-            margin-top: 0;
-            font-size: 22px;
-            color: #0b1117;
-        }
+/* CARDS */
+.info-card {
+	background: #ffffff;
+	border: 1px solid #cbd5e1;
+	border-radius: 16px;
+	padding: 24px;
+	box-shadow: 0 4px 12px rgba(11, 17, 23, 0.03);
+	margin-bottom: 16px;
+}
 
-        .info-card p {
-            font-size: 14px;
-            color: #334155;
-            line-height: 1.5;
-            margin: 8px 0;
-        }
+.info-card h2 {
+	margin-top: 0;
+	font-size: 22px;
+	color: #0b1117;
+}
 
-        .info-card a {
-            color: #0369a1;
-            text-decoration: none;
-            font-weight: 600;
-        }
+.info-card p {
+	font-size: 14px;
+	color: #334155;
+	line-height: 1.5;
+	margin: 8px 0;
+}
 
-        .info-card a:hover {
-            text-decoration: underline;
-        }
+.info-card a {
+	color: #0369a1;
+	text-decoration: none;
+	font-weight: 600;
+}
 
-        .rating-display {
-            margin: 15px 0;
-            font-weight: 700;
-            font-size: 15px;
-            color: #0b1117;
-        }
+.info-card a:hover {
+	text-decoration: underline;
+}
 
-        /* BUTTONS */
-        .btn-primary {
-            display: inline-block;
-            background: #0b1117;
-            color: #ffffff;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 13px;
-            font-weight: 700;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
+.rating-display {
+	margin: 15px 0;
+	font-weight: 700;
+	font-size: 15px;
+	color: #0b1117;
+}
 
-        .btn-primary:hover {
-            background: #1e293b;
-        }
+/* BUTTONS */
+.btn-primary {
+	display: inline-block;
+	background: #0b1117;
+	color: #ffffff;
+	padding: 10px 20px;
+	border-radius: 10px;
+	font-size: 13px;
+	font-weight: 700;
+	text-decoration: none;
+	transition: background 0.2s;
+}
 
-        /* REVIEWS GRID */
-        .reviews-grid-slides {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
+.btn-primary:hover {
+	background: #1e293b;
+}
 
-        .verified-badge {
-            background: #e0f2fe;
-            color: #0369a1;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 3px 8px;
-            border-radius: 6px;
-            margin-left: 8px;
-            display: inline-block;
-            vertical-align: middle;
-        }
-    </style>
+/* REVIEWS GRID */
+.reviews-grid-slides {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.verified-badge {
+	background: #e0f2fe;
+	color: #0369a1;
+	font-size: 11px;
+	font-weight: 700;
+	padding: 3px 8px;
+	border-radius: 6px;
+	margin-left: 8px;
+	display: inline-block;
+	vertical-align: middle;
+}
+</style>
 </head>
 <body>
 
-    <!-- TOP NAVIGATION -->
-    <header class="auth-navbar">
-<div class="nav-brand">Review<span>Platform</span></div>        <div class="nav-right">
-            <a href="index.html">Home</a>
-            <a href="browse.html">Browse Websites</a>
-            <a href="login.html" id="authLink">Log in</a>
-        </div>
-    </header>
+	<!-- TOP NAVIGATION -->
+	<header class="auth-navbar">
+		<div class="nav-brand">
+			Review<span>Platform</span>
+		</div>
+		<div class="nav-right">
+			<a href="index.html">Home</a> <a href="browse.html">Browse
+				Websites</a> <a href="login.html" id="authLink">Log in</a>
+		</div>
+	</header>
 
-    <!-- MAIN CONTAINER -->
-    <div class="dashboard-container">
-        
-        <div class="breadcrumb-nav">
-            <a href="index.html">Home</a> &gt; <span id="breadcrumbWebsiteName">Website Details</span>
-        </div>
+	<!-- MAIN CONTAINER -->
+	<div class="dashboard-container">
 
-        <!-- WEBSITE INFO CARD -->
-        <div class="dashboard-section" id="mainWebsiteSection">
-            <div class="info-card" id="websiteInfoCard">
-                <h2 id="webName">Loading website... <span class="verified-badge">Verified</span></h2>
-                <p id="webDesc">Please wait while we load details.</p>
-                <p><strong>Website URL:</strong> <a id="webUrl" href="#" target="_blank">Not available</a></p>
-                <div class="rating-display">
-                    <span id="webRatingStars">⭐ 0.0 / 5</span> 
-                    <span id="webReviewCount">(0 reviews)</span>
-                </div>
-                <div style="margin-top: 20px;">
-                    <a id="reviewActionBtn" href="#" class="btn-primary">Read & Write Reviews</a>
-                </div>
-            </div>
-        </div>
+		<div class="breadcrumb-nav">
+			<a href="index.html">Home</a> &gt; <span id="breadcrumbWebsiteName">Website
+				Details</span>
+		</div>
 
-        <!-- VERIFIED WEBSITES LIST -->
-        <div class="dashboard-section" id="verifiedListSection" style="display: none;">
-            <h2>Top Verified Websites</h2>
-            <div id="verifiedWebsitesContainer" class="reviews-grid-slides">
-                <!-- Dynamically loaded verified websites -->
-            </div>
-        </div>
+		<!-- WEBSITE INFO CARD -->
+		<div class="dashboard-section" id="mainWebsiteSection">
+			<div class="info-card" id="websiteInfoCard">
+				<h2 id="webName">
+					Loading website... <span class="verified-badge">Verified</span>
+				</h2>
+				<p id="webDesc">Please wait while we load details.</p>
+				<p>
+					<strong>Website URL:</strong> <a id="webUrl" href="#"
+						target="_blank">Not available</a>
+				</p>
+				<div class="rating-display">
+					<span id="webRatingStars">⭐ 0.0 / 5</span> <span
+						id="webReviewCount">(0 reviews)</span>
+				</div>
+				<div style="margin-top: 20px;">
+					<a id="reviewActionBtn" href="#" class="btn-primary">Read &
+						Write Reviews</a>
+				</div>
+			</div>
+		</div>
 
-        <!-- CUSTOMER REVIEWS SECTION -->
-        <div class="dashboard-section" id="reviewsSection">
-            <h2>Customer Reviews</h2>
-            <div id="customerReviewsContainer" class="reviews-grid-slides">
-                <div class="info-card">
-                    <p>Loading reviews...</p>
-                </div>
-            </div>
-        </div>
+		<!-- VERIFIED WEBSITES LIST -->
+		<div class="dashboard-section" id="verifiedListSection"
+			style="display: none;">
+			<h2>Top Verified Websites</h2>
+			<div id="verifiedWebsitesContainer" class="reviews-grid-slides">
+				<!-- Dynamically loaded verified websites -->
+			</div>
+		</div>
 
-    </div>
+		<!-- CUSTOMER REVIEWS SECTION -->
+		<div class="dashboard-section" id="reviewsSection">
+			<h2>Customer Reviews</h2>
+			<div id="customerReviewsContainer" class="reviews-grid-slides">
+				<div class="info-card">
+					<p>Loading reviews...</p>
+				</div>
+			</div>
+		</div>
 
-    <!-- SCRIPT LOGIC -->
-    <script>
+	</div>
+
+	<!-- SCRIPT LOGIC -->
+	<script>
         document.addEventListener("DOMContentLoaded", async function() {
             const urlParams = new URLSearchParams(window.location.search);
             let websiteId = urlParams.get('id') || urlParams.get('websiteId');

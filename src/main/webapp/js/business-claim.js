@@ -124,7 +124,7 @@ if (businessId) {
 		            'No business selected. Open a business profile from ' +
 		            'Browse Websites and click Claim to submit your claim.' +
 		            '</p>' +
-		            '<p style="text-align:center; margin-top:12px;">' +
+		            '<p style="text-align:center; margin:0; padding:0 24px 24px;">' +
 		            '<a href="browse.html" class="claim-browse-link">' +
 		            'Browse Websites' +
 		            '</a></p>';

@@ -73,7 +73,7 @@ svg {
 .brand {
     padding: 0 14px 20px;
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .side-nav {
@@ -215,7 +215,7 @@ svg {
 .page-header h1 {
     margin: 0;
     font-size: 34px;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .page-header p {
@@ -237,7 +237,7 @@ svg {
     border: none;
     border-radius: 24px;
     font-size: 14px;
-    font-weight: 700;
+    font-weight: 600;
     cursor: pointer;
     transition: background 0.2s ease, transform 0.2s ease;
 }
@@ -284,14 +284,14 @@ svg {
 
 .stat-label {
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
     color: var(--muted);
 }
 
 .stat-value {
     margin-top: 6px;
     font-size: 36px;
-    font-weight: 800;
+    font-weight: 700;
     line-height: 1.2;
 }
 
@@ -315,7 +315,7 @@ svg {
 .card > h2 {
     margin: 0 0 20px;
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 /* =========================
@@ -349,7 +349,7 @@ svg {
 .empty-state h2 {
     margin: 0;
     font-size: 24px;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .empty-state p {
@@ -392,7 +392,7 @@ svg {
 .business-card h2 {
     margin: 0 0 12px;
     font-size: 20px;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .business-card p {
@@ -404,6 +404,7 @@ svg {
 
 .business-card strong {
     color: var(--ink);
+    font-weight: 600;
 }
 
 .dashboard-actions {
@@ -424,7 +425,7 @@ svg {
     padding: 4px 12px;
     border-radius: 15px;
     font-size: 13px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .status-verified {
@@ -464,7 +465,7 @@ svg {
     padding: 6px 12px;
     border-radius: 15px;
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 600;
     white-space: nowrap;
 }
 
@@ -486,7 +487,7 @@ svg {
 .verification-form label {
     display: block;
     margin-bottom: 8px;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .verification-form input {
@@ -527,6 +528,7 @@ svg {
 
 .verified-box h3 {
     margin: 0 0 6px;
+    font-weight: 600;
 }
 
 .verified-box p {
@@ -559,11 +561,11 @@ svg {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .step-title {
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .step-text {
@@ -594,12 +596,12 @@ svg {
 
 .success-message {
     color: #0f6b3a;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 .error-message {
     color: #9a2a1a;
-    font-weight: 700;
+    font-weight: 600;
 }
 
 /* =========================

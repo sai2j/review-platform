@@ -1,4 +1,3 @@
-
 const PROFILE_API = "/review-platform/users/profile";
 
 const profileForm = document.getElementById("profileForm");
@@ -58,8 +57,19 @@ function resolveAvatarUrl(avatarUrl) {
     }
 }
 
+function updateSidebarUser(profile) {
+    const email = profile.email || (profileLoggedInUser && profileLoggedInUser.email) || "";
+    const emailEl = document.getElementById("loggedUserEmail");
+    const initialEl = document.getElementById("sidebarInitial");
+
+    if (emailEl) emailEl.textContent = email;
+    if (initialEl) initialEl.textContent = (email.charAt(0) || "U").toUpperCase();
+}
+
 function updateProfileHeader(profile) {
     const name = profile.name || "User";
+
+    updateSidebarUser(profile);
 
     profileDisplayName.textContent = name;
     profileDisplayEmail.textContent = profile.email || "";
@@ -335,5 +345,13 @@ uploadAvatarButton.addEventListener("click", async function () {
         uploadAvatarButton.textContent = "Upload Photo";
     }
 });
+
+// Auto-upload as soon as a photo is chosen
+avatarFile.addEventListener("change", function () {
+    if (avatarFile.files[0]) uploadAvatarButton.click();
+});
+
+// Show the logged-in email immediately (before the API responds)
+updateSidebarUser({});
 
 document.addEventListener("DOMContentLoaded", loadMyProfile);

@@ -66,54 +66,49 @@ body {
 }
 
 .sidebar-footer {
-    margin-top: auto;
-    padding-top: 24px;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 16px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
 }
 
 .user-pill {
+    background: #f0f7ff;
+    padding: 10px 12px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 14px;
-    border-radius: 16px;
-    background: #eaf6ff;
+    gap: 10px;
 }
 
 .user-avatar {
-    flex: 0 0 40px;
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
+    background: #bae6fd;
+    color: #0369a1;
     border-radius: 50%;
-    background: #a8dcfa;
-    color: #0b1117;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 16px;
-    font-weight: 800;
-    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 14px;
 }
 
 .user-text {
-    min-width: 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
 .user-text small {
-    font-size: 13px;
-    font-weight: 700;
-    color: #0b1117;
+    font-size: 11px;
+    color: #64748b;
 }
 
 .user-text strong {
     font-size: 12px;
-    font-weight: 400;
-    color: #4b5b68;
+    color: #0f172a;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -121,35 +116,21 @@ body {
 
 .logout-btn {
     width: 100%;
+    background: #0b1117;
+    color: #ffffff;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    min-height: 44px;
-    padding: 0;
-    border: none;
-    border-radius: 24px;
-    background: #0b1117;
-    color: #ffffff;
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: background 0.2s ease;
 }
 
-.logout-btn:hover {
-    background: #17212b;
-}
-
-.logout-btn span {
-    flex: 0 0 20px;
-    width: 20px;
-    text-align: center;
-    font-size: 16px;
-    line-height: 1;
-}
-
+/* MAIN CONTENT */
 .main-content {
     flex: 1;
     padding: 40px;
@@ -227,6 +208,19 @@ body {
     justify-content: center;
     font-size: 36px;
     font-weight: 700;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.user-avatar-large .profile-avatar-image,
+.profile-avatar-image {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: 50%;
+    display: block;
 }
 
 .avatar-edit-badge {

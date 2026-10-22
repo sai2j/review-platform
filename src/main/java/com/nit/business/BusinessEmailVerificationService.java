@@ -29,8 +29,8 @@ public class BusinessEmailVerificationService {
 			return;
 		}
 
-		if (!EmailDomainMatcher.emailMatchesWebsite(email, officialUrl)) {
-			String host = EmailDomainMatcher.hostOfUrl(officialUrl);
+		if (!emailMatchesWebsite(email, officialUrl)) {
+			String host = hostOfUrl(officialUrl);
 			throw new RuntimeException("Please use an email address of your business website domain"
 					+ (host != null ? " (for example name@" + host + ")." : "."));
 		}
@@ -55,6 +55,60 @@ public class BusinessEmailVerificationService {
 			log.error("Verification email could not be sent to {}: {}", business.getBusinessEmail(), ex.getMessage());
 			throw new RuntimeException(
 					"Could not send the verification email. The mail server is not reachable right now, please try again later.");
+		}
+	}
+
+	// ---------- helpers: email domain must belong to the business website ----------
+
+	private static boolean emailMatchesWebsite(String email, String officialUrl) {
+		String emailDomain = domainOfEmail(email);
+		String siteHost = hostOfUrl(officialUrl);
+
+		if (emailDomain == null || siteHost == null) {
+			return false;
+		}
+
+		return emailDomain.equals(siteHost) || emailDomain.endsWith("." + siteHost);
+	}
+
+	private static String domainOfEmail(String email) {
+		if (email == null) {
+			return null;
+		}
+
+		String value = email.trim().toLowerCase(java.util.Locale.ROOT);
+		int at = value.lastIndexOf('@');
+
+		if (at <= 0 || at == value.length() - 1) {
+			return null;
+		}
+
+		return value.substring(at + 1);
+	}
+
+	private static String hostOfUrl(String url) {
+		if (url == null || url.isBlank()) {
+			return null;
+		}
+
+		String value = url.trim();
+
+		if (!value.matches("(?i)^[a-z][a-z0-9+.-]*://.*")) {
+			value = "https://" + value;
+		}
+
+		try {
+			String host = new java.net.URI(value).getHost();
+
+			if (host == null) {
+				return null;
+			}
+
+			host = host.toLowerCase(java.util.Locale.ROOT);
+
+			return host.startsWith("www.") ? host.substring(4) : host;
+		} catch (Exception ex) {
+			return null;
 		}
 	}
 }

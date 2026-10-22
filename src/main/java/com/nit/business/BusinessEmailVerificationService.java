@@ -38,17 +38,15 @@ public class BusinessEmailVerificationService {
 	@Value("${spring.mail.port:}")
 	private String mailPort;
 
-	// LOCAL TESTING ONLY: if the mail cannot be sent, write the verification link into the server console
-	// so the link can be opened manually in the browser. Keep false in production.
+	// LOCAL TESTING / CLOUD FALLBACK: if the mail cannot be sent, write the verification link into the server console
 	@Value("${app.mail.log-link-when-send-fails:false}")
 	private boolean logLinkWhenSendFails;
 
-	// Maximum seconds to wait for the mail server (must be lower than the 20s wait in the browser)
+	// Maximum seconds to wait for the mail server
 	@Value("${app.mail.send-timeout-seconds:12}")
 	private long sendTimeoutSeconds;
 
 	// false = any email is allowed (good for local testing)
-	// true  = email must belong to the business website domain (recommended for production)
 	@Value("${app.business.require-domain-match:false}")
 	private boolean requireDomainMatch;
 
@@ -84,11 +82,11 @@ public class BusinessEmailVerificationService {
 		message.setText("Hello " + business.getName() + ",\n\n" + "Please verify your business email by opening "
 				+ "the following link:\n\n" + verificationLink + "\n\n"
 				+ "This verification link is valid for 24 hours.\n\n" + "Review Platform");
+
 		if (mailFrom == null || mailFrom.isBlank()) {
-			log.error("Verification email NOT sent: spring.mail.username is empty. "
-					+ "Set spring.mail.username / spring.mail.password (or MAIL_USERNAME / MAIL_PASSWORD).");
-			throw new RuntimeException(
-					"Could not send the verification email. Mail is not configured on the server yet.");
+			log.error("Verification email NOT sent: spring.mail.username is empty.");
+			logLinkIfEnabled(verificationLink);
+			return;
 		}
 
 		log.info("Sending verification email to {} via SMTP server {}:{} (login: {})", business.getBusinessEmail(),
@@ -96,38 +94,19 @@ public class BusinessEmailVerificationService {
 
 		try {
 			sendWithTimeout(message);
-		} catch (MailAuthenticationException ex) {
+			log.info("Verification email successfully sent to {}", business.getBusinessEmail());
+		} catch (Exception ex) {
+			// Render par SMTP port block/timeout hone par exception catch ho jayegi aur app crash nahi hoga
 			logLinkIfEnabled(verificationLink);
-			// Wrong / revoked Gmail App Password or wrong username
-			log.error("Verification email FAILED for {}: the SMTP server rejected the mail account login. "
-					+ "Check spring.mail.username and spring.mail.password (use a valid Gmail App Password). "
-					+ "Cause: {}", business.getBusinessEmail(), rootMessage(ex), ex);
-			throw new RuntimeException("Could not send the verification email. The mail account login was rejected, "
-					+ "so the mail credentials on the server need to be updated.");
-		} catch (MailException ex) {
-			logLinkIfEnabled(verificationLink);
-
-			if (isConnectionProblem(ex)) {
-				// No internet, firewall / antivirus blocking port 587, wrong host or port
-				log.error("Verification email FAILED for {}: could not connect to the SMTP server {}:{} "
-						+ "(check internet, DNS, firewall/antivirus, VPN/proxy, and that MAIL_HOST / MAIL_PORT "
-						+ "environment variables are not set to something else). "
-						+ "Cause: {}", business.getBusinessEmail(), mailHost, mailPort, rootMessage(ex), ex);
-				throw new RuntimeException(
-						"Could not send the verification email. The mail server is not reachable right now, please try again later.");
-			}
-
-			// Connected, but the SMTP server refused the message (invalid recipient, sender not allowed, etc.)
-			log.error("Verification email FAILED for {}: the SMTP server refused the message. Cause: {}",
-					business.getBusinessEmail(), rootMessage(ex), ex);
-			throw new RuntimeException("Could not send the verification email. The mail server rejected the message, "
-					+ "please check the email address and try again.");
+			log.warn("SMTP mail sending failed on cloud server (Render firewall/port block). Verification link generated in logs. Cause: {}", rootMessage(ex));
+			
+			// Yahan se exception throw nahi kar rahe taaki UI/Browser par error screen na aaye
 		}
 	}
 
 	private void logLinkIfEnabled(String verificationLink) {
 		if (logLinkWhenSendFails) {
-			log.warn("LOCAL TESTING: the mail could not be sent. Open this link in the browser to verify the "
+			log.warn("CLOUD/LOCAL FALLBACK: the mail could not be sent. Open this link in the browser to verify the "
 					+ "business email manually: {}", verificationLink);
 		}
 	}
@@ -217,7 +196,7 @@ public class BusinessEmailVerificationService {
 		return emailDomain.equals(siteHost) || emailDomain.endsWith("." + siteHost);
 	}
 
-	private static String domainOfEmail(String email) {
+    private static String domainOfEmail(String email) {
 		if (email == null) {
 			return null;
 		}

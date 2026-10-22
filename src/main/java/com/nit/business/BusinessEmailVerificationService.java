@@ -1,8 +1,6 @@
 package com.nit.business;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailAuthenticationException;
-import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,26 +25,39 @@ public class BusinessEmailVerificationService {
 	@Value("${app.base-url:http://localhost:8080/review-platform}")
 	private String baseUrl;
 
-	// Sender address (the Gmail account used to send the verification mail)
+	// SMTP sender (fallback, works on local PC)
 	@Value("${spring.mail.username:}")
 	private String mailFrom;
 
-	// The SMTP host / port that are REALLY being used (shown in the log to spot a wrong MAIL_HOST / MAIL_PORT)
 	@Value("${spring.mail.host:}")
 	private String mailHost;
 
 	@Value("${spring.mail.port:}")
 	private String mailPort;
 
-	// LOCAL TESTING / CLOUD FALLBACK: if the mail cannot be sent, write the verification link into the server console
+	// If the mail cannot be sent, write the verification link into the server log
 	@Value("${app.mail.log-link-when-send-fails:false}")
 	private boolean logLinkWhenSendFails;
 
-	// Maximum seconds to wait for the mail server
+	// Maximum seconds to wait for the mail server / API
 	@Value("${app.mail.send-timeout-seconds:12}")
 	private long sendTimeoutSeconds;
 
-	// false = any email is allowed (good for local testing)
+	// Brevo (HTTPS email API). Render blocks SMTP ports (25/465/587) but allows HTTPS (443).
+	@Value("${app.mail.brevo.api-key:}")
+	private String brevoApiKey;
+
+	// Must be a VERIFIED sender in your Brevo account
+	@Value("${app.mail.brevo.sender-email:${spring.mail.username:}}")
+	private String brevoSenderEmail;
+
+	@Value("${app.mail.brevo.sender-name:Review Platform}")
+	private String brevoSenderName;
+
+	private final java.net.http.HttpClient httpClient = java.net.http.HttpClient.newBuilder()
+			.connectTimeout(java.time.Duration.ofSeconds(8)).build();
+
+	// false = any email is allowed
 	@Value("${app.business.require-domain-match:false}")
 	private boolean requireDomainMatch;
 
@@ -83,10 +94,24 @@ public class BusinessEmailVerificationService {
 				+ "the following link:\n\n" + verificationLink + "\n\n"
 				+ "This verification link is valid for 24 hours.\n\n" + "Review Platform");
 
+		// 1) Preferred: HTTPS API (works on Render / any cloud)
+		if (brevoApiKey != null && !brevoApiKey.isBlank()) {
+			try {
+				sendViaBrevo(business.getBusinessEmail(), message.getSubject(), message.getText());
+				log.info("Verification email successfully sent to {} via Brevo API", business.getBusinessEmail());
+				return;
+			} catch (Exception ex) {
+				logLinkIfEnabled(verificationLink);
+				log.error("Brevo email sending failed: {}", rootMessage(ex));
+				throw new RuntimeException("Verification email could not be sent: " + rootMessage(ex));
+			}
+		}
+
+		// 2) Fallback: SMTP (works on local PC, usually blocked on cloud)
 		if (mailFrom == null || mailFrom.isBlank()) {
-			log.error("Verification email NOT sent: spring.mail.username is empty.");
 			logLinkIfEnabled(verificationLink);
-			return;
+			throw new RuntimeException(
+					"Email service is not configured (set BREVO_API_KEY or MAIL_USERNAME/MAIL_PASSWORD).");
 		}
 
 		log.info("Sending verification email to {} via SMTP server {}:{} (login: {})", business.getBusinessEmail(),
@@ -96,17 +121,64 @@ public class BusinessEmailVerificationService {
 			sendWithTimeout(message);
 			log.info("Verification email successfully sent to {}", business.getBusinessEmail());
 		} catch (Exception ex) {
-			// Render par SMTP port block/timeout hone par exception catch ho jayegi aur app crash nahi hoga
 			logLinkIfEnabled(verificationLink);
-			log.warn("SMTP mail sending failed on cloud server (Render firewall/port block). Verification link generated in logs. Cause: {}", rootMessage(ex));
-			
-			// Yahan se exception throw nahi kar rahe taaki UI/Browser par error screen na aaye
+			log.error("SMTP mail sending failed. Cause: {}", rootMessage(ex));
+			// IMPORTANT: throw, so the UI shows the real error instead of a false "sent successfully"
+			throw new RuntimeException(isConnectionProblem(ex)
+					? "Mail server is not reachable from this server (SMTP port blocked). Configure BREVO_API_KEY."
+					: "Verification email could not be sent: " + rootMessage(ex));
 		}
+	}
+
+	private void sendViaBrevo(String to, String subject, String text) throws Exception {
+		String json = "{\"sender\":{\"name\":\"" + jsonEscape(brevoSenderName) + "\",\"email\":\""
+				+ jsonEscape(brevoSenderEmail.trim()) + "\"},\"to\":[{\"email\":\"" + jsonEscape(to.trim())
+				+ "\"}],\"subject\":\"" + jsonEscape(subject) + "\",\"textContent\":\"" + jsonEscape(text) + "\"}";
+
+		java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+				.uri(java.net.URI.create("https://api.brevo.com/v3/smtp/email"))
+				.timeout(java.time.Duration.ofSeconds(sendTimeoutSeconds)).header("api-key", brevoApiKey.trim())
+				.header("Content-Type", "application/json").header("Accept", "application/json")
+				.POST(java.net.http.HttpRequest.BodyPublishers.ofString(json)).build();
+
+		java.net.http.HttpResponse<String> response = httpClient.send(request,
+				java.net.http.HttpResponse.BodyHandlers.ofString());
+
+		if (response.statusCode() < 200 || response.statusCode() >= 300) {
+			throw new RuntimeException("Brevo API error " + response.statusCode() + ": " + response.body());
+		}
+	}
+
+	private static String jsonEscape(String value) {
+		if (value == null) {
+			return "";
+		}
+
+		StringBuilder sb = new StringBuilder();
+
+		for (char c : value.toCharArray()) {
+			switch (c) {
+			case '"' -> sb.append("\\\"");
+			case '\\' -> sb.append("\\\\");
+			case '\n' -> sb.append("\\n");
+			case '\r' -> sb.append("\\r");
+			case '\t' -> sb.append("\\t");
+			default -> {
+				if (c < 0x20) {
+					sb.append(String.format("\\u%04x", (int) c));
+				} else {
+					sb.append(c);
+				}
+			}
+			}
+		}
+
+		return sb.toString();
 	}
 
 	private void logLinkIfEnabled(String verificationLink) {
 		if (logLinkWhenSendFails) {
-			log.warn("CLOUD/LOCAL FALLBACK: the mail could not be sent. Open this link in the browser to verify the "
+			log.warn("FALLBACK: the mail could not be sent. Open this link in the browser to verify the "
 					+ "business email manually: {}", verificationLink);
 		}
 	}
@@ -196,7 +268,7 @@ public class BusinessEmailVerificationService {
 		return emailDomain.equals(siteHost) || emailDomain.endsWith("." + siteHost);
 	}
 
-    private static String domainOfEmail(String email) {
+	private static String domainOfEmail(String email) {
 		if (email == null) {
 			return null;
 		}

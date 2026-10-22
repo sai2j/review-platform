@@ -3,6 +3,7 @@ package com.nit.business;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -14,12 +15,25 @@ public class BusinessEmailVerificationService {
 			.getLogger(BusinessEmailVerificationService.class);
 
 	private final JavaMailSender mailSender;
+
+	// Mail is sent on a separate thread so a stuck mail server can never hang the request
+	private final java.util.concurrent.ExecutorService mailExecutor = java.util.concurrent.Executors
+			.newCachedThreadPool(runnable -> {
+				Thread thread = new Thread(runnable, "business-mail-sender");
+				thread.setDaemon(true);
+				return thread;
+			});
+
 	@Value("${app.base-url:http://localhost:8080/review-platform}")
 	private String baseUrl;
 
 	// Sender address (the Gmail account used to send the verification mail)
 	@Value("${spring.mail.username:}")
 	private String mailFrom;
+
+	// Maximum seconds to wait for the mail server (must be lower than the 20s wait in the browser)
+	@Value("${app.mail.send-timeout-seconds:12}")
+	private long sendTimeoutSeconds;
 
 	// false = any email is allowed (good for local testing)
 	// true  = email must belong to the business website domain (recommended for production)
@@ -66,7 +80,7 @@ public class BusinessEmailVerificationService {
 		}
 
 		try {
-			mailSender.send(message);
+			sendWithTimeout(message);
 		} catch (MailAuthenticationException ex) {
 			// Wrong / revoked Gmail App Password or wrong username
 			log.error("Verification email FAILED for {}: the SMTP server rejected the mail account login. "
@@ -89,6 +103,30 @@ public class BusinessEmailVerificationService {
 					business.getBusinessEmail(), rootMessage(ex), ex);
 			throw new RuntimeException("Could not send the verification email. The mail server rejected the message, "
 					+ "please check the email address and try again.");
+		}
+	}
+
+	private void sendWithTimeout(SimpleMailMessage message) {
+		java.util.concurrent.Future<?> future = mailExecutor.submit(() -> mailSender.send(message));
+
+		try {
+			future.get(sendTimeoutSeconds, java.util.concurrent.TimeUnit.SECONDS);
+		} catch (java.util.concurrent.TimeoutException ex) {
+			future.cancel(true);
+			throw new MailSendException("Mail server connection failed: no response within " + sendTimeoutSeconds
+					+ " seconds (check internet / DNS / firewall for smtp.gmail.com:587)");
+		} catch (InterruptedException ex) {
+			Thread.currentThread().interrupt();
+			future.cancel(true);
+			throw new MailSendException("Sending the mail was interrupted", ex);
+		} catch (java.util.concurrent.ExecutionException ex) {
+			Throwable cause = ex.getCause() != null ? ex.getCause() : ex;
+
+			if (cause instanceof RuntimeException) {
+				throw (RuntimeException) cause;
+			}
+
+			throw new MailSendException("Mail server connection failed", cause);
 		}
 	}
 

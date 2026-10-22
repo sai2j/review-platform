@@ -144,9 +144,13 @@
 						</div>
 						<span id="emailBadge" class="badge"></span>
 					</div>
-					<div id="emailVerificationForm" class="verification-form">
+										<div id="emailVerificationForm" class="verification-form">
 						<label for="businessEmail">Business Email</label> <input
-							type="email" id="businessEmail" placeholder="yourname@yourwebsite.com">
+							type="email" id="businessEmail" name="verification-contact-email"
+							placeholder="yourname@yourwebsite.com" autocomplete="off"
+							data-lpignore="true" data-1p-ignore="true" data-bwignore="true"
+							data-form-type="other" readonly
+							onfocus="this.removeAttribute('readonly');">
 						<button type="button" class="btn btn-light"
 							onclick="sendEmailVerification()">Send Verification
 							Email</button>

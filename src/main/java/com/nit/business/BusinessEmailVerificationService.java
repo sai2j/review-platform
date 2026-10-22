@@ -15,8 +15,25 @@ public class BusinessEmailVerificationService {
 	@Value("${app.base-url:http://localhost:8080/review-platform}")
 	private String baseUrl;
 
+	// false = any email is allowed (good for local testing)
+	// true  = email must belong to the business website domain (recommended for production)
+	@Value("${app.business.require-domain-match:false}")
+	private boolean requireDomainMatch;
+
 	public BusinessEmailVerificationService(JavaMailSender mailSender) {
 		this.mailSender = mailSender;
+	}
+
+	public void checkEmailAllowed(String email, String officialUrl) {
+		if (!requireDomainMatch) {
+			return;
+		}
+
+		if (!EmailDomainMatcher.emailMatchesWebsite(email, officialUrl)) {
+			String host = EmailDomainMatcher.hostOfUrl(officialUrl);
+			throw new RuntimeException("Please use an email address of your business website domain"
+					+ (host != null ? " (for example name@" + host + ")." : "."));
+		}
 	}
 
 	public void sendVerificationEmail(Business business) {

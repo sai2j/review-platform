@@ -1,4 +1,3 @@
-
 package com.nit.business;
 
 import java.util.List;
@@ -62,6 +61,9 @@ public class businessController {
 	@PreAuthorize("@businessService.canAccessBusiness(#id)")
 	@PostMapping("/{id}/verify-email")
 	public String sendBusinessEmailVerification(@PathVariable Long id, @RequestParam String email) {
+		Business existingBusiness = businessService.getBusinessById(id);
+		emailVerificationService.checkEmailAllowed(email,
+				existingBusiness != null ? existingBusiness.getOfficialUrl() : null);
 		Business business = businessService.createEmailVerificationToken(id, email);
 		emailVerificationService.sendVerificationEmail(business);
 		return "Verification email sent successfully";

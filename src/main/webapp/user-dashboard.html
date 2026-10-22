@@ -146,30 +146,12 @@
 					</div>
 					<div id="emailVerificationForm" class="verification-form">
 						<label for="businessEmail">Business Email</label> <input
-							type="email" id="businessEmail" placeholder="owner@example.com">
+							type="email" id="businessEmail" placeholder="yourname@yourwebsite.com">
 						<button type="button" class="btn btn-light"
 							onclick="sendEmailVerification()">Send Verification
 							Email</button>
 						<p class="help-text">Your business email domain must match the
 							official website domain.</p>
-					</div>
-					<div class="verification-item">
-						<div>
-							<strong>Meta Tag Verification</strong>
-							<p>
-								Current status: <span id="metaStatus">Checking...</span>
-							</p>
-						</div>
-						<span id="metaBadge" class="badge"></span>
-					</div>
-					<div class="verification-item">
-						<div>
-							<strong>DNS Verification</strong>
-							<p>
-								Current status: <span id="dnsStatus">Checking...</span>
-							</p>
-						</div>
-						<span id="dnsBadge" class="badge"></span>
 					</div>
 					<div id="verifiedMessage" class="verified-box"
 						style="display: none;">

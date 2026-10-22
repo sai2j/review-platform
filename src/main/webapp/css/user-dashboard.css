@@ -672,6 +672,20 @@ svg {
         width: 100%;
     }
 }
+/* My Business: lighter text weights (matches other pages) */
+.page-header h1 { font-weight: 700; }
+.btn { font-weight: 600; }
+.stat-value { font-weight: 700; }
+.card > h2 { font-weight: 700; }
+.empty-state h2 { font-weight: 700; }
+.business-card h2 { font-weight: 700; }
+.status { font-weight: 600; }
+.badge { font-weight: 600; }
+.verification-form label { font-weight: 600; }
+.step-num { font-weight: 700; }
+.step-title { font-weight: 600; }
+.success-message { font-weight: 600; }
+.error-message { font-weight: 600; }
 /* Colourful emoji icons in the sidebar (same as My Profile page) */
 .side-icon {
     flex: 0 0 20px;

@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class BusinessEmailVerificationService {
 
+	private static final org.slf4j.Logger log = org.slf4j.LoggerFactory
+			.getLogger(BusinessEmailVerificationService.class);
+
 	private final JavaMailSender mailSender;
 	@Value("${app.base-url:http://localhost:8080/review-platform}")
 	private String baseUrl;
@@ -29,6 +32,12 @@ public class BusinessEmailVerificationService {
 		message.setText("Hello " + business.getName() + ",\n\n" + "Please verify your business email by opening "
 				+ "the following link:\n\n" + verificationLink + "\n\n"
 				+ "This verification link is valid for 24 hours.\n\n" + "Review Platform");
-		mailSender.send(message);
+		try {
+			mailSender.send(message);
+		} catch (org.springframework.mail.MailException ex) {
+			log.error("Verification email could not be sent to {}: {}", business.getBusinessEmail(), ex.getMessage());
+			throw new RuntimeException(
+					"Could not send the verification email. The mail server is not reachable right now, please try again later.");
+		}
 	}
 }

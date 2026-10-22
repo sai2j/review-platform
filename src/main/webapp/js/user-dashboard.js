@@ -186,7 +186,7 @@ function updateStats(business) {
         }
 
         if (statVerification) {
-            statVerification.textContent = "0/3";
+            statVerification.textContent = "0/1";
         }
 
         if (statStatus) {
@@ -196,17 +196,14 @@ function updateStats(business) {
         return;
     }
 
-    const done =
-        (business.emailVerified === true ? 1 : 0) +
-        (business.metaVerified === true ? 1 : 0) +
-        (business.dnsVerified === true ? 1 : 0);
+    const done = business.emailVerified === true ? 1 : 0;
 
     if (statBusinesses) {
         statBusinesses.textContent = "1";
     }
 
     if (statVerification) {
-        statVerification.textContent = done + "/3";
+        statVerification.textContent = done + "/1";
     }
 
     if (statStatus) {
@@ -398,7 +395,7 @@ function displayPendingBusiness(business) {
     }
 
     if (statVerification) {
-        statVerification.textContent = "0/3";
+        statVerification.textContent = "0/1";
     }
 
     if (statStatus) {
@@ -457,31 +454,30 @@ function displayBusiness(business) {
     const emailForm = document.getElementById("emailVerificationForm");
     const businessEmail = document.getElementById("businessEmail");
 
-    if (businessEmail && business.businessEmail) {
-        businessEmail.value = business.businessEmail;
+    // Do not pre-fill an old saved email. Keep the field empty and show a
+    // hint based on the official website domain (example: yourname@shopsphere.com).
+    if (businessEmail) {
+        businessEmail.value = "";
+
+        let domain = "yourwebsite.com";
+
+        try {
+            const rawUrl = String(business.officialUrl || "");
+            const withProtocol = /^https?:\/\//i.test(rawUrl)
+                ? rawUrl
+                : "https://" + rawUrl;
+
+            domain = new URL(withProtocol).hostname.replace(/^www\./i, "") || domain;
+        } catch (error) {
+            // keep default domain
+        }
+
+        businessEmail.placeholder = "yourname@" + domain;
     }
 
     if (emailForm) {
         emailForm.style.display = emailVerified ? "none" : "block";
     }
-
-
-    /* META VERIFICATION */
-
-    updateVerificationUI(
-        "metaStatus",
-        "metaBadge",
-        business.metaVerified === true
-    );
-
-
-    /* DNS VERIFICATION */
-
-    updateVerificationUI(
-        "dnsStatus",
-        "dnsBadge",
-        business.dnsVerified === true
-    );
 
 
     /* BUSINESS VERIFIED */
@@ -571,8 +567,24 @@ function sendEmailVerification() {
         return;
     }
 
+    const sendButton = document.querySelector(
+        "#emailVerificationForm button"
+    );
+
+    if (sendButton) {
+        sendButton.disabled = true;
+        sendButton.textContent = "Sending...";
+    }
+
     if (dashboardMessage) {
         dashboardMessage.textContent = "Sending verification email...";
+    }
+
+    function resetButton() {
+        if (sendButton) {
+            sendButton.disabled = false;
+            sendButton.textContent = "Send Verification Email";
+        }
     }
 
     const url =
@@ -582,30 +594,60 @@ function sendEmailVerification() {
         "/verify-email?email=" +
         encodeURIComponent(email);
 
+    // Stop waiting after 20 seconds (do not hang forever)
+    const controller = new AbortController();
+    const timer = setTimeout(function() {
+        controller.abort();
+    }, 20000);
+
     fetch(url, {
         method: "POST",
-        credentials: "include"
+        credentials: "include",
+        signal: controller.signal
     })
         .then(function(response) {
-            if (!response.ok) {
-                return response.text().then(function(errorText) {
-                    throw new Error(
-                        errorText || "Unable to send verification email."
-                    );
-                });
-            }
+            return response.text().then(function(text) {
+                if (!response.ok) {
+                    let message = text;
 
-            return response.text();
+                    // Server errors come as {"success":false,"message":"..."}
+                    try {
+                        const json = JSON.parse(text);
+                        message = json.message || text;
+                    } catch (parseError) {
+                        // plain text, keep as it is
+                    }
+
+                    throw new Error(
+                        message || "Unable to send verification email."
+                    );
+                }
+
+                return text;
+            });
         })
         .then(function(responseMessage) {
-            showDashboardSuccess(responseMessage);
+            showDashboardSuccess(
+                responseMessage +
+                ". Please check your inbox (and spam folder)."
+            );
         })
         .catch(function(error) {
             console.error(error);
 
-            showDashboardError(
-                error.message || "Unable to send verification email."
-            );
+            if (error.name === "AbortError") {
+                showDashboardError(
+                    "The server took too long to send the email. Please try again."
+                );
+            } else {
+                showDashboardError(
+                    error.message || "Unable to send verification email."
+                );
+            }
+        })
+        .finally(function() {
+            clearTimeout(timer);
+            resetButton();
         });
 }
 

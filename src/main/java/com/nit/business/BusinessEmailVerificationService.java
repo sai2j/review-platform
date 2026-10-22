@@ -31,6 +31,18 @@ public class BusinessEmailVerificationService {
 	@Value("${spring.mail.username:}")
 	private String mailFrom;
 
+	// The SMTP host / port that are REALLY being used (shown in the log to spot a wrong MAIL_HOST / MAIL_PORT)
+	@Value("${spring.mail.host:}")
+	private String mailHost;
+
+	@Value("${spring.mail.port:}")
+	private String mailPort;
+
+	// LOCAL TESTING ONLY: if the mail cannot be sent, write the verification link into the server console
+	// so the link can be opened manually in the browser. Keep false in production.
+	@Value("${app.mail.log-link-when-send-fails:false}")
+	private boolean logLinkWhenSendFails;
+
 	// Maximum seconds to wait for the mail server (must be lower than the 20s wait in the browser)
 	@Value("${app.mail.send-timeout-seconds:12}")
 	private long sendTimeoutSeconds;
@@ -79,9 +91,13 @@ public class BusinessEmailVerificationService {
 					"Could not send the verification email. Mail is not configured on the server yet.");
 		}
 
+		log.info("Sending verification email to {} via SMTP server {}:{} (login: {})", business.getBusinessEmail(),
+				mailHost, mailPort, mailFrom);
+
 		try {
 			sendWithTimeout(message);
 		} catch (MailAuthenticationException ex) {
+			logLinkIfEnabled(verificationLink);
 			// Wrong / revoked Gmail App Password or wrong username
 			log.error("Verification email FAILED for {}: the SMTP server rejected the mail account login. "
 					+ "Check spring.mail.username and spring.mail.password (use a valid Gmail App Password). "
@@ -89,11 +105,14 @@ public class BusinessEmailVerificationService {
 			throw new RuntimeException("Could not send the verification email. The mail account login was rejected, "
 					+ "so the mail credentials on the server need to be updated.");
 		} catch (MailException ex) {
+			logLinkIfEnabled(verificationLink);
+
 			if (isConnectionProblem(ex)) {
 				// No internet, firewall / antivirus blocking port 587, wrong host or port
-				log.error("Verification email FAILED for {}: could not connect to the SMTP server "
-						+ "(check internet, firewall/antivirus, port 587 and spring.mail.host). "
-						+ "Cause: {}", business.getBusinessEmail(), rootMessage(ex), ex);
+				log.error("Verification email FAILED for {}: could not connect to the SMTP server {}:{} "
+						+ "(check internet, DNS, firewall/antivirus, VPN/proxy, and that MAIL_HOST / MAIL_PORT "
+						+ "environment variables are not set to something else). "
+						+ "Cause: {}", business.getBusinessEmail(), mailHost, mailPort, rootMessage(ex), ex);
 				throw new RuntimeException(
 						"Could not send the verification email. The mail server is not reachable right now, please try again later.");
 			}
@@ -103,6 +122,13 @@ public class BusinessEmailVerificationService {
 					business.getBusinessEmail(), rootMessage(ex), ex);
 			throw new RuntimeException("Could not send the verification email. The mail server rejected the message, "
 					+ "please check the email address and try again.");
+		}
+	}
+
+	private void logLinkIfEnabled(String verificationLink) {
+		if (logLinkWhenSendFails) {
+			log.warn("LOCAL TESTING: the mail could not be sent. Open this link in the browser to verify the "
+					+ "business email manually: {}", verificationLink);
 		}
 	}
 

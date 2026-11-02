@@ -1,0 +1,215 @@
+/* =========================================================
+   TRUSTPILOT-STYLE SEARCH (GREEN + MONTSERRAT)
+   Load this file LAST in index.html
+========================================================= */
+
+:root {
+	--tp-green: #00b67a;
+	--tp-green-dark: #009765;
+	--tp-green-deep: #005128;
+	--tp-green-soft: #e6f7f0;
+	--tp-green-line: #cdeede;
+	--tp-empty: #dcdce6;
+	--tp-text: #191919;
+	--tp-muted: #6b6b76;
+}
+
+/* ---------- Font (hero + search + results + stats) ---------- */
+.hero,
+.hero input,
+.hero button,
+.stats-strip,
+.search-results-section,
+.search-results-section button {
+	font-family: "Montserrat", Arial, Helvetica, sans-serif !important;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+	background: linear-gradient(180deg, #d6f3e6 0%, #e8f8f0 55%, #f7fdfa 100%) !important;
+}
+.hero h1 { color: #000000; font-weight: 800; }
+.hero h1 span { color: var(--tp-green) !important; }
+.hero p { color: #3f5a4e; font-weight: 500; }
+.hero-dots { background-image: radial-gradient(var(--tp-green) 1.3px, transparent 1.3px) !important; }
+.hc1 { background: rgba(0, 182, 122, 0.13) !important; }
+.hc2 { background: rgba(0, 182, 122, 0.10) !important; }
+.hc4 { background: rgba(0, 81, 40, 0.06) !important; }
+
+/* ---------- Search box ---------- */
+.search-box {
+	background: #ffffff;
+	border: 2px solid var(--tp-green-line);
+	border-radius: 50px;
+	padding: 6px 6px 6px 10px;
+	box-shadow: 0 8px 25px rgba(0, 81, 40, 0.10);
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.search-box:focus-within {
+	border-color: var(--tp-green);
+	box-shadow: 0 0 0 4px rgba(0, 182, 122, 0.18);
+}
+/* replace emoji magnifier with a green SVG icon */
+.search-icon {
+	font-size: 0 !important;
+	color: transparent !important;
+	background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300b67a' stroke-width='2.5' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-4-4'/%3E%3C/svg%3E") center / 20px no-repeat;
+}
+.search-box input {
+	font-size: 15px;
+	font-weight: 500;
+	color: var(--tp-text);
+	background: transparent !important;
+}
+.search-box input::placeholder { color: #8a8a96; font-weight: 500; }
+.search-box button {
+	background: var(--tp-green) !important;
+	color: #ffffff !important;
+	border-radius: 40px !important;
+	padding: 13px 30px !important;
+	font-weight: 700 !important;
+}
+.search-box button:hover { background: var(--tp-green-dark) !important; }
+
+/* ---------- Stats strip ---------- */
+.stat-item strong { color: var(--tp-green-dark) !important; font-weight: 800; }
+.stats-strip-inner { border-color: var(--tp-green-line) !important; }
+.stat-item { border-right-color: var(--tp-green-line) !important; }
+
+/* ---------- Results header ---------- */
+#websiteList .search-results-header h2 { font-weight: 800; font-size: 24px; }
+#websiteList .search-keyword { color: var(--tp-green) !important; }
+#websiteList .search-results-count { color: var(--tp-muted); font-weight: 500; }
+.search-clear-button { border-color: var(--tp-green-line) !important; }
+.search-clear-button:hover {
+	background: var(--tp-green-soft) !important;
+	border-color: var(--tp-green) !important;
+}
+.search-empty {
+	padding: 28px;
+	text-align: center;
+	color: var(--tp-muted);
+	font-weight: 500;
+	background: #ffffff;
+	border: 1px solid var(--tp-green-line);
+	border-radius: 12px;
+}
+
+/* ---------- Result list (Trustpilot style rows) ---------- */
+.search-result-list {
+	background: #ffffff;
+	border: 1px solid #e5e5ea;
+	border-radius: 12px;
+	overflow: hidden;
+}
+.search-result-card {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	padding: 20px 24px;
+	background: #ffffff;
+	border: none !important;
+	border-bottom: 1px solid #ececf0 !important;
+	border-radius: 0 !important;
+	box-shadow: none !important;
+	transform: none !important;
+	transition: background 0.15s ease;
+}
+.search-result-card:last-child { border-bottom: none !important; }
+.search-result-card:hover { background: #fafdfb; }
+
+.search-result-avatar {
+	flex: 0 0 56px;
+	width: 56px;
+	height: 56px;
+	border-radius: 8px !important;
+	background: var(--tp-green-soft) !important;
+	border: 1px solid var(--tp-green-line) !important;
+	color: var(--tp-green-deep) !important;
+	font-size: 22px;
+	font-weight: 800;
+}
+.search-result-info h3 {
+	margin: 0 0 2px;
+	font-size: 17px;
+	font-weight: 700;
+	color: var(--tp-text);
+}
+.search-result-url {
+	display: inline-block;
+	padding: 0 !important;
+	border: none !important;
+	background: none !important;
+	color: var(--tp-muted) !important;
+	font-size: 13px;
+	font-weight: 500;
+	text-decoration: none;
+}
+.search-result-url:hover { color: var(--tp-green-dark) !important; text-decoration: underline; }
+
+/* stars: green boxes like Trustpilot */
+.tp-rating {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin: 8px 0 10px;
+}
+.tp-stars-row { display: inline-flex; gap: 2px; }
+.tp-star {
+	width: 20px;
+	height: 20px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--tp-empty);
+	color: #ffffff;
+	font-size: 13px;
+	line-height: 1;
+}
+.tp-star.filled { background: var(--tp-green); }
+.tp-rating-text { font-size: 13px; color: var(--tp-muted); font-weight: 500; }
+.tp-rating-text strong { color: var(--tp-text); font-weight: 700; }
+
+.tp-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tp-tag {
+	padding: 4px 10px;
+	border: 1px solid #dcdce6;
+	border-radius: 4px;
+	font-size: 12px;
+	font-weight: 500;
+	color: #4a4a55;
+	background: #ffffff;
+}
+
+/* right side: country + button */
+.search-result-side {
+	flex: 0 0 auto;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 12px;
+}
+.tp-country { font-size: 13px; color: var(--tp-muted); font-weight: 500; }
+.search-result-card .view-website-button {
+	background: var(--tp-green) !important;
+	color: #ffffff !important;
+	border: none;
+	border-radius: 40px !important;
+	padding: 11px 22px !important;
+	font-size: 13px !important;
+	font-weight: 700 !important;
+	cursor: pointer;
+	white-space: nowrap;
+	transition: background 0.2s ease;
+}
+.search-result-card .view-website-button:hover { background: var(--tp-green-dark) !important; }
+
+/* ---------- Mobile ---------- */
+@media (max-width: 640px) {
+	.search-box { border-radius: 16px; flex-wrap: wrap; }
+	.search-result-card { flex-wrap: wrap; padding: 16px; }
+	.search-result-info { flex: 1 1 calc(100% - 80px); }
+	.search-result-side { width: 100%; flex-direction: row; justify-content: space-between; align-items: center; }
+	.search-result-card .view-website-button { width: auto; }
+}

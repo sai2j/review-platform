@@ -1,0 +1,157 @@
+/* =========================================================
+   HOME REDESIGN - Top rated, Growth banner, How it works,
+   Recent reviews.  Link this file LAST in <head> of index.html
+========================================================= */
+:root {
+	--rd-g: #00b67a;
+	--rd-gd: #009765;
+	--rd-deep: #0b3b2e;
+	--rd-mint: #e6f7f0;
+	--rd-line: #e2e8f0;
+	--rd-muted: #64748b;
+}
+
+/* ---------- square green stars ---------- */
+.sqs { display: inline-flex; gap: 2px; vertical-align: middle; letter-spacing: 0; }
+.sqs i { width: 18px; height: 18px; background: var(--rd-g); display: inline-flex; align-items: center; justify-content: center; }
+.sqs i.e { background: #dfe5e8; }
+.sqs svg { width: 12px; height: 12px; fill: #fff; }
+.sqs.sm i { width: 16px; height: 16px; }
+.sqs.sm svg { width: 11px; height: 11px; }
+
+/* ---------- section headings ---------- */
+.section-head h2 { font-size: 30px; font-weight: 800; }
+.section-link { font-weight: 700 !important; }
+
+/* ---------- TOP RATED ---------- */
+.tp-grid { gap: 20px !important; }
+.tp-card {
+	position: relative;
+	display: block !important;
+	background: #fff !important;
+	border: 1px solid var(--rd-line) !important;
+	border-radius: 16px !important;
+	padding: 22px !important;
+	overflow: hidden;
+	box-shadow: none !important;
+	text-decoration: none;
+	color: #0f172a;
+	transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.tp-card:before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--rd-g); }
+.tp-card:hover { transform: translateY(-4px); border-color: var(--rd-g) !important; box-shadow: 0 12px 26px rgba(0, 182, 122, 0.15) !important; }
+.tp-card .tp-rank {
+	position: absolute !important; top: 18px !important; right: 18px !important; left: auto !important;
+	background: var(--rd-mint) !important; color: var(--rd-gd) !important;
+	font-weight: 800; font-size: 12px; padding: 4px 10px; border-radius: 999px;
+}
+.tp-card .tp-logo {
+	position: static !important; transform: none !important;
+	width: 56px !important; height: 56px !important; margin: 0 0 16px !important;
+	border-radius: 14px !important; background: var(--rd-mint) !important; color: var(--rd-gd) !important;
+	border: none !important; box-shadow: none !important;
+	display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800;
+}
+.tp-card .tp-body { padding: 0 !important; }
+.tp-card .tp-body h3 { margin: 0 !important; font-size: 17px !important; }
+.tp-card .tp-body p { margin: 3px 0 14px !important; color: var(--rd-muted) !important; font-size: 13px; }
+.tp-card .tp-stars { display: flex; align-items: center; gap: 10px; margin: 0 !important; font-size: 13px; letter-spacing: 0; color: var(--rd-muted); }
+.tp-card .tp-stars b { font-size: 18px; color: #0f172a; }
+.tp-card .tp-stars small { margin: 0; color: var(--rd-muted); font-size: 13px; }
+.tp-card .tp-link {
+	margin-top: 16px !important; padding-top: 14px !important;
+	border-top: 1px solid var(--rd-line) !important;
+	color: var(--rd-gd) !important; font-weight: 700; font-size: 13px;
+}
+
+/* ---------- GROWTH BANNER ---------- */
+.business-growth-section { max-width: 1200px; padding: 0 24px; }
+.growth-banner-container {
+	position: relative; overflow: hidden;
+	background: var(--rd-deep) !important;
+	border-radius: 24px !important;
+	padding: 52px 56px !important;
+	box-shadow: none !important;
+}
+.growth-banner-container:before {
+	content: ""; position: absolute; right: -80px; top: -120px; width: 420px; height: 420px; border-radius: 50%;
+	background: radial-gradient(circle, rgba(0, 182, 122, 0.35), transparent 70%); pointer-events: none;
+}
+.growth-text-content { position: relative; max-width: 50%; }
+.growth-text-content h2 { font-size: 36px !important; line-height: 1.15; font-weight: 800; }
+.growth-text-content p { color: #b9dccf !important; font-size: 16px !important; line-height: 1.5; margin: 14px 0 26px !important; }
+.get-started-btn { background: var(--rd-g) !important; color: #fff !important; padding: 14px 30px !important; font-weight: 800 !important; font-size: 15px !important; }
+.get-started-btn:hover { background: var(--rd-gd) !important; }
+.growth-learn { display: inline-block; margin-left: 10px; padding: 14px 18px; color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; }
+.growth-learn:hover { text-decoration: underline; }
+.growth-graphics { position: relative; max-width: none !important; flex: none !important; }
+
+.gc { position: relative; width: 340px; background: #fff; color: #0f172a; border-radius: 18px; padding: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); }
+.gc-top { display: flex; gap: 12px; align-items: center; margin-bottom: 14px; }
+.gc-logo { width: 44px; height: 44px; border-radius: 12px; background: var(--rd-mint); color: var(--rd-gd); font-weight: 800; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+.gc-top b { display: block; font-size: 15px; }
+.gc-top small { color: var(--rd-gd); font-weight: 700; font-size: 11px; }
+.gc-score { display: flex; align-items: center; gap: 14px; }
+.gc-score strong { font-size: 40px; font-weight: 800; color: var(--rd-gd); line-height: 1; }
+.gc-score span { display: block; font-size: 12px; color: var(--rd-muted); margin-top: 4px; }
+.gc-bars { margin-top: 12px; }
+.gc-bar { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--rd-muted); margin-top: 7px; }
+.gc-bar div { flex: 1; height: 7px; background: #eef2f1; border-radius: 9px; overflow: hidden; }
+.gc-bar span { display: block; height: 100%; background: var(--rd-g); }
+.gc-chip { position: absolute; right: -18px; bottom: -16px; background: var(--rd-g); color: #fff; font-weight: 800; font-size: 12px; padding: 8px 14px; border-radius: 999px; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); }
+
+/* ---------- HOW IT WORKS ---------- */
+.how-it-works-section { background: linear-gradient(#f3faf6, #ffffff) !important; }
+.hw-steps:before { display: none !important; }
+.hw-card {
+	background: #fff !important; border: 1px solid var(--rd-line) !important; border-radius: 18px !important;
+	box-shadow: none !important; padding: 34px 26px !important; text-align: center;
+}
+.hw-card .hw-ico {
+	width: 64px !important; height: 64px !important; border-radius: 50% !important; margin: 0 auto 18px !important;
+	background: var(--rd-g) !important; box-shadow: 0 0 0 8px var(--rd-mint) !important;
+	display: flex !important; align-items: center; justify-content: center; position: static !important; transform: none !important;
+}
+.hw-ico svg { width: 28px; height: 28px; stroke: #fff; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.hw-card h3 { margin: 6px 0 8px !important; font-size: 20px !important; }
+.hw-card p { color: var(--rd-muted) !important; font-size: 14px !important; line-height: 1.55 !important; }
+.hw-card .stepno { order: -1; display: block; margin: 0 0 4px; color: var(--rd-gd) !important; font-weight: 800; letter-spacing: 1.5px; font-size: 11px; position: static !important; }
+.hw-clip { display: none !important; }
+
+/* ---------- RECENT REVIEWS ---------- */
+.rv-grid { gap: 20px !important; }
+.rv-card {
+	background: #fff !important; border: 1px solid var(--rd-line) !important; border-radius: 16px !important;
+	box-shadow: none !important; padding: 0 !important; overflow: hidden;
+	display: flex !important; flex-direction: column;
+}
+.rv-card:before { display: none !important; }
+.rv-quote { display: none !important; }
+.rv-stars { padding: 22px 22px 0; letter-spacing: 0 !important; font-size: 0 !important; }
+.rv-text { margin: 14px 0 18px !important; padding: 0 22px; font-size: 14px !important; line-height: 1.6 !important; color: #1e293b !important; }
+.rv-user { padding: 0 22px 20px !important; margin-top: auto; }
+.rv-av { background: var(--rd-g) !important; color: #fff !important; }
+.rv-user small, .rv-user small.ok { color: var(--rd-gd) !important; }
+.rv-site {
+	background: #f6faf8 !important; border-top: 1px solid var(--rd-line) !important;
+	border-radius: 0 !important; padding: 13px 22px !important; margin: 0 !important;
+}
+.rv-logo { background: var(--rd-mint) !important; color: var(--rd-gd) !important; border-radius: 8px !important; }
+.rv-arrow { color: var(--rd-gd) !important; }
+
+@media (max-width: 1000px) {
+	.growth-banner-container { flex-direction: column; align-items: flex-start; gap: 32px; padding: 36px 28px !important; }
+	.growth-text-content { max-width: 100%; }
+	.growth-text-content h2 { font-size: 28px !important; }
+}
+@media (max-width: 520px) {
+	.gc { width: 100%; }
+	.gc-chip { right: 8px; }
+}
+
+/* ---------- real website logos (favicon) ---------- */
+.tp-card .tp-logo.has-logo,
+.rv-logo.has-logo { background: #fff !important; border: 1px solid var(--rd-line) !important; overflow: hidden; }
+.tp-logo.has-logo img { width: 34px; height: 34px; object-fit: contain; }
+.rv-logo.has-logo img { width: 18px; height: 18px; object-fit: contain; }
+.rv-logo { overflow: hidden; }

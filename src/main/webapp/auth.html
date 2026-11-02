@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, follow">
+<title>Log in or sign up - Review Platform</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/navbar.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/auth.css?v=1">
+</head>
+<body class="au-body">
+	<nav class="navbar">
+		<div class="logo">
+			Review <span>Platform</span>
+		</div>
+		<div class="nav-links">
+			<a href="index.html"> Home </a> <a href="browse.html"> Websites </a>
+		</div>
+	</nav>
+
+	<main class="au-page">
+
+		<h1 class="au-heading">Read reviews. Write reviews. Find companies.</h1>
+
+		<section class="au-card" id="auCard">
+
+			<!-- STEP 1: choose how to continue -->
+			<div class="au-step" id="stepChoose">
+				<h2 class="au-title">Log in or sign up below</h2>
+
+				<div class="au-socials">
+					<div id="googleBtn" class="au-google" hidden></div>
+
+					<button type="button" class="au-btn au-facebook" id="facebookBtn" hidden>
+						<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+							<circle cx="12" cy="12" r="12" fill="#ffffff"></circle>
+							<path fill="#1877f2" d="M13.4 21v-7.2h2.4l.4-2.8h-2.8V9.3c0-.8.2-1.4 1.4-1.4h1.5V5.4c-.3 0-1.1-.1-2.2-.1-2.2 0-3.7 1.3-3.7 3.8V11H8.3v2.8h2.5V21z"></path>
+						</svg>
+						<span>Continue with Facebook</span>
+					</button>
+				</div>
+
+				<button type="button" class="au-link" id="emailStart">Continue with email</button>
+			</div>
+
+			<!-- STEP 2: type the email -->
+			<form class="au-step" id="stepEmail" novalidate hidden>
+				<h2 class="au-title">What is your email?</h2>
+				<input class="au-input" type="email" id="emailInput" placeholder="Email address"
+					autocomplete="email" aria-label="Email address">
+				<button type="submit" class="au-btn au-primary" id="emailNext">Continue</button>
+				<button type="button" class="au-link au-back" data-back="stepChoose">Back</button>
+			</form>
+
+			<!-- STEP 3a: existing account -> password -->
+			<form class="au-step" id="stepPassword" novalidate hidden>
+				<h2 class="au-title">Welcome back</h2>
+				<p class="au-who" data-email></p>
+				<div class="au-pass">
+					<input class="au-input" type="password" id="loginPassword" placeholder="Password"
+						autocomplete="current-password" aria-label="Password">
+					<button type="button" class="au-show" data-show="loginPassword">Show</button>
+				</div>
+				<button type="submit" class="au-btn au-primary" id="loginSubmit">Log in</button>
+				<a class="au-link" href="forgot-password.html">Forgot your password?</a>
+				<button type="button" class="au-link au-back" data-back="stepEmail">Use a different email</button>
+			</form>
+
+			<!-- STEP 3b: new account -> name + password -->
+			<form class="au-step" id="stepSignup" novalidate hidden>
+				<h2 class="au-title">Create your account</h2>
+				<p class="au-who" data-email></p>
+				<input class="au-input" type="text" id="signupName" placeholder="Your name (optional)"
+					autocomplete="name" aria-label="Your name" maxlength="255">
+				<div class="au-pass">
+					<input class="au-input" type="password" id="signupPassword"
+						placeholder="Password (at least 8 characters)"
+						autocomplete="new-password" aria-label="Password">
+					<button type="button" class="au-show" data-show="signupPassword">Show</button>
+				</div>
+				<button type="submit" class="au-btn au-primary" id="signupSubmit">Create account</button>
+				<button type="button" class="au-link au-back" data-back="stepEmail">Use a different email</button>
+			</form>
+
+			<p class="au-message" id="auMessage" role="alert"></p>
+		</section>
+
+		<section class="au-business">
+			<h2>Are you a business?</h2>
+			<p>Set up your business account for free.</p>
+			<a class="au-pill" href="business-signup.html">Sign up as a business</a>
+		</section>
+	</main>
+
+	<script src="js/auth.js?v=1"></script>
+</body>
+</html>

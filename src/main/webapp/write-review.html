@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, follow">
+<title>Write a review - Review Platform</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/navbar.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/write-review.css">
+</head>
+<body class="wr-body">
+	<nav class="navbar">
+		<div class="logo">
+			Review <span>Platform</span>
+		</div>
+		<div class="nav-links">
+			<a href="index.html"> Home </a> <a href="browse.html"> Websites </a>
+			<a href="login.html"> Login </a> <a href="register.html"> Register </a>
+		</div>
+	</nav>
+
+	<main class="wr-page">
+
+		<a class="wr-company" id="wrCompany" href="index.html">
+			<span class="wr-logo" id="wrLogo">W</span>
+			<span class="wr-company-text">
+				<strong id="wrName">Loading...</strong>
+				<small id="wrDomain"></small>
+			</span>
+		</a>
+
+		<div class="wr-notice" id="wrLoginNotice" hidden>
+			Please <a href="login.html">log in</a> to submit your review. You can choose your rating now.
+		</div>
+
+		<section id="wrRateBlock">
+			<h1 class="wr-title">How would you rate your experience?</h1>
+
+			<div class="wr-stars" id="wrStars" role="radiogroup" aria-label="Your rating">
+				<button type="button" class="wr-star" data-value="1" role="radio" aria-checked="false" aria-label="1 star - Bad"></button>
+				<button type="button" class="wr-star" data-value="2" role="radio" aria-checked="false" aria-label="2 stars - Poor"></button>
+				<button type="button" class="wr-star" data-value="3" role="radio" aria-checked="false" aria-label="3 stars - Average"></button>
+				<button type="button" class="wr-star" data-value="4" role="radio" aria-checked="false" aria-label="4 stars - Good"></button>
+				<button type="button" class="wr-star" data-value="5" role="radio" aria-checked="false" aria-label="5 stars - Excellent"></button>
+			</div>
+		</section>
+
+		<div class="wr-form-wrap" id="wrFormWrap" hidden>
+			<form class="wr-form" id="wrForm" novalidate>
+
+				<label class="wr-label" for="wrComment">Tell us more about your experience</label>
+				<textarea id="wrComment" rows="6"
+					placeholder="What made your experience good or bad? Remember to be honest, helpful, and constructive."></textarea>
+
+				<div class="wr-mentions">
+					<span>Other people mention</span>
+					<div id="wrChips">
+						<button type="button" class="wr-chip">Support</button>
+						<button type="button" class="wr-chip">Delivery</button>
+						<button type="button" class="wr-chip">Pricing</button>
+						<button type="button" class="wr-chip">Quality</button>
+						<button type="button" class="wr-chip">Refund</button>
+					</div>
+				</div>
+
+				<details class="wr-tips">
+					<summary>Tips for a helpful review</summary>
+					<ul>
+						<li>Write about your own experience with this website.</li>
+						<li>Be specific: what happened and when?</li>
+						<li>Do not share personal details or use offensive language.</li>
+						<li>Reviews that break the platform guidelines can be removed.</li>
+					</ul>
+				</details>
+
+				<label class="wr-check">
+					<input type="checkbox" id="wrConsent">
+					<span>I confirm this review is based on my own genuine experience, and I have not received any incentive to write it.</span>
+				</label>
+
+				<p class="wr-message" id="wrMessage" role="alert"></p>
+
+				<button type="submit" class="wr-submit" id="wrSubmit">Submit review</button>
+			</form>
+		</div>
+
+		<section class="wr-success" id="wrSuccess" hidden>
+			<svg class="wr-check-icon" viewBox="0 0 52 52" aria-hidden="true">
+				<circle cx="26" cy="26" r="24"></circle>
+				<path d="M15 27l8 8 15-17"></path>
+			</svg>
+			<h2>Thank you for your review!</h2>
+			<p>Your review helps other people make better decisions.</p>
+			<div class="wr-success-actions">
+				<a class="wr-btn-solid" id="wrSeeReviews" href="index.html">See all reviews</a>
+				<a class="wr-btn-line" href="index.html">Back to home</a>
+			</div>
+		</section>
+
+		<p class="wr-fine">Your review is public. Please follow the platform guidelines.</p>
+	</main>
+
+	<script src="js/write-review.js"></script>
+</body>
+</html>

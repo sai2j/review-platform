@@ -1,0 +1,192 @@
+/* =========================================================
+   LOG IN OR SIGN UP PAGE (one page for everyone)
+   Green + Montserrat
+========================================================= */
+
+:root {
+	--au-green: #00b67a;
+	--au-green-dark: #009765;
+	--au-green-deep: #005128;
+	--au-green-soft: #e6f7f0;
+	--au-line: #e3dfd8;
+	--au-text: #191919;
+	--au-muted: #6b6b76;
+}
+
+body.au-body,
+body.au-body input,
+body.au-body button {
+	font-family: "Montserrat", Arial, Helvetica, sans-serif;
+}
+body.au-body {
+	background: #faf8f5;
+	color: var(--au-text);
+}
+
+.au-page {
+	max-width: 760px;
+	margin: 0 auto;
+	padding: 48px 20px 80px;
+	text-align: center;
+}
+
+.au-heading {
+	margin: 0 0 32px;
+	font-size: 32px;
+	font-weight: 800;
+	line-height: 1.25;
+	animation: auRise 0.6s ease both;
+}
+
+/* ---------- Card ---------- */
+.au-card {
+	max-width: 600px;
+	margin: 0 auto;
+	padding: 40px 32px 34px;
+	background: #ffffff;
+	border: 1px solid var(--au-line);
+	border-radius: 12px;
+	animation: auRise 0.6s ease 0.1s both;
+}
+.au-step {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 14px;
+	animation: auStep 0.45s ease both;
+}
+.au-title {
+	margin: 0 0 8px;
+	font-size: 19px;
+	font-weight: 600;
+}
+.au-who {
+	margin: -4px 0 4px;
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--au-green-dark);
+	word-break: break-all;
+}
+
+/* ---------- Buttons ---------- */
+.au-socials {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 14px;
+	width: 100%;
+}
+.au-google { min-height: 40px; display: flex; justify-content: center; width: 100%; }
+
+.au-btn {
+	width: 320px;
+	max-width: 100%;
+	height: 42px;
+	border: none;
+	border-radius: 40px;
+	font-size: 14px;
+	font-weight: 700;
+	cursor: pointer;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	transition: filter 0.15s ease, transform 0.15s ease, background 0.2s ease;
+}
+.au-btn:hover:not(:disabled) { transform: translateY(-1px); }
+.au-btn:disabled { opacity: 0.65; cursor: wait; }
+.au-facebook { background: #1877f2; color: #ffffff; }
+.au-facebook:hover:not(:disabled) { filter: brightness(1.08); }
+.au-primary { background: var(--au-green); color: #ffffff; }
+.au-primary:hover:not(:disabled) { background: var(--au-green-dark); }
+
+.au-link {
+	border: none;
+	background: none;
+	padding: 4px;
+	font-size: 14px;
+	font-weight: 500;
+	color: var(--au-green-dark);
+	text-decoration: underline;
+	cursor: pointer;
+}
+.au-link:hover { color: var(--au-green-deep); }
+.au-back { font-size: 13px; color: var(--au-muted); }
+
+/* ---------- Inputs ---------- */
+.au-input {
+	width: 320px;
+	max-width: 100%;
+	height: 44px;
+	padding: 0 16px;
+	border: 1.5px solid #c9c9d3;
+	border-radius: 10px;
+	font-size: 14px;
+	background: #ffffff;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.au-input:focus {
+	outline: none;
+	border-color: var(--au-green);
+	box-shadow: 0 0 0 4px rgba(0, 182, 122, 0.15);
+}
+.au-input.invalid { border-color: #dc2626; }
+
+.au-pass { position: relative; width: 320px; max-width: 100%; }
+.au-pass .au-input { width: 100%; padding-right: 62px; }
+.au-show {
+	position: absolute;
+	right: 8px;
+	top: 50%;
+	transform: translateY(-50%);
+	border: none;
+	background: none;
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--au-green-dark);
+	cursor: pointer;
+	padding: 6px 8px;
+}
+
+.au-message {
+	min-height: 20px;
+	margin: 16px 0 0;
+	font-size: 13px;
+	font-weight: 600;
+	color: #dc2626;
+}
+.au-message.ok { color: var(--au-green-dark); }
+
+/* ---------- Business ---------- */
+.au-business {
+	margin-top: 56px;
+	animation: auRise 0.6s ease 0.2s both;
+}
+.au-business h2 { margin: 0 0 6px; font-size: 24px; font-weight: 800; }
+.au-business p { margin: 0 0 16px; font-size: 14px; color: var(--au-muted); }
+.au-pill {
+	display: inline-block;
+	padding: 10px 24px;
+	border: 1.5px solid var(--au-green);
+	border-radius: 40px;
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--au-green-dark);
+	text-decoration: none;
+	transition: background 0.2s ease;
+}
+.au-pill:hover { background: var(--au-green-soft); }
+
+/* ---------- Animations ---------- */
+@keyframes auRise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes auStep { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
+
+@media (max-width: 520px) {
+	.au-heading { font-size: 24px; }
+	.au-card { padding: 28px 16px; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.au-heading, .au-card, .au-step, .au-business { animation: none; }
+}
+
+[hidden] { display: none !important; }

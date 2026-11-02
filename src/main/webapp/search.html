@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, follow">
+<title>Search - Review Platform</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/navbar.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/search-page.css">
+</head>
+<body class="sp-body">
+	<nav class="navbar">
+		<div class="logo">
+			Review <span>Platform</span>
+		</div>
+		<div class="nav-links">
+			<a href="index.html"> Home </a> <a href="browse.html"> Websites </a>
+			<a href="login.html"> Login </a> <a href="register.html"> Register </a>
+		</div>
+	</nav>
+
+	<div class="sp-searchbar-wrap">
+		<form class="sp-searchbar" id="spSearchForm" autocomplete="off">
+			<input type="text" id="spSearchInput"
+				placeholder="Search for a website or category..." aria-label="Search">
+			<button type="submit">Search</button>
+		</form>
+	</div>
+
+	<main class="sp-page">
+		<div class="sp-filters">
+			<label class="sp-select"> <span>Rating</span> <select
+				id="spRatingFilter">
+					<option value="0">All ratings</option>
+					<option value="4.5">4.5 &amp; up</option>
+					<option value="4">4.0 &amp; up</option>
+					<option value="3">3.0 &amp; up</option>
+			</select>
+			</label> <label class="sp-select"> <span>Sort by</span> <select
+				id="spSort">
+					<option value="reviews">Most reviews</option>
+					<option value="rating">Highest rated</option>
+					<option value="name">Name A-Z</option>
+			</select>
+			</label>
+		</div>
+
+		<div class="sp-layout">
+			<section class="sp-main">
+				<p class="sp-count" id="spCount">Companies</p>
+				<div class="sp-list" id="spList"></div>
+				<nav class="sp-pagination" id="spPagination" aria-label="Pages"></nav>
+			</section>
+
+			<aside class="sp-side">
+				<div class="sp-side-card">
+					<h2>Categories</h2>
+					<div id="spCategories"></div>
+				</div>
+			</aside>
+		</div>
+	</main>
+
+	<script src="js/search.js"></script>
+</body>
+</html>

@@ -64,7 +64,7 @@ body .auth-navbar .nav-brand span,
 body .navbar .brand span,
 body .navbar .brand-blue {
     margin: 0;
-    color: #8fd8ff;
+    color: #8fe6c3;
 }
 
 /* ---------- Right side links ---------- */
@@ -108,7 +108,7 @@ body .navbar .back-link:hover,
 body .navbar .nav-links a.active,
 body .top-navbar .nav-links a.active,
 body .auth-navbar .nav-right a.active-link {
-    color: #8fd8ff;
+    color: #8fe6c3;
 }
 
 /* ---------- Sidebar pages (user dashboard / profile / admin) ---------- */
@@ -127,7 +127,7 @@ body .sidebar-logo {
 body .sidebar .brand .brand-accent,
 body .sidebar-logo .brand-accent,
 body .sidebar .brand-name > span {
-    color: #299bd7;
+    color: #00b67a;
 }
 
 /* ---------- Mobile ---------- */
@@ -156,4 +156,24 @@ body .sidebar .brand-name > span {
     body .auth-navbar .nav-right {
         gap: 10px;
     }
+}
+/* ===== "For Businesses" green pill button (Trustpilot style) ===== */
+body .navbar .nav-links a.business-nav-button,
+body .navbar .nav-links a.business-nav-button:visited {
+    background: #00b67a;
+    color: #ffffff;
+    padding: 9px 20px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
+    box-shadow: 0 2px 8px rgba(0, 182, 122, 0.35);
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+body .navbar .nav-links a.business-nav-button:hover {
+    background: #009765;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 182, 122, 0.45);
 }

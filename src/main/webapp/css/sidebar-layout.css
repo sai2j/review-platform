@@ -31,10 +31,10 @@ html.rp-has-sidebar body {
 .rp-sidebar {
     --rp-ink: #0b1117;
     --rp-muted: #4b5b68;
-    --rp-line: #d3e8f7;
-    --rp-bg: #eaf6ff;
-    --rp-sky: #a8dcfa;
-    --rp-soft: #d6eeff;
+    --rp-line: #d1f4e5;
+    --rp-bg: #eefbf4;
+    --rp-sky: #a7eacd;
+    --rp-soft: #ddf6eb;
 
     flex: 0 0 260px;
     width: 260px;
@@ -64,7 +64,7 @@ html.rp-has-sidebar body {
 }
 
 .rp-brand span {
-    color: #299bd7;
+    color: #0cb17a;
 }
 
 .rp-nav {
@@ -232,4 +232,94 @@ html.rp-has-sidebar body {
     text-align: center;
     font-size: 16px;
     line-height: 1;
+}
+
+/* =========================================================
+   My Business style sidebar (line icons, green active item)
+========================================================= */
+.rp-sidebar {
+    padding: 24px 16px 28px;
+    border-right: 1px solid #e2f0eb;
+}
+
+.rp-brand {
+    padding: 0 0 12px 16px;
+    font-size: 21px;
+    font-weight: 800;
+}
+
+.rp-brand span {
+    color: #00b67a;
+}
+
+.rp-link {
+    padding: 12px 16px;
+    min-height: 46px;
+    border-radius: 10px;
+    color: #47695c;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.rp-link:hover {
+    background: #f6faf8;
+    color: #111111;
+}
+
+.rp-link.active {
+    background: #e6f7f0;
+    color: #009765;
+    font-weight: 600;
+    box-shadow: inset 3px 0 0 #00b67a;
+}
+
+.rp-icon svg,
+.rp-link svg,
+.rp-logout svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.rp-user-card {
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #f6faf8;
+}
+
+.rp-avatar {
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    background: #e6f7f0;
+    color: #009765;
+    font-size: 14px;
+}
+
+.rp-user-label {
+    color: #0b1712;
+}
+
+.rp-user-email {
+    color: #4b685c;
+}
+
+.rp-logout {
+    min-height: 42px;
+    border: 1.5px solid #0b3b2e;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #111111;
+}
+
+.rp-logout:hover {
+    background: #0b3b2e;
+    color: #ffffff;
 }

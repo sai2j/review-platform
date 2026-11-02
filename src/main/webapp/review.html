@@ -3,251 +3,256 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Read website reviews, ratings, experiences, and frequently asked questions.">
+<meta name="description"
+	content="Read website reviews, ratings, experiences, and frequently asked questions.">
 <meta name="robots" content="index, follow">
 <title>Website Reviews | ReviewPlatform</title>
 <link rel="stylesheet" href="css/review.css">
 <link rel="stylesheet" href="css/navbar.css">
 <link rel="stylesheet" href="css/sidebar-layout.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link
+	href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap"
+	rel="stylesheet">
+<link rel="stylesheet" href="css/review-green.css">
 <script src="js/sidebar-layout.js"></script>
 </head>
 
 <style>
-    /* MODERNIZED STYLING & MODAL OVERRIDES */
-    body {
-        background: #f0f7ff;
-        color: #0b1117;
-        font-family: Arial, Helvetica, sans-serif;
-    }
+/* MODERNIZED STYLING & MODAL OVERRIDES */
+body {
+	background: #f0f7ff;
+	color: #0b1117;
+	font-family: Arial, Helvetica, sans-serif;
+}
 
-    /* Modern Write Review Section Card */
-    .write-review-section {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        border-radius: 20px;
-        padding: 40px;
-        max-width: 900px;
-        margin: 30px auto;
-        box-shadow: 0 10px 25px rgba(11, 17, 23, 0.04);
-    }
+/* Modern Write Review Section Card */
+.write-review-section {
+	background: #ffffff;
+	border: 1px solid #cbd5e1;
+	border-radius: 20px;
+	padding: 40px;
+	max-width: 900px;
+	margin: 30px auto;
+	box-shadow: 0 10px 25px rgba(11, 17, 23, 0.04);
+}
 
-    .write-review-section h2 {
-        font-size: 22px;
-        font-weight: 700;
-        color: #0b1117;
-        margin-top: 0;
-        margin-bottom: 6px;
-    }
+.write-review-section h2 {
+	font-size: 22px;
+	font-weight: 700;
+	color: #0b1117;
+	margin-top: 0;
+	margin-bottom: 6px;
+}
 
-    .section-description {
-        font-size: 14px;
-        color: #475569;
-        margin-bottom: 24px;
-    }
+.section-description {
+	font-size: 14px;
+	color: #475569;
+	margin-bottom: 24px;
+}
 
-    .form-group {
-        margin-bottom: 20px;
-    }
+.form-group {
+	margin-bottom: 20px;
+}
 
-    .form-group label {
-        display: block;
-        font-size: 13px;
-        font-weight: 600;
-        color: #0b1117;
-        margin-bottom: 8px;
-    }
+.form-group label {
+	display: block;
+	font-size: 13px;
+	font-weight: 600;
+	color: #0b1117;
+	margin-bottom: 8px;
+}
 
-    .form-group select, 
-    .form-group textarea {
-        width: 100%;
-        padding: 14px;
-        border: 1px solid #cbd5e1;
-        border-radius: 12px;
-        font-size: 14px;
-        outline: none;
-        background: #ffffff;
-        color: #0b1117;
-        transition: all 0.2s;
-    }
+.form-group select, .form-group textarea {
+	width: 100%;
+	padding: 14px;
+	border: 1px solid #cbd5e1;
+	border-radius: 12px;
+	font-size: 14px;
+	outline: none;
+	background: #ffffff;
+	color: #0b1117;
+	transition: all 0.2s;
+}
 
-    .form-group select:focus, 
-    .form-group textarea:focus {
-        border-color: #0b1117;
-        box-shadow: 0 0 0 3px rgba(11, 17, 23, 0.1);
-    }
+.form-group select:focus, .form-group textarea:focus {
+	border-color: #0b1117;
+	box-shadow: 0 0 0 3px rgba(11, 17, 23, 0.1);
+}
 
-    .form-group textarea {
-        min-height: 120px;
-        resize: vertical;
-    }
+.form-group textarea {
+	min-height: 120px;
+	resize: vertical;
+}
 
-    /* Modern Submit Review Button */
-    .submit-review-button {
-        background: #0b1117;
-        color: #ffffff;
-        border: none;
-        padding: 14px 28px;
-        border-radius: 12px;
-        font-weight: 700;
-        font-size: 14px;
-        cursor: pointer;
-        transition: background 0.2s;
-        width: 100%;
-    }
+/* Modern Submit Review Button */
+.submit-review-button {
+	background: #0b1117;
+	color: #ffffff;
+	border: none;
+	padding: 14px 28px;
+	border-radius: 12px;
+	font-weight: 700;
+	font-size: 14px;
+	cursor: pointer;
+	transition: background 0.2s;
+	width: 100%;
+}
 
-    .submit-review-button:hover {
-        background: #1e293b;
-    }
+.submit-review-button:hover {
+	background: #1e293b;
+}
 
-    /* Modernized Report Form Container */
-    .report-form {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 20px;
-        margin-top: 15px;
-        box-shadow: inset 0 2px 4px rgba(0,0,0,0.01);
-    }
+/* Modernized Report Form Container */
+.report-form {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 14px;
+	padding: 20px;
+	margin-top: 15px;
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.01);
+}
 
-    .report-form label {
-        display: block;
-        font-size: 12px;
-        font-weight: 700;
-        color: #475569;
-        margin-bottom: 6px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
+.report-form label {
+	display: block;
+	font-size: 12px;
+	font-weight: 700;
+	color: #475569;
+	margin-bottom: 6px;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
 
-    .report-form select {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        font-size: 13px;
-        outline: none;
-        background: #ffffff;
-        color: #0b1117;
-        margin-bottom: 12px;
-    }
+.report-form select {
+	width: 100%;
+	padding: 10px 12px;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	font-size: 13px;
+	outline: none;
+	background: #ffffff;
+	color: #0b1117;
+	margin-bottom: 12px;
+}
 
-    .submit-report-button {
-        background: #ef4444;
-        color: #ffffff;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-weight: 700;
-        font-size: 13px;
-        cursor: pointer;
-        transition: background 0.2s;
-    }
+.submit-report-button {
+	background: #ef4444;
+	color: #ffffff;
+	border: none;
+	padding: 10px 20px;
+	border-radius: 8px;
+	font-weight: 700;
+	font-size: 13px;
+	cursor: pointer;
+	transition: background 0.2s;
+}
 
-    .submit-report-button:hover {
-        background: #dc2626;
-    }
+.submit-report-button:hover {
+	background: #dc2626;
+}
 
-    /* MODERN EDIT MODAL STYLING */
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(11, 17, 23, 0.5);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
-        backdrop-filter: blur(4px);
-    }
+/* MODERN EDIT MODAL STYLING */
+.modal-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(11, 17, 23, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 1000;
+	backdrop-filter: blur(4px);
+}
 
-    .modal-card {
-        background: #ffffff;
-        border: 1px solid #cbd5e1;
-        border-radius: 20px;
-        padding: 30px;
-        width: 100%;
-        max-width: 500px;
-        box-shadow: 0 20px 40px rgba(11, 17, 23, 0.15);
-    }
+.modal-card {
+	background: #ffffff;
+	border: 1px solid #cbd5e1;
+	border-radius: 20px;
+	padding: 30px;
+	width: 100%;
+	max-width: 500px;
+	box-shadow: 0 20px 40px rgba(11, 17, 23, 0.15);
+}
 
-    .modal-card h3 {
-        margin-top: 0;
-        font-size: 20px;
-        color: #0b1117;
-        margin-bottom: 20px;
-    }
+.modal-card h3 {
+	margin-top: 0;
+	font-size: 20px;
+	color: #0b1117;
+	margin-bottom: 20px;
+}
 
-    .modal-actions {
-        display: flex;
-        gap: 12px;
-        margin-top: 20px;
-    }
+.modal-actions {
+	display: flex;
+	gap: 12px;
+	margin-top: 20px;
+}
 
-    .btn-modal-save {
-        flex: 1;
-        background: #0b1117;
-        color: #ffffff;
-        border: none;
-        padding: 12px;
-        border-radius: 10px;
-        font-weight: 700;
-        font-size: 14px;
-        cursor: pointer;
-    }
+.btn-modal-save {
+	flex: 1;
+	background: #0b1117;
+	color: #ffffff;
+	border: none;
+	padding: 12px;
+	border-radius: 10px;
+	font-weight: 700;
+	font-size: 14px;
+	cursor: pointer;
+}
 
-    .btn-modal-save:hover {
-        background: #1e293b;
-    }
+.btn-modal-save:hover {
+	background: #1e293b;
+}
 
-    .btn-modal-cancel {
-        flex: 1;
-        background: #ffffff;
-        color: #0b1117;
-        border: 1px solid #cbd5e1;
-        padding: 12px;
-        border-radius: 10px;
-        font-weight: 700;
-        font-size: 14px;
-        cursor: pointer;
-    }
+.btn-modal-cancel {
+	flex: 1;
+	background: #ffffff;
+	color: #0b1117;
+	border: 1px solid #cbd5e1;
+	padding: 12px;
+	border-radius: 10px;
+	font-weight: 700;
+	font-size: 14px;
+	cursor: pointer;
+}
 
-    .btn-modal-cancel:hover {
-        background: #f1f5f9;
-    }
+.btn-modal-cancel:hover {
+	background: #f1f5f9;
+}
 
-    /* WRITE REVIEW POPUP (same look as Edit Review popup) */
-    #writeReviewOverlay {
-        display: none;
-    }
+/* WRITE REVIEW POPUP (same look as Edit Review popup) */
+#writeReviewOverlay {
+	display: none;
+}
 
-    #writeReviewOverlay.open {
-        display: flex;
-    }
+#writeReviewOverlay.open {
+	display: flex;
+}
 
-    .modal-overlay .write-review-section {
-        display: block;
-        width: 100%;
-        max-width: 500px;
-        margin: 0;
-        padding: 30px;
-        max-height: 90vh;
-        overflow-y: auto;
-        box-shadow: 0 20px 40px rgba(11, 17, 23, 0.15);
-    }
+.modal-overlay .write-review-section {
+	display: block;
+	width: 100%;
+	max-width: 500px;
+	margin: 0;
+	padding: 30px;
+	max-height: 90vh;
+	overflow-y: auto;
+	box-shadow: 0 20px 40px rgba(11, 17, 23, 0.15);
+}
 
-    .modal-overlay .write-review-section h2 {
-        font-size: 20px;
-        margin-bottom: 6px;
-    }
+.modal-overlay .write-review-section h2 {
+	font-size: 20px;
+	margin-bottom: 6px;
+}
 
-    .modal-actions .submit-review-button {
-        flex: 1;
-        width: auto;
-        padding: 12px;
-        border-radius: 10px;
-    }
+.modal-actions .submit-review-button {
+	flex: 1;
+	width: auto;
+	padding: 12px;
+	border-radius: 10px;
+}
 </style>
 </head>
 <body>
@@ -257,165 +262,196 @@
 			Review<span>Platform</span>
 		</div>
 		<div class="nav-links">
-			<a href="index.html"> Home </a>
-			<a href="browse.html"> Websites </a>
+			<a href="index.html"> Home </a> <a href="browse.html"> Websites </a>
 			<a href="login.html"> Log in </a>
 		</div>
 	</nav>
 
 	<main class="profile-container">
 
-		<!-- WEBSITE HEADER -->
-		<section class="profile-header">
-			<div class="profile-main">
-				<div class="website-logo"></div>
+		<!-- TOP AREA: header + summary (left) and rating card (right) -->
+		<div class="top-grid">
 
-				<div class="website-details">
-					<div class="name-row">
-						<h1 id="websiteName">Loading...</h1>
-						<span id="verifiedSlot"></span>
+			<div class="top-main">
+
+				<!-- WEBSITE HEADER -->
+				<section class="profile-header">
+					<div class="ph-badges" id="phBadges"></div>
+					<div class="profile-main">
+						<div class="website-logo"></div>
+
+						<div class="website-details">
+							<div class="name-row">
+								<h1 id="websiteName">Loading...</h1>
+								<span id="verifiedSlot"></span>
+							</div>
+							<div id="headRating" class="rating-line"></div>
+							<div id="websiteInfo">Loading website information...</div>
+
+							<div class="profile-actions">
+								<button type="button" class="write-review-button"
+									id="writeReviewButton">&#9998; Write a review</button>
+								<a id="visitWebsiteButton" class="visit-button" target="_blank"
+									rel="noopener noreferrer" hidden>Visit website</a>
+							</div>
+						</div>
 					</div>
-					<div id="headRating" class="rating-line"></div>
-					<div id="websiteInfo">Loading website information...</div>
-				</div>
+				</section>
 
-				<div class="profile-actions">
-					<button type="button" class="write-review-button"
-						id="writeReviewButton">✎ Write a review</button>
-					<a id="visitWebsiteButton" class="visit-button" target="_blank"
-						rel="noopener noreferrer" hidden>Visit website</a>
-				</div>
+				<div class="note-box">Reviews on this platform are written by users and
+					go through moderation before they appear.</div>
+
+				<!-- REVIEW SUMMARY (built from the real reviews by js/review-extras.js) -->
+				<section class="block rv-summary" id="rvSummary">
+					<h2 class="block-title">Review summary <small>Based on recent reviews</small></h2>
+					<p id="rvSummaryText" class="rv-summary-text clamp"></p>
+					<button type="button" class="linkbtn" id="rvSummaryMore" hidden>See more</button>
+				</section>
+
+				<section class="block" id="rvTopicsBlock">
+					<h3 class="block-sub">What people talk about most</h3>
+					<div class="carousel">
+						<div id="rvTopics" class="rv-topics"></div>
+						<button type="button" class="car-arrow" data-for="rvTopics" aria-label="Next">&rsaquo;</button>
+					</div>
+				</section>
+
+				<section class="block" id="rvShaping"></section>
+
+				<!-- COMPANY DETAILS + CONTACT INFO -->
+				<section class="block" id="aboutCard">
+					<h3 class="block-sub">Company details</h3>
+					<div id="aboutCats" class="about-cats"></div>
+					<div class="about-box">
+						<strong>Written by the company</strong>
+						<p id="aboutText" class="about-text clamp">Loading...</p>
+						<button type="button" class="linkbtn" id="aboutMore" hidden>See more</button>
+					</div>
+				</section>
+
+				<section class="block details-card" id="contactCard">
+					<h3 class="block-sub">Contact info</h3>
+					<dl id="websiteDetails" class="details"></dl>
+				</section>
+			</div>
+
+			<aside class="top-side">
+				<section class="card score-card">
+					<div class="score-top">
+						<div id="averageRating" class="average-rating">Loading rating...</div>
+						<div class="score-meta">
+							<div id="scoreStars" class="stars" role="img"></div>
+							<div id="totalReviews" class="total-reviews">Loading reviews...</div>
+						</div>
+					</div>
+
+					<div class="rating-bars">
+						<div class="rating-row"><span>5-star</span>
+							<div class="rating-bar"><div id="fiveStarBar"></div></div>
+							<strong id="fiveStarCount">0</strong></div>
+						<div class="rating-row"><span>4-star</span>
+							<div class="rating-bar"><div id="fourStarBar"></div></div>
+							<strong id="fourStarCount">0</strong></div>
+						<div class="rating-row"><span>3-star</span>
+							<div class="rating-bar"><div id="threeStarBar"></div></div>
+							<strong id="threeStarCount">0</strong></div>
+						<div class="rating-row"><span>2-star</span>
+							<div class="rating-bar"><div id="twoStarBar"></div></div>
+							<strong id="twoStarCount">0</strong></div>
+						<div class="rating-row"><span>1-star</span>
+							<div class="rating-bar"><div id="oneStarBar"></div></div>
+							<strong id="oneStarCount">0</strong></div>
+					</div>
+				</section>
+
+				<section class="card notice-card">
+					<div id="noticeList"></div>
+				</section>
+			</aside>
+		</div>
+
+		<!-- PEOPLE ALSO LOOKED AT is inserted here by js/review-extras.js -->
+		<div id="similarSlot"></div>
+
+		<!-- ALL REVIEWS: sticky filter panel (left) + review list (right) -->
+		<section class="all-reviews" id="allReviews">
+			<div class="ar-grid">
+
+				<aside class="ar-side">
+					<div class="ar-score">
+						<span class="ar-big" id="arBig">0.0</span>
+						<span class="ar-label" id="arLabel"></span>
+					</div>
+					<h3 class="ar-title">All reviews <small id="arCount"></small></h3>
+					<p class="ar-recent" id="arRecent"></p>
+					<button type="button" class="ar-write" id="arWrite">&#9998; Write a review</button>
+					<div class="ar-bars" id="arBars"></div>
+				</aside>
+
+				<section class="customer-reviews">
+					<div class="card reviews-heading">
+						<h2>Customer reviews</h2>
+						<div class="reviews-tools">
+							<div class="filter-chips" role="group"
+								aria-label="Filter reviews by rating" hidden>
+								<button type="button" class="filter-chip active" data-filter="0"
+									aria-pressed="true">All</button>
+								<button type="button" class="filter-chip" data-filter="5"
+									aria-pressed="false">5 star</button>
+								<button type="button" class="filter-chip" data-filter="4"
+									aria-pressed="false">4 star</button>
+								<button type="button" class="filter-chip" data-filter="3"
+									aria-pressed="false">3 star</button>
+								<button type="button" class="filter-chip" data-filter="2"
+									aria-pressed="false">2 star</button>
+								<button type="button" class="filter-chip" data-filter="1"
+									aria-pressed="false">1 star</button>
+							</div>
+							<select id="reviewSort" class="sort-select" aria-label="Sort reviews">
+								<option value="recent">Most recent</option>
+								<option value="high">Highest rated</option>
+								<option value="low">Lowest rated</option>
+							</select>
+						</div>
+					</div>
+
+					<div id="reviewList">Loading reviews...</div>
+
+					<div class="more-wrap">
+						<p id="reviewsShown" class="shown-text"></p>
+						<button type="button" id="loadMoreButton" class="visit-button" hidden>Load more reviews</button>
+					</div>
+				</section>
 			</div>
 		</section>
 
-		<!-- WRITE REVIEW SECTION -->
-		<div id="writeReviewOverlay" class="modal-overlay">
-		<section class="write-review-section">
-			<h2>Share your experience</h2>
-			<p class="section-description">Have you used this website? Share your experience with other users.</p>
-			<form id="reviewForm">
-				<div class="form-group">
-					<label for="rating"> Your rating </label>
-					<select id="rating" required>
-						<option value="">Select Rating</option>
-						<option value="1">1 - Bad</option>
-						<option value="2">2 - Poor</option>
-						<option value="3">3 - Average</option>
-						<option value="4">4 - Good</option>
-						<option value="5">5 - Excellent</option>
-					</select>
-				</div>
-				<div class="form-group">
-					<label for="comment"> Your review </label>
-					<textarea id="comment" placeholder="Share your experience..." required></textarea>
-				</div>
-				<div class="modal-actions">
-					<button type="button" id="writeReviewCancelBtn" class="btn-modal-cancel">Cancel</button>
-					<button type="submit" class="submit-review-button">Submit Review</button>
-				</div>
-			</form>
-			<p id="message" style="margin-top: 15px; font-weight: 600; font-size: 13px;"></p>
-		</section>
-		</div>
-
-		<!-- TWO COLUMNS -->
-		<div class="layout">
-
-			<section class="card score-card">
-				<h2 class="card-title">Rating summary</h2>
-				<div id="averageRating" class="average-rating">Loading rating...</div>
-				<div id="scoreStars" class="stars" role="img"></div>
-				<div id="totalReviews" class="total-reviews">Loading reviews...</div>
-
-				<div class="rating-bars">
-					<div class="rating-row">
-						<span>5 stars</span>
-						<div class="rating-bar"><div id="fiveStarBar"></div></div>
-						<strong id="fiveStarCount">0</strong>
-					</div>
-					<div class="rating-row">
-						<span>4 stars</span>
-						<div class="rating-bar"><div id="fourStarBar"></div></div>
-						<strong id="fourStarCount">0</strong>
-					</div>
-					<div class="rating-row">
-						<span>3 stars</span>
-						<div class="rating-bar"><div id="threeStarBar"></div></div>
-						<strong id="threeStarCount">0</strong>
-					</div>
-					<div class="rating-row">
-						<span>2 stars</span>
-						<div class="rating-bar"><div id="twoStarBar"></div></div>
-						<strong id="twoStarCount">0</strong>
-					</div>
-					<div class="rating-row">
-						<span>1 star</span>
-						<div class="rating-bar"><div id="oneStarBar"></div></div>
-						<strong id="oneStarCount">0</strong>
-					</div>
-				</div>
-			</section>
-
-			<section class="card details-card">
-				<h2 class="card-title">Company details</h2>
-				<dl id="websiteDetails" class="details"></dl>
-			</section>
-
-			<section class="card faq-section">
-				<div class="faq-heading">
-					<h2>Frequently Asked Questions</h2>
-					<p>Find answers to common questions about this website profile and reviews.</p>
-				</div>
-				<div class="faq-item">
-					<h3>What is this website profile?</h3>
-					<p>This profile provides information, ratings, and reviews about the website.</p>
-				</div>
-				<div class="faq-item">
-					<h3>How is the website rating calculated?</h3>
-					<p>The rating is based on reviews submitted by users of the website.</p>
-				</div>
-				<div class="faq-item">
-					<h3>Can I submit a review?</h3>
-					<p>Yes. Logged-in users can share their experience by submitting a review and rating.</p>
-				</div>
-				<div class="faq-item">
-					<h3>Can I report a review?</h3>
-					<p>Yes. Users can report a review when they believe it violates the platform's review guidelines.</p>
-				</div>
-			</section>
-
-			<section class="customer-reviews">
-				<div class="card reviews-heading">
-					<div>
-						<h2>Customer Reviews</h2>
-						<p>Read experiences shared by other users.</p>
-					</div>
-					<div class="reviews-tools">
-						<div class="filter-chips" role="group" aria-label="Filter reviews by rating">
-							<button type="button" class="filter-chip active" data-filter="0" aria-pressed="true">All</button>
-							<button type="button" class="filter-chip" data-filter="5" aria-pressed="false">5★</button>
-							<button type="button" class="filter-chip" data-filter="4" aria-pressed="false">4★</button>
-							<button type="button" class="filter-chip" data-filter="3" aria-pressed="false">3★</button>
-							<button type="button" class="filter-chip" data-filter="2" aria-pressed="false">2★</button>
-							<button type="button" class="filter-chip" data-filter="1" aria-pressed="false">1★</button>
+		<section class="card faq-section">
+						<div class="faq-heading">
+							<h2>Frequently Asked Questions</h2>
+							<p>Find answers to common questions about this website profile
+								and reviews.</p>
 						</div>
-						<select id="reviewSort" class="sort-select" aria-label="Sort reviews">
-							<option value="recent">Most recent</option>
-							<option value="high">Highest rated</option>
-							<option value="low">Lowest rated</option>
-						</select>
-					</div>
-				</div>
-
-				<div id="reviewList">Loading reviews...</div>
-
-				<div class="more-wrap">
-					<p id="reviewsShown" class="shown-text"></p>
-					<button type="button" id="loadMoreButton" class="visit-button" hidden>Load more reviews</button>
-				</div>
-			</section>
-
-		</div>
+						<div class="faq-item">
+							<h3>What is this website profile?</h3>
+							<p>This profile provides information, ratings, and reviews
+								about the website.</p>
+						</div>
+						<div class="faq-item">
+							<h3>How is the website rating calculated?</h3>
+							<p>The rating is based on reviews submitted by users of the
+								website.</p>
+						</div>
+						<div class="faq-item">
+							<h3>Can I submit a review?</h3>
+							<p>Yes. Logged-in users can share their experience by
+								submitting a review and rating.</p>
+						</div>
+						<div class="faq-item">
+							<h3>Can I report a review?</h3>
+							<p>Yes. Users can report a review when they believe it violates
+								the platform's review guidelines.</p>
+						</div>
+					</section>
 
 		<div class="back-home">
 			<a href="index.html"> ← Back to Home </a>
@@ -576,7 +612,9 @@
 				}
 
 				if (websiteInfo) {
-					websiteInfo.innerHTML = (website.description ? "<p>" + escapeHtml(website.description) + "</p>" : "") + '<div id="claimStatus">Checking business verification...</div>';
+					websiteInfo.innerHTML = website.category
+						? '<a class="ph-cat" href="category.html?category=' + encodeURIComponent(website.category) + '">' + escapeHtml(website.category) + '</a>'
+						: "";
 				}
 				renderCompanyDetails();
 			}).catch(err => {
@@ -752,8 +790,8 @@
 					${reply ? `<div class="business-response"><strong>Business Response</strong><p>${escapeHtml(reply)}</p></div>` : ""}
 					
 					<div class="review-actions">
-						<button type="button" class="review-btn" data-action="helpful" data-review-id="${id}">Helpful · <span id="helpful-${id}">0</span></button>
-						<button type="button" class="review-btn" data-action="not-helpful" data-review-id="${id}">Not Helpful · <span id="not-helpful-${id}">0</span></button>
+						<button type="button" class="review-btn" data-action="helpful" data-review-id="${id}">Useful · <span id="helpful-${id}">0</span></button>
+						<button type="button" class="review-btn" data-action="not-helpful" data-review-id="${id}">Not useful · <span id="not-helpful-${id}">0</span></button>
 						<button type="button" class="review-btn" data-action="share" data-review-id="${id}">Share</button>
 					</div>
 
@@ -949,14 +987,7 @@
 
 		/* WRITE REVIEW POPUP */
 		function openWriteReviewModal() {
-			const overlay = document.getElementById("writeReviewOverlay");
-			const message = document.getElementById("message");
-			if (message) message.innerHTML = "";
-			if (overlay) overlay.classList.add("open");
-			const ratingSelect = document.getElementById("rating");
-			if (ratingSelect) {
-				setTimeout(function () { ratingSelect.focus(); }, 50);
-			}
+			window.location.href = "write-review.html?websiteId=" + encodeURIComponent(websiteId);
 		}
 
 		function closeWriteReviewModal() {
@@ -1102,4 +1133,5 @@
 			});
 		});
 	</script>
+		<script src="js/review-extras.js"></script>
 </body>

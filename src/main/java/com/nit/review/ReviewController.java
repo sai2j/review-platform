@@ -69,6 +69,15 @@ public class ReviewController {
 
 	}
 
+	// ==============================
+	// MY REVIEWS (needs login, every status)
+	// ==============================
+
+	@GetMapping("/my")
+	public List<ReviewResponseDTO> getMyReviews() {
+		return reviewService.getMyReviews();
+	}
+
 	@GetMapping("/website/{websiteId}")
 
 	public Page<ReviewResponseDTO> getReviewsByWebsiteId(

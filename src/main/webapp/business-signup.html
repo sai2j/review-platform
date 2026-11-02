@@ -7,31 +7,48 @@
     <link rel="stylesheet" href="css/business-signup.css">
     <style>
         .business-signup-message.error { color: #d93025; }
-        .business-signup-message.success { color: #188038; }
+        .business-signup-message.success { color: #00805a; }
     </style>
 </head>
 <body>
 
     <!-- TOP NAVIGATION -->
     <header class="auth-navbar">
-        <div class="nav-brand">ReviewPlatform</div>
+        <div class="nav-brand">Review<span>Platform</span></div>
         <div class="nav-right">
             <a href="index.html">Home</a>
+            <a href="browse.html">Websites</a>
             <a href="login.html">Log in</a>
         </div>
     </header>
 
-    <!-- MAIN CONTAINER -->
-    <div class="signup-container">
-        <div class="signup-header-badge">FOR BUSINESSES</div>
-        <h1>Create your business profile</h1>
-        <p class="signup-subtext">Add your business to Review Platform and start managing your business profile and customer reviews.</p>
+    <!-- HERO -->
+    <section class="biz-hero">
+        <div class="biz-wrap">
+            <span class="signup-header-badge">FOR BUSINESSES</span>
+            <h1>Grow your business with <em>genuine reviews</em></h1>
+            <p class="signup-subtext">Add your business to Review Platform, collect honest customer feedback and build trust with people who are ready to buy.</p>
+            <div class="biz-stats">
+                <div><b>22+</b><span>Businesses</span></div>
+                <div><b>57+</b><span>Reviews</span></div>
+                <div><b>Free</b><span>To get started</span></div>
+            </div>
+        </div>
+    </section>
 
-        <!-- FORM CARD -->
+    <!-- FORM + WHY JOIN -->
+    <div class="biz-cols">
         <div class="signup-card">
+            <div class="biz-progress">
+                <div class="on"><i></i>1. Details</div>
+                <div><i></i>2. Verify</div>
+                <div><i></i>3. Dashboard</div>
+            </div>
+
             <form id="businessSignupForm">
                 
-                <div class="section-title">Business details</div>
+                <h2 class="form-title">Create your business profile</h2>
+                <p class="form-sub">It takes less than 2 minutes.</p>
 
                 <div class="form-group">
                     <label for="businessName">Business Name</label>
@@ -40,7 +57,7 @@
 
                 <div class="form-group">
                     <label for="officialUrl">Business Website</label>
-                    <input type="url" id="officialUrl" placeholder="https://example.com" required>
+                    <input type="url" id="officialUrl" placeholder="https://www.example.com" required>
                     <small class="form-hint">Enter your official business website URL.</small>
                 </div>
 
@@ -97,25 +114,73 @@
             </form>
         </div>
 
-        <!-- WHAT HAPPENS NEXT SECTION -->
-        <div class="next-steps-card">
-            <h3>What happens next?</h3>
-            <div class="step-list">
-                <div class="step-item">
-                    <span class="step-number">1</span>
-                    <span>Create your business profile</span>
-                </div>
-                <div class="step-item">
-                    <span class="step-number">2</span>
-                    <span>Manage your claim and verification</span>
-                </div>
-                <div class="step-item">
-                    <span class="step-number">3</span>
-                    <span>Access your business dashboard</span>
+        <aside class="why-card">
+            <h3>Why join Review Platform?</h3>
+            <ul>
+                <li><span class="ck">&#10003;</span><div><b>Collect genuine reviews</b>Real feedback from real customers.</div></li>
+                <li><span class="ck">&#10003;</span><div><b>Reply to every review</b>Show customers you care.</div></li>
+                <li><span class="ck">&#10003;</span><div><b>Get a Verified badge</b>Build trust at first glance.</div></li>
+                <li><span class="ck">&#10003;</span><div><b>Track your rating</b>See insights in your dashboard.</div></li>
+            </ul>
+            <div class="why-mini">
+                <strong>4.8</strong>
+                <div>
+                    <span class="mini-stars"><i></i><i></i><i></i><i></i><i></i></span>
+                    <small>Average business rating</small>
                 </div>
             </div>
+        </aside>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <section class="biz-section">
+        <div class="biz-wrap">
+            <div class="biz-head"><h2>How it works</h2><p>Three easy steps to start collecting reviews.</p></div>
+            <div class="biz-grid3">
+                <div class="biz-step"><div class="biz-ic">1</div><small>STEP 01</small><h3>Create your profile</h3><p>Add your business name, website and category.</p></div>
+                <div class="biz-step"><div class="biz-ic">2</div><small>STEP 02</small><h3>Claim &amp; verify</h3><p>Confirm you own the business with your official email.</p></div>
+                <div class="biz-step"><div class="biz-ic">3</div><small>STEP 03</small><h3>Manage reviews</h3><p>Reply to customers and track your rating.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="biz-section biz-soft">
+        <div class="biz-wrap">
+            <div class="biz-head"><h2>Everything you need</h2><p>Simple tools to grow your reputation.</p></div>
+            <div class="biz-grid4">
+                <div class="biz-feat"><div class="sq">&#9733;</div><h4>Review management</h4><p>See all your reviews in one place.</p></div>
+                <div class="biz-feat"><div class="sq">&#8617;</div><h4>Public replies</h4><p>Respond to feedback and show you care.</p></div>
+                <div class="biz-feat"><div class="sq">&#10004;</div><h4>Verified badge</h4><p>Stand out with a trusted company mark.</p></div>
+                <div class="biz-feat"><div class="sq">&#9646;</div><h4>Insights</h4><p>Track ratings and trends over time.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="biz-section">
+        <div class="biz-wrap">
+            <div class="biz-head"><h2>Frequently asked questions</h2></div>
+            <div class="biz-faq">
+                <details open><summary>Is it free to create a business profile?</summary><p>Yes. Creating a profile and replying to reviews is free.</p></details>
+                <details><summary>How do I verify my business?</summary><p>After you create your profile, confirm ownership using your official business email from the claim and verification page.</p></details>
+                <details><summary>Can I remove a bad review?</summary><p>Reviews cannot be deleted just because they are negative. You can reply publicly, and reviews that break our rules can be reported.</p></details>
+            </div>
+        </div>
+    </section>
+
+    <!-- CLAIM BANNER -->
+    <div class="biz-wrap">
+        <div class="biz-banner">
+            <div>
+                <h2>Already have a business on Review Platform?</h2>
+                <p>Claim it and start managing your reviews today.</p>
+            </div>
+            <a href="business-claim.html">Claim your business</a>
         </div>
     </div>
+
+    <footer class="biz-footer">&copy; 2026 Review Platform. All rights reserved.</footer>
 
     <script src="js/business-signup.js"></script>
 </body>

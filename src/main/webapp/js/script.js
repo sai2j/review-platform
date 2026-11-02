@@ -631,7 +631,7 @@ function displayDemoRecentReviews() {
 
         {
             userName:
-                "Demo User 1",
+                "Priya Sharma",
 
             rating:
                 5,
@@ -648,7 +648,7 @@ function displayDemoRecentReviews() {
 
         {
             userName:
-                "Demo User 2",
+                "Rahul Verma",
 
             rating:
                 4,
@@ -665,7 +665,7 @@ function displayDemoRecentReviews() {
 
         {
             userName:
-                "Demo User 3",
+                "Ananya Iyer",
 
             rating:
                 5,
@@ -682,7 +682,7 @@ function displayDemoRecentReviews() {
 
         {
             userName:
-                "Demo User 4",
+                "Mohit Patil",
 
             rating:
                 4,
@@ -1506,6 +1506,7 @@ function displayWebsites(
 
 /* =========================================================
    SEARCH WEBSITES
+   (now redirects to the new results page: search.html)
 ========================================================= */
 
 function searchWebsites() {
@@ -1522,323 +1523,22 @@ function searchWebsites() {
     const keyword =
         searchInput.value.trim();
 
-    if (
-        keyword === ""
-    ) {
+    if (keyword === "") {
 
         alert(
             "Please enter a website name."
         );
 
-        updateSearchUrl(
-            ""
-        );
-
-        const websiteList =
-            document.getElementById(
-                "websiteList"
-            );
-
-        if (websiteList) {
-
-            websiteList.innerHTML =
-                "";
-        }
-
         return;
     }
 
-    updateSearchUrl(
-        keyword
-    );
-
-    const websiteList =
-        document.getElementById(
-            "websiteList"
-        );
-
-    if (websiteList) {
-
-        websiteList.innerHTML = `
-            <p>
-                Searching for
-                <strong>
-                    ${escapeHtml(
-            keyword
-        )}
-                </strong>...
-            </p>
-        `;
-    }
-
-    fetch(
-        DISCOVERY_API +
-        "?keyword=" +
+    window.location.href =
+        "search.html?q=" +
         encodeURIComponent(
             keyword
-        )
-    )
-
-        .then(function(response) {
-
-            if (!response.ok) {
-
-                throw new Error(
-                    "Website search failed"
-                );
-            }
-
-            return response.json();
-        })
-
-        .then(function(results) {
-
-            displaySearchResults(
-                results,
-                keyword
-            );
-        })
-
-        .catch(function(error) {
-
-            console.error(
-                error
-            );
-
-            if (websiteList) {
-
-                websiteList.innerHTML = `
-                    <p class="error-message">
-                        Unable to search website.
-                    </p>
-                `;
-            }
-        });
+        );
 }
 
-/* =========================================================
-   DISPLAY SEARCH RESULT
-========================================================= */
-function clearSearchResults() {
-
-    const searchInput =
-        document.getElementById(
-            "searchInput"
-        );
-
-    const websiteList =
-        document.getElementById(
-            "websiteList"
-        );
-
-    if (searchInput) {
-
-        searchInput.value = "";
-    }
-
-    if (websiteList) {
-
-        websiteList.innerHTML = "";
-    }
-
-    updateSearchUrl(
-        ""
-    );
-
-    if (searchInput) {
-
-        searchInput.focus();
-    }
-}
-
-function buildSearchResultsHeader(
-    keyword,
-    infoText
-) {
-
-    return `
-        <div class="search-results-header">
-
-            <div class="search-results-heading">
-
-                <h2>
-                    Results for
-                    <span class="search-keyword">"${escapeHtml(keyword || '')}"</span>
-                </h2>
-
-                <p class="search-results-count">
-                    ${escapeHtml(infoText)}
-                </p>
-
-            </div>
-
-            <button
-                type="button"
-                class="search-clear-button"
-                aria-label="Clear search"
-                title="Clear search"
-            >
-                <svg
-                    viewBox="0 0 24 24"
-                    width="16"
-                    height="16"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    aria-hidden="true"
-                >
-                    <path d="M6 6l12 12M18 6L6 18"></path>
-                </svg>
-            </button>
-
-        </div>
-    `;
-}
-
-function attachSearchClearButton() {
-
-    const clearButton =
-        document.querySelector(
-            "#websiteList .search-clear-button"
-        );
-
-    if (clearButton) {
-
-        clearButton.addEventListener(
-            "click",
-            clearSearchResults
-        );
-    }
-}
-
-function getSearchResultHost(url) {
-
-    try {
-
-        return new URL(url)
-            .hostname
-            .replace(/^www\./, "");
-
-    } catch (error) {
-
-        return url || "";
-    }
-}
-
-function displaySearchResults(
-    results,
-    keyword
-) {
-
-    const websiteList =
-        document.getElementById(
-            "websiteList"
-        );
-
-    if (!websiteList) {
-        return;
-    }
-
-    if (
-        !results ||
-        results.length === 0
-    ) {
-
-        websiteList.innerHTML =
-            buildSearchResultsHeader(
-                keyword,
-                "0 websites found"
-            );
-
-        websiteList.innerHTML += `
-            <p>
-                No website found.
-            </p>
-        `;
-
-        attachSearchClearButton();
-
-        return;
-    }
-
-    const result =
-        results[0];
-
-    const resultCountText =
-        results.length === 1
-            ? "1 website found"
-            : "Showing the top match";
-
-    const initial =
-        (result.title || "")
-            .trim()
-            .charAt(0)
-            .toUpperCase() || "W";
-
-    websiteList.innerHTML =
-        buildSearchResultsHeader(
-            keyword,
-            resultCountText
-        );
-
-    websiteList.innerHTML += `
-        <div class="search-result-card">
-
-            <div class="search-result-avatar">
-                ${escapeHtml(initial)}
-            </div>
-
-            <div class="search-result-info">
-
-                <h3>
-                    ${escapeHtml(
-        result.title
-    )}
-                </h3>
-
-                <p>
-                    ${escapeHtml(
-        result.description || ""
-    )}
-                </p>
-
-                <a
-                    class="search-result-url"
-                    href="${escapeAttribute(
-        result.url
-    )}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                >
-                    ${escapeHtml(
-        getSearchResultHost(result.url)
-    )}
-                </a>
-
-            </div>
-
-            <button
-                type="button"
-                class="view-website-button search-website-button"
-                data-title="${escapeAttribute(
-        result.title
-    )}"
-                data-url="${escapeAttribute(
-        result.url
-    )}"
-                data-description="${escapeAttribute(
-        result.description || ""
-    )}"
-            >
-                View website and review &rarr;
-            </button>
-
-        </div>
-    `;
-
-    attachSearchClearButton();
-}
 /* =========================================================
    OPEN WEBSITE FOR REVIEW
 ========================================================= */
@@ -2330,26 +2030,13 @@ function displayRecentWebsites() {
    SELECT WEBSITE
 ========================================================= */
 
-function selectWebsite(
-    title,
-    url,
-    description
-) {
+function selectWebsite(title, url, description) {
 
-    document.getElementById(
-        "websiteName"
-    ).value =
-        title;
+    document.getElementById("websiteName").value = title;
 
-    document.getElementById(
-        "websiteUrl"
-    ).value =
-        url;
+    document.getElementById("websiteUrl").value = url;
 
-    document.getElementById(
-        "websiteDescription"
-    ).value =
-        description || "";
+    document.getElementById("websiteDescription").value = description || "";
 }
 
 /* =========================================================
@@ -2693,7 +2380,7 @@ document.addEventListener(
                     if (category) {
 
                         window.location.href =
-                            "category.html?category=" +
+                            "search.html?category=" +
                             encodeURIComponent(
                                 category
                             );

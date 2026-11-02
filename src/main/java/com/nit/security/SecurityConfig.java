@@ -108,18 +108,19 @@ public class SecurityConfig {
                 )
 
                 .contentSecurityPolicy(csp ->
-                    csp.policyDirectives(
-                        "default-src 'self'; "
-                        + "script-src 'self' 'unsafe-inline'; "
-                        + "style-src 'self' 'unsafe-inline'; "
-                        + "img-src 'self' data: https:; "
-                        + "font-src 'self' data:; "
-                        + "connect-src 'self'; "
-                        + "object-src 'none'; "
-                        + "base-uri 'self'; "
-                        + "form-action 'self'"
-                    )
+                csp.policyDirectives(
+                    "default-src 'self'; "
+                    + "script-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/client https://connect.facebook.net; "
+                    + "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; "
+                    + "img-src 'self' data: https:; "
+                    + "font-src 'self' data: https://fonts.gstatic.com; "
+                    + "connect-src 'self' https://accounts.google.com/gsi/ https://www.facebook.com https://graph.facebook.com; "
+                    + "frame-src https://accounts.google.com/gsi/ https://www.facebook.com https://web.facebook.com https://staticxx.facebook.com; "
+                    + "object-src 'none'; "
+                    + "base-uri 'self'; "
+                    + "form-action 'self'"
                 )
+            )
 
                 .referrerPolicy(referrerPolicy ->
                     referrerPolicy.policy(
@@ -134,25 +135,28 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
 
                 // Public HTML pages
-                .requestMatchers(
-                        "/",
-                        "/index.html",
-                        "/login.html",
-                        "/register.html",
-                        "/browse.html",
-                        "/category.html",
-                        "/review.html",
-                        "/website.html",
-                        "/business-signup.html",
-                        "/business-claim.html",
-                        "/business-dashboard.html",
-                        "/business-response.html",
-                        "/subscription.html",
-                        "/admin.html",
-                        "/forgot-password.html",
-                        "/reset-password.html"
-                )
-                .permitAll()
+            		.requestMatchers(
+                            "/",
+                            "/index.html",
+                            "/login.html",
+                            "/register.html",
+                            "/browse.html",
+                            "/category.html",
+                            "/search.html",
+                            "/auth.html",
+                            "/write-review.html",
+                            "/review.html",
+                            "/website.html",
+                            "/business-signup.html",
+                            "/business-claim.html",
+                            "/business-dashboard.html",
+                            "/business-response.html",
+                            "/subscription.html",
+                            "/admin.html",
+                            "/forgot-password.html",
+                            "/reset-password.html"
+                    )
+                    .permitAll()
 
                 // Public website pages
                 .requestMatchers(
@@ -190,6 +194,7 @@ public class SecurityConfig {
                 .requestMatchers(
                         "/users/register",
                         "/users/login",
+                        "/users/auth/**",
                         "/users/public-profile/**"
                 )
                 .permitAll()

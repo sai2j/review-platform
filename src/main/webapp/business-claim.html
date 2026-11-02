@@ -16,8 +16,8 @@
 body {
 	margin: 0;
 	font-family: Arial, Helvetica, sans-serif;
-	background: #f0f7ff;
-	color: #0b1117;
+	background: #f0fff9;
+	color: #0b1712;
 	display: flex;
 	min-height: 100vh;
 }
@@ -26,7 +26,7 @@ body {
 .sidebar {
 	width: 260px;
 	background: #ffffff;
-	border-right: 1px solid #e2e8f0;
+	border-right: 1px solid #e2f0eb;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -38,19 +38,19 @@ body {
 }
 
 .sidebar-top {
-	padding: 24px;
+	padding: 24px 16px;
 }
 
 .sidebar-brand {
-	font-size: 23px;
-	font-weight: 700;
-	letter-spacing: 0.2px;
+	font-size: 21px;
+	font-weight: 800;
 	color: #000000;
-	margin-bottom: 30px;
+	padding-left: 16px;
+	margin-bottom: 28px;
 }
 
 .sidebar-brand span {
-	color: #299bd7;
+	color: #00b67a;
 }
 
 .sidebar-menu {
@@ -64,22 +64,24 @@ body {
 	align-items: center;
 	gap: 12px;
 	padding: 12px 16px;
-	color: #475569;
+	color: #47695c;
 	text-decoration: none;
 	font-size: 14px;
 	font-weight: 600;
 	border-radius: 10px;
+	min-height: 46px;
 	transition: all 0.2s;
 }
 
 .sidebar-item:hover {
-	background: #f1f5f9;
-	color: #0b1117;
+	background: #f6faf8;
+	color: #111111;
 }
 
 .sidebar-item.active {
-	background: #0b1117;
-	color: #ffffff;
+	background: #e6f7f0;
+	color: #009765;
+	box-shadow: inset 3px 0 0 #00b67a;
 }
 
 .sidebar-footer {
@@ -92,23 +94,23 @@ body {
 .sf-user-card {
 	display: flex;
 	align-items: center;
-	gap: 12px;
-	padding: 14px;
-	border-radius: 16px;
-	background: #eaf6ff;
+	gap: 10px;
+	padding: 10px 12px;
+	border-radius: 12px;
+	background: #f6faf8;
 }
 
 .sf-avatar {
-	flex: 0 0 40px;
-	width: 40px;
-	height: 40px;
+	flex: 0 0 32px;
+	width: 32px;
+	height: 32px;
 	border-radius: 50%;
-	background: #a8dcfa;
-	color: #0b1117;
+	background: #e6f7f0;
+	color: #009765;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 16px;
+	font-size: 14px;
 	font-weight: 800;
 	text-transform: uppercase;
 }
@@ -122,12 +124,12 @@ body {
 .sf-user-label {
 	font-size: 13px;
 	font-weight: 700;
-	color: #0b1117;
+	color: #0b1712;
 }
 
 .sf-user-email {
 	font-size: 12px;
-	color: #4b5b68;
+	color: #4b685c;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -139,22 +141,25 @@ body {
 	align-items: center;
 	justify-content: center;
 	gap: 8px;
-	min-height: 44px;
+	min-height: 42px;
 	padding: 0;
-	border: none;
-	border-radius: 24px;
-	background: #0b1117;
-	color: #ffffff;
+	border: 1.5px solid #0b3b2e;
+	border-radius: 10px;
+	background: #ffffff;
+	color: #111111;
 	font-family: inherit;
 	font-size: 14px;
 	font-weight: 700;
 	cursor: pointer;
-	transition: background 0.2s ease;
+	transition: background 0.2s ease, color 0.2s ease;
 }
 
 .logout-btn:hover {
-	background: #17212b;
+	background: #0b3b2e;
+	color: #ffffff;
 }
+
+.sf-icon svg, .sidebar-item svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 
 .sf-icon {
 	flex: 0 0 20px;
@@ -181,19 +186,13 @@ body {
 				Review<span>Platform</span>
 			</div>
 			<div class="sidebar-menu">
-				<a href="index.html" class="sidebar-item"><span
-					style="color: #f97316;">🏠</span> Home</a> <a href="review.html"
-					class="sidebar-item"><span style="color: #3b82f6;">✏️</span>
-					Write a Review</a> <a href="browse.html" class="sidebar-item"><span
-					style="color: #06b6d4;">🌐</span> Browse Websites</a> <a
-					href="user-profile.html" class="sidebar-item"><span
-					style="color: #8b5cf6;">👤</span> My Profile</a> <a
-					href="user-dashboard.html" class="sidebar-item"><span
-					style="color: #10b981;">🏢</span> My Business</a> <a
-					href="business-claim.html" class="sidebar-item active"><span
-					style="color: #6366f1;">🛡️</span> Claim Business</a> <a
-					href="business-dashboard.html" class="sidebar-item"><span
-					style="color: #ec4899;">📊</span> Business Dashboard</a>
+				<a href="index.html" class="sidebar-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg> Home</a> <a href="review.html"
+					class="sidebar-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg>
+					Write a Review</a> <a href="browse.html" class="sidebar-item"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg> Browse Websites</a> <a
+					href="user-profile.html" class="sidebar-item"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg> My Profile</a> <a
+					href="user-dashboard.html" class="sidebar-item"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M10 21v-4h4v4"/></svg> My Business</a> <a
+					href="business-claim.html" class="sidebar-item active"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg> Claim Business</a> <a
+					href="business-dashboard.html" class="sidebar-item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg> Business Dashboard</a>
 			</div>
 		</div>
 		<div class="sidebar-footer">
@@ -205,7 +204,7 @@ body {
 				</div>
 			</div>
 			<button type="button" id="sidebarLogoutBtn" class="logout-btn">
-				<span class="sf-icon">🚪</span> Logout
+				<span class="sf-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></span> Logout
 			</button>
 		</div>
 	</aside>
@@ -218,6 +217,7 @@ body {
 				<p>Claim this business profile to manage your business
 					information and respond to customer reviews.</p>
 			</div>
+			<div class="claim-layout">
 			<div class="claim-card">
 				<section class="business-details-section">
 					<div class="section-title-row">
@@ -256,6 +256,22 @@ body {
 					<a href="index.html"> ← Back to Home </a> <span> | </span> <a
 						href="business-signup.html"> Create New Business Profile </a>
 				</div>
+			</div>
+			<aside class="claim-aside">
+				<div class="aside-card">
+					<h3>Why claim your business?</h3>
+					<ul class="aside-list">
+						<li><span>&#10003;</span><div><strong>Reply to reviews</strong>Show customers you care.</div></li>
+						<li><span>&#10003;</span><div><strong>Verified badge</strong>Build trust at first glance.</div></li>
+						<li><span>&#10003;</span><div><strong>Track your rating</strong>Insights in your dashboard.</div></li>
+					</ul>
+				</div>
+				<div class="aside-card aside-cta">
+					<h3>No business yet?</h3>
+					<p>Create a new business profile in less than 2 minutes.</p>
+					<a href="business-signup.html" class="aside-btn">Create business profile</a>
+				</div>
+			</aside>
 			</div>
 			<section class="claim-process">
 				<div class="process-step">

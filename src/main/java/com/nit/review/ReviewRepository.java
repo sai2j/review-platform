@@ -1,4 +1,3 @@
-
 package com.nit.review;
 
 import java.time.LocalDateTime;
@@ -59,6 +58,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             Pageable pageable);
 
     List<Review> findByStatus(String status);
+
+    List<Review> findByUserIdOrderByCreatedAtDesc(Long userId);
 
     Page<Review> findByWebsiteIdAndStatusIgnoreCase(
             Long websiteId,

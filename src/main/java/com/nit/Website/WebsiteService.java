@@ -1,4 +1,3 @@
-
 package com.nit.Website;
 
 import java.net.URI;
@@ -27,6 +26,11 @@ import com.nit.review.ReviewService;
 
 @Service
 public class WebsiteService {
+
+    // Optional: used only to show the "Paid subscription" badge.
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    private com.nit.business.SubscriptionService subscriptionService;
+
 
     private final WebsiteRepository websiteRepository;
     private final ReviewService reviewService;
@@ -424,8 +428,15 @@ public class WebsiteService {
 
         boolean claimed = false;
         boolean verified = false;
+        boolean paid = false;
 
         Business business = getBusinessForWebsiteInternal(website);
+
+        if (business != null && subscriptionService != null) {
+            paid = subscriptionService
+                    .getSubscriptionByBusinessId(business.getId())
+                    .isPresent();
+        }
 
         if (business != null) {
             BusinessClaim approvedClaim = businessClaimRepository
@@ -462,6 +473,7 @@ public class WebsiteService {
 
         responseDTO.setCategory(website.getCategory());
         responseDTO.setCountry(website.getCountry());
+        responseDTO.setPaid(paid);
 
         return responseDTO;
     }
@@ -531,4 +543,3 @@ public class WebsiteService {
         }
     }
 }
-

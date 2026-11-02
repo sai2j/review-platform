@@ -31,10 +31,10 @@ html.rp-has-sidebar body {
 .rp-sidebar {
     --rp-ink: #0b1117;
     --rp-muted: #4b5b68;
-    --rp-line: #d3e8f7;
-    --rp-bg: #eaf6ff;
-    --rp-sky: #a8dcfa;
-    --rp-soft: #d6eeff;
+    --rp-line: #d1f4e5;
+    --rp-bg: #eefbf4;
+    --rp-sky: #a7eacd;
+    --rp-soft: #ddf6eb;
 
     flex: 0 0 260px;
     width: 260px;
@@ -64,7 +64,7 @@ html.rp-has-sidebar body {
 }
 
 .rp-brand span {
-    color: #299bd7;
+    color: #0cb17a;
 }
 
 .rp-nav {

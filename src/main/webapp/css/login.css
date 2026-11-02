@@ -5,7 +5,7 @@
 body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
-    background: #f0f7ff; /* Pure Light Blue */
+    background: #f3fcf8; /* Pure Light Green */
     color: #0b1117;
     min-height: 100vh;
     display: flex;
@@ -47,7 +47,7 @@ body {
 }
 
 .btn-business {
-    background: #e0f2fe; /* Light Blue Accent */
+    background: #e5f9ef; /* Light Green Accent */
     color: #0b1117 !important;
     padding: 8px 16px;
     border-radius: 20px;
@@ -56,7 +56,7 @@ body {
 }
 
 .btn-business:hover {
-    background: #bae6fd !important;
+    background: #bdefd9 !important;
 }
 
 /* SPLIT SCREEN LAYOUT */
@@ -102,17 +102,17 @@ body {
     gap: 16px;
     font-size: 13px;
     font-weight: 600;
-    color: #bae6fd; /* Light Blue Text */
+    color: #bdefd9; /* Light Green Text */
 }
 
-/* RIGHT PANEL & CARD - Light Blue Background with Pure White Card */
+/* RIGHT PANEL & CARD - Light Green Background with Pure White Card */
 .auth-right-panel {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 40px;
-    background: #f0f7ff; /* Light Blue */
+    background: #f3fcf8; /* Light Green */
 }
 
 .auth-card {
@@ -227,6 +227,6 @@ body {
     }
     .auth-right-panel {
         padding: 20px;
-        background: #f0f7ff;
+        background: #f3fcf8;
     }
 }

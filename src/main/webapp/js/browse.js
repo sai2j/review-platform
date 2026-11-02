@@ -3,14 +3,24 @@ const BROWSE_API =
 
 const BROWSE_PAGE_SIZE = 10;
 
+const BROWSE_ICONS = {
+    all: '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
+    bank: '<path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/>',
+    cart: '<circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.4a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L21 7H6"/>',
+    plane: '<path d="M10.5 13.5L3 11l1.5-1.5 8-1L16 4.5a1.8 1.8 0 0 1 2.5 2.5l-4 3.5-1 8L12 20l-2.5-6.5z"/>',
+    food: '<path d="M7 3v8M4 3v5a3 3 0 0 0 6 0V3M7 11v10"/><path d="M17 3c-2 2-3 4.5-3 7h3v11"/>',
+    laptop: '<rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/>',
+    book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/><path d="M9 7h6"/>'
+};
+
 const BROWSE_CATEGORIES = [
-    { value: "", label: "All", icon: "🌐" },
-    { value: "Bank", label: "Banks", icon: "🏦" },
-    { value: "Shopping", label: "Shopping", icon: "🛍️" },
-    { value: "Travel", label: "Travel", icon: "✈️" },
-    { value: "Food", label: "Food", icon: "🍔" },
-    { value: "Technology", label: "Technology", icon: "💻" },
-    { value: "Education", label: "Education", icon: "🎓" }
+    { value: "", label: "All", icon: "all" },
+    { value: "Bank", label: "Banks", icon: "bank" },
+    { value: "Shopping", label: "Shopping", icon: "cart" },
+    { value: "Travel", label: "Travel", icon: "plane" },
+    { value: "Food", label: "Food", icon: "food" },
+    { value: "Technology", label: "Technology", icon: "laptop" },
+    { value: "Education", label: "Education", icon: "book" }
 ];
 
 let browseAllSites = [];
@@ -82,7 +92,8 @@ function renderBrowseChips() {
         return '<button type="button" class="category-chip' +
             (active ? " active" : "") +
             '" data-category="' + browseEscape(item.value) + '">' +
-            item.icon + " " + browseEscape(item.label) + "</button>";
+            '<svg viewBox="0 0 24 24" aria-hidden="true">' + BROWSE_ICONS[item.icon] + "</svg>" +
+            browseEscape(item.label) + "</button>";
 
     }).join("");
 }

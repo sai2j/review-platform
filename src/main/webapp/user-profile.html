@@ -11,28 +11,28 @@
     <div class="dashboard-layout">
         <!-- LEFT SIDEBAR -->
         <aside class="sidebar">
-<div class="sidebar-logo">Review<span class="brand-accent">Platform</span></div>            
+<div class="sidebar-logo">Review<span class="brand-accent">Platform</span></div>
             <nav class="sidebar-menu">
                 <a href="index.html" class="menu-item">
-                    <span class="icon">🏠</span> Home
+                    <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg></span> Home
                 </a>
                 <a href="review.html" class="menu-item">
-                    <span class="icon">✏️</span> Write a Review
+                    <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></span> Write a Review
                 </a>
                 <a href="browse.html" class="menu-item">
-                    <span class="icon">🌐</span> Browse Websites
+                    <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span> Browse Websites
                 </a>
                 <a href="user-profile.html" class="menu-item active">
-                    <span class="icon">👤</span> My Profile
+                    <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></span> My Profile
                 </a>
                 <a href="user-dashboard.html" class="menu-item">
-                    <span class="icon">🏢</span> My Business
+                    <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M10 21v-4h4v4"/></svg></span> My Business
                 </a>
                 <a href="business-claim.html" class="menu-item">
-                    <span class="icon">🛡️</span> Claim Business
+                    <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span> Claim Business
                 </a>
                 <a href="business-dashboard.html" class="menu-item">
-                    <span class="icon">📊</span> Business Dashboard
+                    <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span> Business Dashboard
                 </a>
             </nav>
 
@@ -45,7 +45,7 @@
                     </div>
                 </div>
                 <button class="logout-btn" id="logoutButton">
-                    <span>🚪</span> Logout
+                    <span class="icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></span> Logout
                 </button>
             </div>
         </aside>
@@ -60,51 +60,75 @@
                 <a href="user-dashboard.html" class="btn-back">Back to Dashboard</a>
             </header>
 
-            <div class="profile-card-box">
-                <!-- INSTAGRAM STYLE AVATAR SECTION -->
+            <!-- Messages (saved, errors, loading) -->
+            <div id="profileMessage" class="message" role="status" aria-live="polite"></div>
+
+            <!-- PROFILE SUMMARY CARD -->
+            <section class="profile-hero">
                 <div class="profile-user-row">
                     <div class="avatar-wrapper">
                         <div class="user-avatar-large" id="profileAvatar">U</div>
                         <label for="avatarFile" class="avatar-edit-badge" title="Change profile photo">
-                            ✏️
+                            <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zm17.7-10.2a1 1 0 0 0 0-1.4l-2.35-2.35a1 1 0 0 0-1.4 0l-1.84 1.84 3.75 3.75 1.84-1.84z"/></svg>
                         </label>
                         <input type="file" id="avatarFile" accept="image/png, image/jpeg, image/webp" style="display: none;">
                         <button type="button" id="uploadAvatarButton" style="display: none;">Upload Photo</button>
                     </div>
                     <div class="user-meta-info">
-                        <h2 id="profileDisplayName">User</h2>
-                        <span id="profileDisplayEmail"></span>
-                        <span class="badge-public" id="profileVisibilityBadge">PUBLIC PROFILE</span>
+                        <div class="name-line">
+                            <h2 id="profileDisplayName">User</h2>
+                            <span class="visibility-badge" id="profileVisibilityBadge">PUBLIC PROFILE</span>
+                        </div>
+                        <span class="meta-email" id="profileDisplayEmail"></span>
+                        <p class="meta-bio" id="profileDisplayBio" hidden></p>
+                        <div class="meta-extra">
+                            <span id="profileDisplayCountry" hidden></span>
+                        </div>
+                    </div>
+                <div class="hero-actions">
+                        <button type="button" class="btn-dark" id="editProfileBtn" aria-expanded="false" aria-controls="panelEdit">Edit profile</button>
                     </div>
                 </div>
 
-                <!-- PROFILE FORM -->
-                <form id="profileForm">
+                <div class="stat-row" id="statRow">
+                    <div class="stat"><strong id="statReviews">0</strong><span>Reviews</span></div>
+                    <div class="stat"><strong id="statAvg">-</strong><span>Avg rating given</span></div>
+                    <div class="stat"><strong id="statHelpful">0</strong><span>Helpful votes</span></div>
+                    <div class="stat"><strong id="statSites">0</strong><span>Websites</span></div>
+                </div>
+            </section>
+            <!-- EDIT PROFILE POPUP (small card, opens when "Edit profile" is pressed) -->
+            <div class="pf-modal" id="panelEdit" hidden>
+                <div class="pf-modal-card profile-modal" role="dialog" aria-modal="true" aria-labelledby="editProfileTitle">
+                    <button type="button" class="modal-x" id="editProfileClose" aria-label="Close">&times;</button>
+                    <h3 id="editProfileTitle">Edit your profile</h3>
+                    <p class="pf-modal-site">This is what other people see on your public profile.</p>
+                    <form id="profileForm">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Full Name</label>
+                            <label for="profileName">Full Name</label>
                             <input type="text" id="profileName" placeholder="Enter your name">
                         </div>
                         <div class="form-group">
-                            <label>Email Address</label>
+                            <label for="profileEmail">Email Address</label>
                             <input type="email" id="profileEmail" readonly class="input-disabled" placeholder="Loading...">
                             <small class="form-hint">Your registered email address cannot be changed here.</small>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label>Bio</label>
+                        <label for="profileBio">Bio</label>
                         <textarea id="profileBio" rows="4" maxlength="500" placeholder="Tell people a little about yourself"></textarea>
                         <div class="char-count"><span id="bioCount">0</span>/500 characters</div>
                     </div>
 
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Country</label>
+                            <label for="profileCountry">Country</label>
                             <input type="text" id="profileCountry" placeholder="Enter your country">
                         </div>
                         <div class="form-group">
-                            <label>Profile Visibility</label>
+                            <label for="profileVisibility">Profile Visibility</label>
                             <select id="profileVisibility">
                                 <option value="true">Public - Anyone can view my profile</option>
                                 <option value="false">Private - Restricted by backend</option>
@@ -115,12 +139,79 @@
 
                     <div class="form-actions">
                         <button type="submit" class="btn-dark" id="saveProfileButton">Save Changes</button>
-                        <a href="user-dashboard.html" class="btn-light">Cancel</a>
+                        <button type="button" class="btn-light" id="cancelEditButton">Cancel</button>
                     </div>
                 </form>
-                <div id="profileMessage" style="margin-top: 15px; font-weight: 600; font-size: 14px;"></div>
+                </div>
             </div>
+
+            <div class="pf-cols">
+                <!-- MY REVIEWS -->
+                <section class="pf-panel" id="panelReviews">
+                    <div class="pf-section-head">
+                        <h2>My reviews <span class="pf-count" id="reviewsCount">0</span></h2>
+                    </div>
+                <div class="mr-filters" id="mrFilters" role="group" aria-label="Filter my reviews">
+                    <button type="button" class="mr-chip active" data-filter="all">All</button>
+                    <button type="button" class="mr-chip" data-filter="high">4 star and up</button>
+                    <button type="button" class="mr-chip" data-filter="low">Low ratings</button>
+                </div>
+
+                <div class="mr-list" id="myReviewList">
+                    <p class="mr-empty">Loading your reviews...</p>
+                </div>
+            </section>
+
+                <aside class="pf-side">
+                    <div class="side-card">
+                        <h3>Profile strength</h3>
+                        <div class="strength">
+                            <div class="ring" id="strengthRing" style="--pct:0"><span id="strengthPct">0%</span></div>
+                            <div class="strength-text">
+                                <strong id="strengthTitle">Let's get started</strong>
+                                <span id="strengthHint">Complete your profile.</span>
+                            </div>
+                        </div>
+                        <ul class="todo" id="strengthList">
+                            <li data-key="name"><i></i>Name added</li>
+                            <li data-key="bio"><i></i>Bio added</li>
+                            <li data-key="country"><i></i>Country added</li>
+                            <li data-key="photo"><i></i>Upload a profile photo</li>
+                            <li data-key="review"><i></i>Write your first review</li>
+                        </ul>
+                    </div>
+
+                    <div class="side-card">
+                        <h3>Quick links</h3>
+                        <a class="side-link-row" href="user-dashboard.html"><span><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 7h2M13 7h2M9 11h2M13 11h2M10 21v-4h4v4"/></svg></span>My Business<em>&rarr;</em></a>
+                        <a class="side-link-row" href="business-claim.html"><span><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>Claim Business<em>&rarr;</em></a>
+                        <a class="side-link-row" href="business-dashboard.html"><span><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>Business Dashboard<em>&rarr;</em></a>
+                    </div>
+
+                    <div class="side-card side-cta">
+                        <h3>Share your experience</h3>
+                        <p>Help others decide. Write a review for a website you have used.</p>
+                        <a class="btn-dark" href="browse.html">Write a review</a>
+                    </div>
+                </aside>
+            </div>
+
         </main>
+    </div>
+
+    <!-- EDIT REVIEW POPUP -->
+    <div class="pf-modal" id="editModal" hidden>
+        <div class="pf-modal-card" role="dialog" aria-modal="true" aria-labelledby="editModalTitle">
+            <h3 id="editModalTitle">Edit your review</h3>
+            <p class="pf-modal-site" id="editModalSite"></p>
+            <div class="pf-rate" id="editStars" role="radiogroup" aria-label="Rating"></div>
+            <textarea id="editComment" rows="5" maxlength="2000" placeholder="Share your experience..."></textarea>
+            <p class="pf-modal-error" id="editError" role="alert"></p>
+            <div class="pf-modal-actions">
+                <button type="button" class="btn-light" id="editCancel">Cancel</button>
+                <button type="button" class="btn-dark" id="editSave">Save changes</button>
+            </div>
+        </div>
     </div>
 
     <script src="js/user-profile.js"></script>

@@ -1,4 +1,7 @@
-<!DOCTYPE html>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/search-trustpilot.css"><!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -10,6 +13,11 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/theme.css">
 <link rel="stylesheet" href="css/home-improvements.css">
+<link rel="stylesheet" href="css/home-redesign.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/search-trustpilot.css">
 
 <style>
 .notification-wrapper {
@@ -53,7 +61,7 @@
 	width: 360px;
 	max-width: calc(100vw - 30px);
 	background: #ffffff;
-	border: 1px solid #e5e7eb;
+	border: 1px solid #e5ebe9;
 	border-radius: 10px;
 	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
 	z-index: 9999;
@@ -68,7 +76,7 @@
 	justify-content: space-between;
 	align-items: center;
 	padding: 14px 16px;
-	border-bottom: 1px solid #e5e7eb;
+	border-bottom: 1px solid #e5ebe9;
 }
 .notification-header h3 {
 	margin: 0;
@@ -77,7 +85,7 @@
 .notification-mark-all {
 	border: none;
 	background: transparent;
-	color: #2563eb;
+	color: #00b67a;
 	cursor: pointer;
 	font-size: 12px;
 	font-weight: 600;
@@ -91,21 +99,21 @@
 }
 .notification-item {
 	padding: 13px 16px;
-	border-bottom: 1px solid #f1f5f9;
+	border-bottom: 1px solid #f1f9f6;
 	cursor: pointer;
 	transition: background 0.15s ease;
 }
 .notification-item:hover {
-	background: #f8fafc;
+	background: #f8fcfa;
 }
 .notification-item.unread {
-	background: #eff6ff;
+	background: #effff9;
 }
 .notification-message {
 	margin: 0 0 5px;
 	font-size: 13px;
 	line-height: 1.45;
-	color: #1f2937;
+	color: #1f372e;
 }
 .notification-time {
 	margin: 0;
@@ -142,7 +150,6 @@
 		<div class="nav-links">
 			<a href="index.html" class="active"> Home </a> <a href="browse.html">
 				Websites </a> <a href="login.html" id="homeLoginLink"> Login </a> <a
-				href="register.html" id="homeRegisterLink"> Register </a> <a
 				href="business-signup.html" class="business-nav-button"> For
 				Businesses </a> <a href="user-dashboard.html" id="homeDashboardLink"
 				style="display: none;"> My Dashboard </a>
@@ -208,23 +215,23 @@
 		</div>
 		<div class="category-list" id="categoryList">
 			<button type="button" class="category-item" data-category="Bank">
-				<span class="category-icon"> 🏦 </span> <span class="category-name">Banks</span> <small class="category-count"></small>
+				<span class="category-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/></svg></span> <span class="category-name">Banks</span> <small class="category-count"></small>
 			</button>
 			<button type="button" class="category-item" data-category="Shopping">
-				<span class="category-icon"> 🛒 </span> <span class="category-name">Shopping</span> <small class="category-count"></small>
+				<span class="category-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.6 12.4a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L21 7H6"/></svg></span> <span class="category-name">Shopping</span> <small class="category-count"></small>
 			</button>
 			<button type="button" class="category-item" data-category="Travel">
-				<span class="category-icon"> ✈ </span> <span class="category-name">Travel</span> <small class="category-count"></small>
+				<span class="category-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.5 13.5L3 11l1.5-1.5 8-1L16 4.5a1.8 1.8 0 0 1 2.5 2.5l-4 3.5-1 8L12 20l-2.5-6.5z"/></svg></span> <span class="category-name">Travel</span> <small class="category-count"></small>
 			</button>
 			<button type="button" class="category-item" data-category="Food">
-				<span class="category-icon"> 🍴 </span> <span class="category-name">Food</span> <small class="category-count"></small>
+				<span class="category-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3v8M4 3v5a3 3 0 0 0 6 0V3M7 11v10"/><path d="M17 3c-2 2-3 4.5-3 7h3v11"/></svg></span> <span class="category-name">Food</span> <small class="category-count"></small>
 			</button>
 			<button type="button" class="category-item"
 				data-category="Technology">
-				<span class="category-icon"> 💻 </span> <span class="category-name">Technology</span> <small class="category-count"></small>
+				<span class="category-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"/><path d="M2 19h20"/></svg></span> <span class="category-name">Technology</span> <small class="category-count"></small>
 			</button>
 			<button type="button" class="category-item" data-category="Education">
-				<span class="category-icon"> 📚 </span> <span class="category-name">Education</span> <small class="category-count"></small>
+				<span class="category-icon"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/><path d="M9 7h6"/></svg></span> <span class="category-name">Education</span> <small class="category-count"></small>
 			</button>
 		</div>
 	</section>
@@ -275,12 +282,20 @@
     <div class="growth-banner-container">
         <div class="growth-text-content">
             <h2>Looking to grow your business?</h2>
-            <p>Get in front of millions of customers and build trust today.</p>
-            <a href="business-signup.html" class="get-started-btn">Get Started</a>
+            <p>Get in front of millions of customers, collect genuine reviews and build trust today.</p>
+            <a href="business-signup.html" class="get-started-btn">Get Started</a><a href="business-signup.html" class="growth-learn">Learn more &rarr;</a>
         </div>
         <div class="growth-graphics">
-            <div class="growth-image-card">
-                <img src="images/growth-chart.png" alt="Business Growth Chart" class="growth-chart-img">
+            <div class="gc">
+                <div class="gc-top"><div class="gc-logo">Y</div><div><b>yourbusiness.com</b><small>&#10004; Verified company</small></div></div>
+                <div class="gc-score"><strong>4.8</strong><div><span class="sqs sm"><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.5l7.1-.6z"/></svg></i><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.5l7.1-.6z"/></svg></i><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.5l7.1-.6z"/></svg></i><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.5l7.1-.6z"/></svg></i><i><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.5l7.1-.6z"/></svg></i></span><span>2,418 reviews</span></div></div>
+                <div class="gc-bars">
+                    <div class="gc-bar">5<div><span style="width:88%"></span></div></div>
+                    <div class="gc-bar">4<div><span style="width:8%"></span></div></div>
+                    <div class="gc-bar">3<div><span style="width:3%"></span></div></div>
+                    <div class="gc-bar">2<div><span style="width:1%"></span></div></div>
+                </div>
+                <span class="gc-chip">+32% this month</span>
             </div>
         </div>
     </div>
@@ -293,25 +308,22 @@
 		</div>
 		<div class="hw-steps">
 			<div class="hw-card">
-				<div class="hw-ico">&#128269;</div>
+				<div class="hw-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></div>
+				<span class="stepno">STEP 01</span>
 				<h3>Search</h3>
 				<p>Find any website or company by its name or category in seconds.</p>
-				<span class="stepno">STEP ONE</span>
-				<div class="hw-clip"><span class="hw-big">01</span></div>
 			</div>
 			<div class="hw-card">
-				<div class="hw-ico">&#128214;</div>
+				<div class="hw-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M9 7h6"/></svg></div>
+				<span class="stepno">STEP 02</span>
 				<h3>Read</h3>
 				<p>See genuine ratings and honest reviews from real people.</p>
-				<span class="stepno">STEP TWO</span>
-				<div class="hw-clip"><span class="hw-big">02</span></div>
 			</div>
 			<div class="hw-card">
-				<div class="hw-ico">&#9997;&#65039;</div>
+				<div class="hw-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></div>
+				<span class="stepno">STEP 03</span>
 				<h3>Write a review</h3>
 				<p>Share your own experience and help others decide better.</p>
-				<span class="stepno">STEP THREE</span>
-				<div class="hw-clip"><span class="hw-big">03</span></div>
 			</div>
 		</div>
 	</section>
@@ -345,8 +357,7 @@
 			<div class="footer-column">
 				<h3>Community</h3>
 				<a href="#websites"> Write a Review </a> <a
-					href="#recentReviewsList"> Recent Reviews </a> <a
-					href="register.html"> Register </a> <a href="login.html"> Login
+					href="#recentReviewsList"> Recent Reviews </a> <a href="login.html"> Login
 				</a>
 			</div>
 			<div class="footer-column">

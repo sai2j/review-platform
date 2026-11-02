@@ -33,11 +33,31 @@
 		return t ? t.charAt(0).toUpperCase() : "W";
 	}
 
-	function stars(value) {
+	/* Website logo: real favicon, falls back to the first letter */
+	function logoHtml(name, domain, cls) {
+		var letter = esc(initialOf(name));
+		if (!domain) { return '<div class="' + cls + '">' + letter + '</div>'; }
+		var src = "https://www.google.com/s2/favicons?sz=128&domain=" + encodeURIComponent(domain);
+		return '<div class="' + cls + ' has-logo" data-letter="' + letter + '">' +
+			'<img src="' + esc(src) + '" alt="" loading="lazy"></div>';
+	}
+
+	document.addEventListener("error", function (event) {
+		var img = event.target;
+		if (!img || img.tagName !== "IMG") { return; }
+		var box = img.parentElement;
+		if (box && box.classList.contains("has-logo")) {
+			box.textContent = box.getAttribute("data-letter") || "W";
+			box.classList.remove("has-logo");
+		}
+	}, true);
+
+	function stars(value, small) {
 		var full = Math.max(0, Math.min(5, Math.round(Number(value) || 0)));
-		var out = "";
-		for (var i = 1; i <= 5; i++) { out += i <= full ? "\u2605" : "\u2606"; }
-		return out;
+		var svg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.9 7.1.6-5.4 4.7 1.7 7-6.3-3.8-6.3 3.8 1.7-7L2 9.5l7.1-.6z"/></svg>';
+		var out = '<span class="sqs' + (small ? ' sm' : '') + '" role="img" aria-label="' + full + ' out of 5 stars">';
+		for (var i = 1; i <= 5; i++) { out += '<i class="' + (i <= full ? '' : 'e') + '">' + svg + '</i>'; }
+		return out + '</span>';
 	}
 
 	function formatDate(value) {
@@ -79,7 +99,7 @@
 		var date = formatDate(r.createdAt);
 
 		var siteInner =
-			'<div class="rv-logo">' + esc(initialOf(r.websiteName)) + '</div>' +
+			logoHtml(r.websiteName, r.websiteDomain, "rv-logo") +
 			'<div><b>' + esc(r.websiteName) + '</b><small>' + esc(r.websiteDomain) + '</small></div>' +
 			'<span class="rv-arrow">\u2192</span>';
 
@@ -109,10 +129,10 @@
 		if (!list) { return; }
 
 		var demo = [
-			{ userName: "Demo User 1", rating: 5, comment: "Very easy to use and the information was helpful. I found what I was looking for quickly.", websiteName: "Example Business", websiteDomain: "example.com" },
-			{ userName: "Demo User 2", rating: 4, comment: "The website profile was clear and useful. The review section made it easier to understand the service.", websiteName: "Sample Store", websiteDomain: "samplestore.com" },
-			{ userName: "Demo User 3", rating: 5, comment: "Good experience overall. I liked having customer feedback available in one place.", websiteName: "Demo Services", websiteDomain: "demoservices.com" },
-			{ userName: "Demo User 4", rating: 4, comment: "Simple layout and useful information. It was easy to read the customer experiences.", websiteName: "Test Company", websiteDomain: "testcompany.com" }
+			{ userName: "Priya Sharma", rating: 5, comment: "Very easy to use and the information was helpful. I found what I was looking for quickly.", websiteName: "Example Business", websiteDomain: "example.com" },
+			{ userName: "Rahul Verma", rating: 4, comment: "The website profile was clear and useful. The review section made it easier to understand the service.", websiteName: "Sample Store", websiteDomain: "samplestore.com" },
+			{ userName: "Ananya Iyer", rating: 5, comment: "Good experience overall. I liked having customer feedback available in one place.", websiteName: "Demo Services", websiteDomain: "demoservices.com" },
+			{ userName: "Mohit Patil", rating: 4, comment: "Simple layout and useful information. It was easy to read the customer experiences.", websiteName: "Test Company", websiteDomain: "testcompany.com" }
 		];
 
 		list.innerHTML = demo.map(reviewCardHtml).join("");
@@ -182,17 +202,12 @@
 
 			return '' +
 				'<a class="tp-card c' + (i + 1) + '" href="review.html?websiteId=' + encodeURIComponent(w.id) + '">' +
-				'<div class="tp-head">' +
 				'<span class="tp-rank">#' + (i + 1) + '</span>' +
-				'<span class="tp-score">' + avg.toFixed(1) + ' <span>\u2605</span></span>' +
-				'<span class="tp-big">' + letter + '</span>' +
-				'</div>' +
-				'<div class="tp-logo">' + letter + '</div>' +
+				logoHtml(w.name, domainOf(w.url), "tp-logo") +
 				'<div class="tp-body">' +
-				(w.category ? '<span class="tp-chip">' + esc(w.category) + '</span>' : '') +
 				'<h3>' + esc(w.name) + '</h3>' +
 				'<p>' + esc(domainOf(w.url)) + '</p>' +
-				'<div class="tp-stars">' + stars(avg) + '<small>' + r.reviewCount + (r.reviewCount === 1 ? ' review' : ' reviews') + '</small></div>' +
+				'<div class="tp-stars"><b>' + avg.toFixed(1) + '</b>' + stars(avg, true) + '<small>' + r.reviewCount + (r.reviewCount === 1 ? ' review' : ' reviews') + '</small></div>' +
 				'<div class="tp-link"><span>Read reviews</span><span>\u2192</span></div>' +
 				'</div>' +
 				'</a>';

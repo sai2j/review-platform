@@ -24,78 +24,93 @@
         <!-- HEADER SECTION -->
         <div class="dashboard-header">
             <div>
+                <div class="dashboard-badge">BUSINESS DASHBOARD</div>
                 <h1>Business Dashboard</h1>
                 <p>Manage your business and view customer reviews.</p>
             </div>
             <div class="header-actions">
                 <a href="subscription.html" class="btn-outline">Subscription</a>
                 <a href="user-dashboard.html" class="btn-outline">My Dashboard</a>
-                <a href="index.html" class="btn-outline">Home</a>
+                <a href="index.html" class="btn-outline btn-filled">Home</a>
             </div>
         </div>
 
-        <!-- BUSINESS INFORMATION -->
-        <section class="dashboard-section">
-            <h2>Business Information</h2>
-            <div class="info-card" id="businessInfoCard">
-                <p><strong>Business ID:</strong> <span id="bizId">-</span></p>
-                <p><strong>Name:</strong> <span id="bizName">-</span></p>
-                <p><strong>Description:</strong> <span id="bizDesc">-</span></p>
-                <p><strong>Official URL:</strong> <a id="bizUrl" href="#" target="_blank">-</a></p>
-                <p><strong>Status:</strong> <span id="bizStatus" class="badge-verified">-</span></p>
-            </div>
-        </section>
-
-        <!-- SUBSCRIPTION -->
-        <section class="dashboard-section">
-            <h2>Subscription</h2>
-            <div class="info-card">
-                <p id="subscriptionStatusText">No active subscription found.</p>
-                <a href="subscription.html" class="link-action">Choose a Plan</a>
-            </div>
-        </section>
-
-        <!-- WEBSITE INFORMATION -->
-        <section class="dashboard-section">
-            <h2>Website Information</h2>
-            <div class="info-card" id="websiteInfoCard">
-                <p><strong>Website ID:</strong> <span id="webId">-</span></p>
-                <p><strong>Name:</strong> <span id="webName">-</span></p>
-                <p><strong>URL:</strong> <a id="webUrl" href="#" target="_blank">-</a></p>
-                <p><strong>Description:</strong> <span id="webDesc">-</span></p>
-                <p><strong>Domain:</strong> <span id="webDomain">-</span></p>
-            </div>
-        </section>
-
         <!-- REVIEW SUMMARY -->
-        <section class="dashboard-section">
-            <h2>Review Summary</h2>
-            <div class="summary-grid">
-                <div class="summary-box">
-                    <span class="summary-label">Average Rating</span>
+        <section class="summary-grid">
+            <div class="summary-box">
+                <span class="summary-icon">&#9734;</span>
+                <div>
+                    <span class="summary-label">Average rating</span>
                     <span class="summary-value" id="avgRating">0.0</span>
                 </div>
-                <div class="summary-box">
-                    <span class="summary-label">Total Reviews</span>
+            </div>
+            <div class="summary-box">
+                <span class="summary-icon">&#128172;</span>
+                <div>
+                    <span class="summary-label">Total reviews</span>
                     <span class="summary-value" id="totalReviews">0</span>
                 </div>
-                <div class="summary-box">
-                    <span class="summary-label">Response Rate</span>
+            </div>
+            <div class="summary-box">
+                <span class="summary-icon">&#8617;</span>
+                <div>
+                    <span class="summary-label">Response rate</span>
                     <span class="summary-value" id="responseRate">0%</span>
                 </div>
             </div>
         </section>
 
+        <!-- INFORMATION + SUBSCRIPTION -->
+        <div class="dashboard-grid">
+            <section class="dashboard-section">
+                <h2>Business Information</h2>
+                <div class="info-card" id="businessInfoCard">
+                    <p><strong>Business ID</strong> <span id="bizId">-</span></p>
+                    <p><strong>Name</strong> <span id="bizName">-</span></p>
+                    <p><strong>Description</strong> <span id="bizDesc">-</span></p>
+                    <p><strong>Official URL</strong> <a id="bizUrl" href="#" target="_blank">-</a></p>
+                    <p><strong>Status</strong> <span id="bizStatus" class="badge-verified">-</span></p>
+                </div>
+            </section>
+
+            <section class="dashboard-section side-subscription">
+                <h2>Subscription</h2>
+                <div class="info-card">
+                    <p id="subscriptionStatusText">No active subscription found.</p>
+                    <a href="subscription.html" class="link-action">Choose a Plan</a>
+                </div>
+            </section>
+
+            <section class="dashboard-section">
+                <h2>Website Information</h2>
+                <div class="info-card" id="websiteInfoCard">
+                    <p><strong>Website ID</strong> <span id="webId">-</span></p>
+                    <p><strong>Name</strong> <span id="webName">-</span></p>
+                    <p><strong>URL</strong> <a id="webUrl" href="#" target="_blank">-</a></p>
+                    <p><strong>Description</strong> <span id="webDesc">-</span></p>
+                    <p><strong>Domain</strong> <span id="webDomain">-</span></p>
+                </div>
+            </section>
+
+            <section class="dashboard-section side-promo">
+                <div class="promo-card">
+                    <h3>Get more from reviews</h3>
+                    <p>Pick a plan to unlock insights and reply tools for your business.</p>
+                    <a href="subscription.html" class="promo-btn">View plans</a>
+                </div>
+            </section>
+        </div>
+
         <!-- CUSTOMER REVIEWS WITH PAGINATION (5 per view) -->
-        <section class="dashboard-section">
+        <section class="dashboard-section reviews-section">
             <h2>Customer Reviews</h2>
             <div id="customerReviewsContainer" class="reviews-grid-slides">
                 <!-- Dynamic Reviews injected via JS -->
             </div>
-            
+
             <!-- Pagination Dots & Controls -->
             <div class="reviews-pagination" id="reviewsPagination">
-                <button id="prevReviewBtn" class="pagination-arrow" disabled>&larr;</button>
+                <button id="prevReviewBtn" class="pagination-arrow" disabled>&larr; Prev</button>
                 <div class="pagination-dots" id="paginationDots"></div>
                 <button id="nextReviewBtn" class="pagination-arrow">Next &rarr;</button>
             </div>
@@ -104,9 +119,9 @@
         <!-- FOOTER LINKS -->
         <footer class="dashboard-footer">
             <a href="subscription.html">Manage Subscriptions</a>
-            <span>•</span>
+            <span>&bull;</span>
             <a href="user-dashboard.html">Back to My Dashboard</a>
-            <span>•</span>
+            <span>&bull;</span>
             <a href="index.html">Back to Home</a>
         </footer>
     </div>

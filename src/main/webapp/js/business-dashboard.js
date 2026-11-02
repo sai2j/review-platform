@@ -738,8 +738,45 @@ function renderReviewsPaginated() {
             Number(review.rating) || 0;
 
 
-        let responseHTML = "";
+        const reviewerName =
+            review.userName ||
+            ("Customer #" + userId);
 
+        let dateText = "";
+
+        if (review.createdAt) {
+
+            const created =
+                new Date(review.createdAt);
+
+            if (!isNaN(created.getTime())) {
+
+                dateText =
+                    created.toLocaleDateString(
+                        "en-IN",
+                        {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric"
+                        }
+                    );
+
+            }
+
+        }
+
+        let starsHTML = "";
+
+        for (let s = 1; s <= 5; s++) {
+
+            starsHTML +=
+                s <= rating
+                    ? "\u2605"
+                    : "<i>\u2605</i>";
+
+        }
+
+        let responseHTML = "";
 
         if (response) {
 
@@ -747,26 +784,19 @@ function renderReviewsPaginated() {
 
                 <div class="business-response">
 
-                    <h4>
-                        Business Response
-                    </h4>
+                    <h4>Your response</h4>
 
-                    <p>
-
-                        ${escapeHtml(
-                            response.response || ""
-                        )}
-
-                    </p>
-
-                    <button
-                        onclick="updateResponse(${reviewId})">
-
-                        Update Response
-
-                    </button>
+                    <p>${escapeHtml(response.response || "")}</p>
 
                 </div>
+
+                <button
+                    class="respond-btn respond-update"
+                    onclick="updateResponse(${reviewId})">
+
+                    Update Response
+
+                </button>
 
             `;
 
@@ -774,57 +804,40 @@ function renderReviewsPaginated() {
 
             responseHTML = `
 
-                <div class="business-response">
+                <button
+                    class="respond-btn"
+                    onclick="respondToReview(${reviewId})">
 
-                    <p>
-                        No response added yet.
-                    </p>
+                    &#8617; Respond
 
-                    <button
-                        onclick="respondToReview(${reviewId})">
-
-                        Respond
-
-                    </button>
-
-                </div>
+                </button>
 
             `;
 
         }
 
-
         container.innerHTML += `
 
-            <div class="review-card info-card" style="margin-bottom: 12px;">
+            <div class="review-card">
 
-                <h3>
-                    ⭐ ${rating}/5
-                </h3>
+                <div class="review-head">
 
-                <p>
+                    <div class="review-avatar">
+                        ${escapeHtml(String(reviewerName).charAt(0).toUpperCase())}
+                    </div>
 
-                    ${escapeHtml(
-                        review.comment ||
-                        "No comment"
-                    )}
+                    <div class="review-meta">
+                        <strong>${escapeHtml(reviewerName)}</strong>
+                        <small>${escapeHtml(dateText)}</small>
+                    </div>
 
-                </p>
+                    <span class="review-stars"
+                          title="${rating}/5">${starsHTML}</span>
 
-                <p>
+                </div>
 
-                    <strong>User ID:</strong>
-
-                    ${userId}
-
-                </p>
-
-                <p>
-
-                    <strong>Review ID:</strong>
-
-                    ${reviewId}
-
+                <p class="review-comment">
+                    ${escapeHtml(review.comment || "No comment")}
                 </p>
 
                 ${responseHTML}

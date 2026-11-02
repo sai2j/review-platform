@@ -73,6 +73,32 @@ public class ReviewService {
     }
 
     // ==============================
+    // MY REVIEWS (logged-in user, every status)
+    // ==============================
+
+    public List<ReviewResponseDTO> getMyReviews() {
+
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null) {
+            throw new RuntimeException("Please login first");
+        }
+
+        User loggedInUser =
+                userRepository.findByEmailIgnoreCase(
+                        authentication.getName());
+
+        if (loggedInUser == null) {
+            throw new RuntimeException("User not found");
+        }
+
+        return convertToResponseDTOList(
+                reviewRepository.findByUserIdOrderByCreatedAtDesc(
+                        loggedInUser.getId()));
+    }
+
+    // ==============================
     // CREATE REVIEW
     // ==============================
 

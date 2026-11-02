@@ -694,3 +694,117 @@ svg {
     font-size: 16px;
     line-height: 1;
 }
+
+/* =========================================================
+   GREEN REDESIGN (matches the Home page)
+   Everything below overrides the older blue look above.
+========================================================= */
+
+:root {
+    --bg: #f3faf6;
+    --surface: #ffffff;
+    --ink: #111111;
+    --muted: #5b796d;
+    --line: #d7f5e8;
+    --sky: #cdeede;
+    --sky-hover: #b6e6d0;
+    --sky-soft: #e6f7f0;
+    --dark-hover: #009765;
+    --shadow: 0 4px 14px rgba(0, 81, 40, 0.06);
+    --g: #00b67a;
+    --gd: #009765;
+    --deep: #0b3b2e;
+}
+
+/* ---------- sidebar ---------- */
+.sidebar { padding: 24px 16px; }
+.brand { font-size: 21px; font-weight: 800; padding: 0 12px 24px; }
+.brand-accent { color: var(--g) !important; }
+
+.side-link { min-height: 46px; border-radius: 10px; font-size: 14px; color: #475569; transition: background 0.2s ease, color 0.2s ease; }
+.side-link:hover { background: #f6faf8; color: var(--ink); }
+.side-link.active { background: var(--sky-soft); color: var(--gd); box-shadow: inset 3px 0 0 var(--g); }
+.side-icon { display: inline-flex; width: 18px; height: 18px; }
+.side-icon svg { width: 18px; height: 18px; stroke-width: 1.8; }
+
+.user-card { background: #f6faf8; border-radius: 12px; padding: 10px 12px; }
+.avatar { flex: 0 0 32px; width: 32px; height: 32px; background: var(--sky-soft); color: var(--gd); font-size: 14px; }
+.logout-btn { background: #ffffff; color: var(--ink); border: 1.5px solid var(--deep); border-radius: 10px; min-height: 42px; }
+.logout-btn:hover { background: var(--deep); color: #ffffff; }
+
+/* ---------- header + buttons ---------- */
+.content { padding: 34px 40px 60px; max-width: 1180px; }
+.page-header h1 { font-size: 30px; font-weight: 800; }
+.page-header p { font-size: 14px; }
+
+.btn { border-radius: 999px; font-weight: 700; }
+.btn-dark { background: var(--g); color: #ffffff; }
+.btn-dark:hover { background: var(--gd); }
+.btn-light { background: #ffffff; color: var(--gd); border: 1.5px solid var(--g); }
+.btn-light:hover { background: var(--g); color: #ffffff; }
+
+/* ---------- stat cards with icon ---------- */
+.stats { gap: 18px; }
+.stat-card { flex: 1 1 220px; display: flex; align-items: center; gap: 16px; padding: 20px 22px; border: 1px solid var(--line); border-radius: 16px; }
+.stat-icon { flex: none; width: 48px; height: 48px; border-radius: 12px; background: var(--sky-soft); color: var(--gd); display: flex; align-items: center; justify-content: center; }
+.stat-icon svg { width: 22px; height: 22px; stroke-width: 1.8; }
+.stat-label { font-weight: 600; }
+.stat-value { margin-top: 2px; font-size: 26px; line-height: 1.2; }
+.stat-value-text { font-size: 22px; padding: 0; color: var(--gd); }
+
+/* ---------- two columns ---------- */
+.dash-cols { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
+.dash-side { display: flex; flex-direction: column; gap: 18px; }
+
+.card { padding: 26px; border-radius: 16px; border: 1px solid var(--line); }
+.card > h2 { font-size: 18px; font-weight: 800; }
+
+/* ---------- business info rows ---------- */
+.business-card { background: #ffffff; border-radius: 14px; padding: 22px; }
+.business-card h2 { font-size: 18px; font-weight: 800; }
+#businessInfo p { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 0; padding: 13px 0; border-bottom: 1px solid var(--line); }
+#businessInfo p strong { color: var(--muted); font-weight: 600; }
+#businessInfo p span { color: var(--ink); font-weight: 700; text-align: right; }
+
+.status { border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; }
+.status-verified { background: var(--sky-soft); color: var(--gd) !important; }
+.status-pending { background: #fef3c7; color: #92400e; border: none; }
+
+/* ---------- verification ---------- */
+.badge { border-radius: 999px; font-size: 11px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; }
+.badge.verified { background: var(--sky-soft); color: var(--gd); }
+.badge.not-verified { background: #fef3c7; color: #92400e; border: none; }
+.verification-form input { border: 1px solid #cbd5e1; border-radius: 10px; }
+.verification-form input:focus { border-color: var(--g); box-shadow: 0 0 0 3px rgba(0, 182, 122, 0.15); }
+.verified-box { background: var(--sky-soft); border: 1px solid #cdeede; border-radius: 14px; }
+.verified-box h3 { font-weight: 800; }
+
+/* ---------- empty state ---------- */
+.empty-icon { background: var(--sky-soft); color: var(--gd); }
+.empty-state { border: 1.5px dashed #cbd5e1; border-radius: 14px; padding: 34px 20px; background: #f9fcfb; }
+
+/* ---------- claim steps (vertical, with line) ---------- */
+#claimBusinessSection .steps { flex-direction: column; gap: 0; position: relative; }
+#claimBusinessSection .steps:before { content: ""; position: absolute; left: 17px; top: 24px; bottom: 24px; width: 2px; background: #cdeede; }
+#claimBusinessSection .step { flex: none; padding: 12px 0; position: relative; }
+.step-num { background: var(--g); color: #ffffff; box-shadow: 0 0 0 5px var(--sky-soft); position: relative; z-index: 1; }
+.step-title { font-weight: 700; }
+
+/* ---------- messages ---------- */
+.success-message { color: var(--gd); }
+#dashboardMessage:not(:empty) { border-radius: 12px; }
+
+/* ---------- help card ---------- */
+.side-cta { background: var(--deep); color: #ffffff; border: none; }
+.side-cta h2 { color: #ffffff; }
+.side-cta p { margin: 0 0 16px; color: #b9dccf; font-size: 14px; line-height: 1.5; }
+
+@media (max-width: 1000px) {
+    .dash-cols { grid-template-columns: 1fr; }
+}
+@media (max-width: 860px) {
+    .side-link, .side-link.active { background: var(--sky-soft); }
+    .side-link.active { box-shadow: none; }
+    .content { padding: 24px 16px; }
+}
+#businessInfo p:last-of-type { border-bottom: none; }

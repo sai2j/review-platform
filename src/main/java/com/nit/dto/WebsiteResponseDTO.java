@@ -1,4 +1,3 @@
-
 package com.nit.dto;
 
 public class WebsiteResponseDTO {
@@ -18,6 +17,7 @@ public class WebsiteResponseDTO {
 
     private boolean claimed;
     private boolean verified;
+    private boolean paid;
     private double averageRating;
     private int reviewCount;
     private int fiveStarCount;
@@ -225,5 +225,13 @@ public class WebsiteResponseDTO {
 
     public void setOneStarCount(int oneStarCount) {
         this.oneStarCount = oneStarCount;
+    }
+
+    public boolean isPaid() {
+        return paid;
+    }
+
+    public void setPaid(boolean paid) {
+        this.paid = paid;
     }
 }

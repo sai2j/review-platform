@@ -265,3 +265,242 @@
 		init();
 	}
 })();
+/* =========================================================
+   SEARCH SUGGESTIONS DROPDOWN
+   Opens when the search box is clicked (like Trustpilot):
+   - empty box  -> recent searches + suggested websites/categories
+   - typing     -> matching websites and categories
+   Keyboard: Up / Down / Enter / Esc
+========================================================= */
+(function () {
+	"use strict";
+
+	var RECENT_KEY = "recentSearches";
+	var input, box, panel, items = [], active = -1, sites = null;
+
+	function esc(v) {
+		return String(v == null ? "" : v).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+	}
+
+	function domainOf(url) {
+		try {
+			var u = String(url || "");
+			if (!/^https?:\/\//i.test(u)) { u = "https://" + u; }
+			return new URL(u).hostname.replace(/^www\./, "");
+		} catch (e) { return ""; }
+	}
+
+	function getRecent() {
+		try { return JSON.parse(localStorage.getItem(RECENT_KEY) || "[]").slice(0, 4); } catch (e) { return []; }
+	}
+
+	function saveRecent(q) {
+		q = String(q || "").trim();
+		if (!q) { return; }
+		try {
+			var list = getRecent().filter(function (x) { return x.toLowerCase() !== q.toLowerCase(); });
+			list.unshift(q);
+			localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, 4)));
+		} catch (e) { /* storage blocked - ignore */ }
+	}
+
+	function clearRecent() {
+		try { localStorage.removeItem(RECENT_KEY); } catch (e) { /* ignore */ }
+	}
+
+	function iconSearch() {
+		return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>';
+	}
+	function iconClock() {
+		return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+	}
+	function iconTag() {
+		return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.2"/></svg>';
+	}
+
+	function siteLogo(name, domain) {
+		var letter = esc((String(name || "W").trim().charAt(0) || "W").toUpperCase());
+		if (!domain) { return '<span class="ss-logo">' + letter + '</span>'; }
+		var src = "https://www.google.com/s2/favicons?sz=64&domain=" + encodeURIComponent(domain);
+		return '<span class="ss-logo has-logo" data-letter="' + letter + '"><img src="' + esc(src) + '" alt=""></span>';
+	}
+
+	function categories() {
+		var seen = {}, out = [];
+		(sites || []).forEach(function (w) {
+			if (w.category && !seen[w.category]) { seen[w.category] = true; out.push(w.category); }
+		});
+		return out;
+	}
+
+	function row(kind, value, html) {
+		return '<button type="button" class="ss-row" role="option" data-kind="' + kind + '" data-value="' + esc(value) + '">' + html + '</button>';
+	}
+
+	function render() {
+		var q = input.value.trim().toLowerCase();
+		var html = "";
+
+		if (!q) {
+			var recent = getRecent();
+			if (recent.length) {
+				html += '<div class="ss-head"><span>Recent searches</span><button type="button" class="ss-clear" id="ssClear">Clear</button></div>';
+				recent.forEach(function (r) {
+					html += row("query", r, '<span class="ss-ico">' + iconClock() + '</span><span class="ss-text">' + esc(r) + '</span>');
+				});
+			}
+
+			var list = (sites || []).slice(0, 5);
+			if (list.length) {
+				html += '<div class="ss-head"><span>Suggested websites</span></div>';
+				list.forEach(function (w) {
+					html += row("site", w.name, siteLogo(w.name, domainOf(w.url)) +
+						'<span class="ss-text"><b>' + esc(w.name) + '</b><small>' + esc(domainOf(w.url)) + '</small></span>');
+				});
+			}
+
+			var cats = categories().slice(0, 4);
+			if (cats.length) {
+				html += '<div class="ss-head"><span>Browse by category</span></div><div class="ss-chips">';
+				cats.forEach(function (c) {
+					html += '<button type="button" class="ss-chip" role="option" data-kind="query" data-value="' + esc(c) + '">' + esc(c) + '</button>';
+				});
+				html += '</div>';
+			}
+		} else {
+			var found = (sites || []).filter(function (w) {
+				return String(w.name || "").toLowerCase().indexOf(q) !== -1 ||
+					domainOf(w.url).toLowerCase().indexOf(q) !== -1;
+			}).slice(0, 5);
+
+			var catHits = categories().filter(function (c) { return c.toLowerCase().indexOf(q) !== -1; }).slice(0, 3);
+
+			if (found.length) {
+				html += '<div class="ss-head"><span>Websites</span></div>';
+				found.forEach(function (w) {
+					html += row("site", w.name, siteLogo(w.name, domainOf(w.url)) +
+						'<span class="ss-text"><b>' + esc(w.name) + '</b><small>' + esc(domainOf(w.url)) + '</small></span>');
+				});
+			}
+			if (catHits.length) {
+				html += '<div class="ss-head"><span>Categories</span></div>';
+				catHits.forEach(function (c) {
+					html += row("query", c, '<span class="ss-ico">' + iconTag() + '</span><span class="ss-text">' + esc(c) + '</span>');
+				});
+			}
+			html += row("query", input.value.trim(),
+				'<span class="ss-ico">' + iconSearch() + '</span><span class="ss-text">Search for <b>&ldquo;' + esc(input.value.trim()) + '&rdquo;</b></span>');
+		}
+
+		if (!html) { close(); return; }
+
+		panel.innerHTML = html;
+		items = Array.prototype.slice.call(panel.querySelectorAll("[data-value]"));
+		active = -1;
+	}
+
+	function place() {
+		var r = box.getBoundingClientRect();
+		panel.style.left = (r.left + window.pageXOffset) + "px";
+		panel.style.top = (r.bottom + window.pageYOffset + 8) + "px";
+		panel.style.width = r.width + "px";
+	}
+
+	function open() {
+		render();
+		if (!panel.innerHTML) { return; }
+		place();
+		panel.hidden = false;
+	}
+
+	function close() {
+		panel.hidden = true;
+		active = -1;
+	}
+
+	function go(value) {
+		value = String(value || "").trim();
+		if (!value) { return; }
+		saveRecent(value);
+		window.location.href = "search.html?q=" + encodeURIComponent(value);
+	}
+
+	function setActive(i) {
+		items.forEach(function (el) { el.classList.remove("on"); });
+		if (i < 0 || i >= items.length) { active = -1; return; }
+		active = i;
+		items[i].classList.add("on");
+		items[i].scrollIntoView({ block: "nearest" });
+	}
+
+	function init() {
+		input = document.getElementById("searchInput");
+		box = input && input.closest(".search-box");
+		if (!input || !box) { return; }
+
+		panel = document.createElement("div");
+		panel.className = "ss-panel";
+		panel.setAttribute("role", "listbox");
+		panel.hidden = true;
+		document.body.appendChild(panel);
+
+		input.setAttribute("autocomplete", "off");
+
+		/* website list for the suggestions */
+		fetch("/review-platform/websites").then(function (r) { return r.ok ? r.json() : []; })
+			.then(function (list) {
+				sites = Array.isArray(list) ? list : [];
+				if (!panel.hidden) { render(); }
+			}).catch(function () { sites = []; });
+
+		input.addEventListener("focus", open);
+		input.addEventListener("click", open);
+		input.addEventListener("input", open);
+
+		input.addEventListener("keydown", function (e) {
+			if (panel.hidden && (e.key === "ArrowDown" || e.key === "ArrowUp")) { open(); }
+			if (panel.hidden) { return; }
+
+			if (e.key === "ArrowDown") { e.preventDefault(); setActive(active + 1 >= items.length ? 0 : active + 1); }
+			else if (e.key === "ArrowUp") { e.preventDefault(); setActive(active <= 0 ? items.length - 1 : active - 1); }
+			else if (e.key === "Enter" && active >= 0) { e.preventDefault(); e.stopImmediatePropagation(); go(items[active].getAttribute("data-value")); }
+			else if (e.key === "Escape") { close(); }
+		}, true);
+
+		/* the normal Search button / Enter also remembers the search */
+		var btn = document.getElementById("searchButton");
+		if (btn) { btn.addEventListener("click", function () { saveRecent(input.value); }, true); }
+
+		panel.addEventListener("mousedown", function (e) { e.preventDefault(); });
+
+		panel.addEventListener("click", function (e) {
+			if (e.target.closest("#ssClear")) { clearRecent(); render(); return; }
+			var el = e.target.closest("[data-value]");
+			if (el) { go(el.getAttribute("data-value")); }
+		});
+
+		document.addEventListener("click", function (e) {
+			if (!panel.hidden && !box.contains(e.target) && !panel.contains(e.target)) { close(); }
+		});
+
+		window.addEventListener("resize", function () { if (!panel.hidden) { place(); } });
+		window.addEventListener("scroll", function () { if (!panel.hidden) { place(); } }, { passive: true });
+	}
+
+	/* logo fallback for the small favicons */
+	document.addEventListener("error", function (event) {
+		var img = event.target;
+		if (!img || img.tagName !== "IMG") { return; }
+		var b = img.parentElement;
+		if (b && b.classList.contains("ss-logo")) {
+			b.textContent = b.getAttribute("data-letter") || "W";
+			b.classList.remove("has-logo");
+		}
+	}, true);
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", init);
+	} else {
+		init();
+	}
+})();

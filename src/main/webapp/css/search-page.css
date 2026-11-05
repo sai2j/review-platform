@@ -355,3 +355,14 @@ body.sp-body {
 		text-align: left;
 	}
 }
+/* ---------- Similar websites (same category as the results) ---------- */
+.sp-related { margin-top: 8px; padding-top: 26px; border-top: 1px solid #d7f5e8; }
+.sp-related-title { margin: 0 0 4px; font-size: 20px; font-weight: 800; color: #111111; }
+.sp-related-sub { margin: 0 0 16px; font-size: 14px; color: #5b796d; }
+
+/* ---------- "Can't find a company?" ---------- */
+.sp-add { margin: 34px 0 10px; padding: 24px 20px; text-align: center; border: 1px dashed #bfeedb; border-radius: 16px; background: #f6fdf9; }
+.sp-add h3 { margin: 0 0 4px; font-size: 16px; font-weight: 800; }
+.sp-add p { margin: 0 0 14px; font-size: 13px; color: #5b796d; }
+.sp-add-btn { display: inline-block; padding: 10px 24px; border: 1.5px solid #00b67a; border-radius: 999px; font-size: 13px; font-weight: 700; color: #009765; text-decoration: none; }
+.sp-add-btn:hover { background: #e6f7f0; }

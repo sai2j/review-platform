@@ -88,6 +88,85 @@ function spFindCategory(value) {
     }) || null;
 }
 
+/* ---------- Smart (fuzzy) matching ----------
+   "spotify" also finds spotify.fr, Shopify, same-category websites, etc. */
+
+function spNorm(text) {
+    return String(text || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function spDistance(a, b) {
+
+    if (a === b) { return 0; }
+    if (!a.length) { return b.length; }
+    if (!b.length) { return a.length; }
+
+    let prev = [];
+    for (let j = 0; j <= b.length; j++) { prev[j] = j; }
+
+    for (let i = 1; i <= a.length; i++) {
+
+        const cur = [i];
+
+        for (let j = 1; j <= b.length; j++) {
+            cur[j] = Math.min(
+                prev[j] + 1,
+                cur[j - 1] + 1,
+                prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+            );
+        }
+
+        prev = cur;
+    }
+
+    return prev[b.length];
+}
+
+function spSimilarity(a, b) {
+
+    if (!a || !b) { return 0; }
+
+    return 1 - spDistance(a, b) / Math.max(a.length, b.length);
+}
+
+/* returns 0 (no match) .. 100 (exact) */
+function spScore(website, query) {
+
+    const q = spNorm(query);
+
+    if (!q) { return 0; }
+
+    const name = spNorm(website.name);
+    const domain = spDomain(website).toLowerCase();
+    const label = spNorm(domain.split(".")[0]);
+    const category = spNorm(website.category);
+    const host = spNorm(domain);
+
+    let best = 0;
+
+    if (name === q || label === q) { best = 100; }
+    else if (name.indexOf(q) === 0 || label.indexOf(q) === 0) { best = 90; }
+    else if (name.indexOf(q) !== -1 || host.indexOf(q) !== -1) { best = 78; }
+    else if (category && (category === q || category.indexOf(q) !== -1 || q.indexOf(category) !== -1)) { best = 70; }
+
+    /* similar spelling (typos, look-alike names) */
+    if (q.length >= 3) {
+
+        const sim = Math.max(
+            spSimilarity(q, name),
+            spSimilarity(q, label),
+            spSimilarity(q, name.slice(0, q.length)),
+            spSimilarity(q, label.slice(0, q.length))
+        );
+
+        if (sim >= 0.6) {
+            best = Math.max(best, Math.round(30 + sim * 40));
+        }
+    }
+
+    return best;
+}
+
 function spFetchJson(url) {
 
     return fetch(url, { credentials: "include" }).then(function (response) {
@@ -131,28 +210,37 @@ function spLoad() {
 
         spLabel = params.q;
 
-        /* name / domain search + category match (e.g. "travel") */
+        /* smart search: name, domain, similar spelling and category */
         request = Promise.all([
 
-            spFetchJson(SP_SEARCH_API + "?q=" + encodeURIComponent(params.q)),
+            spFetchJson(SP_SEARCH_API),
 
-            spFetchJson(SP_FILTER_API + "?category=" + encodeURIComponent(params.q))
+            spFetchJson(SP_SEARCH_API + "?q=" + encodeURIComponent(params.q))
                 .catch(function () { return []; })
 
         ]).then(function (results) {
 
-            const seen = {};
-            const merged = [];
+            const fromServer = {};
 
-            results[0].concat(results[1]).forEach(function (website) {
+            results[1].forEach(function (website) { fromServer[website.id] = true; });
 
-                if (!seen[website.id]) {
-                    seen[website.id] = true;
-                    merged.push(website);
+            const scored = [];
+
+            results[0].forEach(function (website) {
+
+                let score = spScore(website, params.q);
+
+                if (fromServer[website.id]) { score = Math.max(score, 80); }
+
+                if (score >= 45) {
+                    website.spScore = score;
+                    scored.push(website);
                 }
             });
 
-            return merged;
+            scored.sort(function (a, b) { return b.spScore - a.spScore; });
+
+            return scored;
         });
 
         document.title = "Results for " + params.q + " - Review Platform";
@@ -171,6 +259,13 @@ function spLoad() {
             spAll = Array.isArray(websites) ? websites : [];
             spPage = 1;
             spRender();
+            spLoadRelated();
+
+            if (spParams().q && spAll.length) {
+                spRenderCategories("", spResultCategories());
+            }
+
+            spShowAddCompany();
         })
         .catch(function (error) {
 
@@ -202,6 +297,11 @@ function spVisibleList() {
 
     filtered.sort(function (a, b) {
 
+        if (sort === "match" && (a.spScore || b.spScore)) {
+            return ((b.spScore || 0) - (a.spScore || 0)) ||
+                ((Number(b.reviewCount) || 0) - (Number(a.reviewCount) || 0));
+        }
+
         if (sort === "name") {
             return String(a.name || "").localeCompare(String(b.name || ""));
         }
@@ -221,35 +321,9 @@ function spVisibleList() {
     return filtered;
 }
 
-/* ---------- Render list ---------- */
+/* ---------- One result row (used by the list and the related list) ---------- */
 
-function spRender() {
-
-    const list = document.getElementById("spList");
-    const count = document.getElementById("spCount");
-    const items = spVisibleList();
-
-    count.textContent = "Companies (" + items.length + ")";
-
-    if (items.length === 0) {
-
-        list.innerHTML =
-            '<p class="sp-message">No websites found. Try a different name or category.</p>';
-
-        document.getElementById("spPagination").innerHTML = "";
-        return;
-    }
-
-    const totalPages = Math.ceil(items.length / SP_PAGE_SIZE);
-
-    if (spPage > totalPages) {
-        spPage = totalPages;
-    }
-
-    const start = (spPage - 1) * SP_PAGE_SIZE;
-    const pageItems = items.slice(start, start + SP_PAGE_SIZE);
-
-    list.innerHTML = pageItems.map(function (website) {
+function spRowHtml(website) {
 
         const domain = spDomain(website);
         const reviewCount = Number(website.reviewCount) || 0;
@@ -298,10 +372,47 @@ function spRender() {
 
         "</a>";
 
-    }).join("");
+}
+
+/* ---------- Render list ---------- */
+
+function spRender() {
+
+    const list = document.getElementById("spList");
+    const count = document.getElementById("spCount");
+    const items = spVisibleList();
+
+    count.textContent = "Companies (" + items.length + ")";
+
+    if (items.length === 0) {
+
+        list.innerHTML =
+            '<p class="sp-message">No websites found. Try a different name or category.</p>';
+
+        document.getElementById("spPagination").innerHTML = "";
+        return;
+    }
+
+    const totalPages = Math.ceil(items.length / SP_PAGE_SIZE);
+
+    if (spPage > totalPages) {
+        spPage = totalPages;
+    }
+
+    const start = (spPage - 1) * SP_PAGE_SIZE;
+    const pageItems = items.slice(start, start + SP_PAGE_SIZE);
+
+    list.innerHTML = pageItems.map(spRowHtml).join("");
+
+    spLogoFallback(list);
+
+    spRenderPagination(totalPages);
+}
+
+function spLogoFallback(root) {
 
     /* If the logo image fails, show the first letter instead. */
-    list.querySelectorAll(".sp-logo img").forEach(function (img) {
+    root.querySelectorAll(".sp-logo img").forEach(function (img) {
 
         img.addEventListener("error", function () {
 
@@ -310,8 +421,6 @@ function spRender() {
             logo.classList.add("sp-logo-fallback");
         });
     });
-
-    spRenderPagination(totalPages);
 }
 
 function spRenderPagination(totalPages) {
@@ -351,27 +460,156 @@ function spRenderPagination(totalPages) {
     nav.innerHTML = html;
 }
 
+/* ---------- Same category: "Similar websites" ---------- */
+
+function spRelatedBox() {
+
+    let box = document.getElementById("spRelated");
+
+    if (!box) {
+        box = document.createElement("section");
+        box.id = "spRelated";
+        box.className = "sp-related";
+        document.getElementById("spPagination").insertAdjacentElement("afterend", box);
+    }
+
+    return box;
+}
+
+function spLoadRelated() {
+
+    const box = spRelatedBox();
+    box.innerHTML = "";
+
+    /* only for a name/keyword search - a category page is already "same category" */
+    if (spParams().category || spAll.length === 0) {
+        return;
+    }
+
+    const inResults = {};
+    const categories = [];
+
+    spAll.forEach(function (website) {
+
+        inResults[website.id] = true;
+
+        if (website.category && categories.indexOf(website.category) === -1) {
+            categories.push(website.category);
+        }
+    });
+
+    if (categories.length === 0) {
+        return;
+    }
+
+    Promise.all(categories.slice(0, 3).map(function (category) {
+
+        return spFetchJson(SP_FILTER_API + "?category=" + encodeURIComponent(category))
+            .catch(function () { return []; });
+
+    })).then(function (groups) {
+
+        const seen = {};
+        const related = [];
+
+        groups.forEach(function (group) {
+
+            (Array.isArray(group) ? group : []).forEach(function (website) {
+
+                if (!inResults[website.id] && !seen[website.id]) {
+                    seen[website.id] = true;
+                    related.push(website);
+                }
+            });
+        });
+
+        if (related.length === 0) {
+            return;
+        }
+
+        related.sort(function (a, b) {
+            return (Number(b.reviewCount) || 0) - (Number(a.reviewCount) || 0);
+        });
+
+        box.innerHTML =
+            '<h2 class="sp-related-title">Similar websites you may like</h2>' +
+            '<p class="sp-related-sub">More from ' +
+                categories.slice(0, 3).map(spEscape).join(", ") + "</p>" +
+            '<div class="sp-list">' + related.slice(0, 6).map(spRowHtml).join("") + "</div>";
+
+        spLogoFallback(box);
+    });
+}
+
 /* ---------- Sidebar ---------- */
 
-function spRenderCategories(activeValue) {
+function spCatHtml(item, active, href) {
+
+    return '<a class="sp-cat' + (active ? " active" : "") + '" href="' + href + '">' +
+        '<span class="sp-cat-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" ' +
+            'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" ' +
+            'stroke-linejoin="round" aria-hidden="true">' + SP_ICONS[item.icon] + "</svg></span>" +
+        '<span class="sp-cat-text"><strong>' + spEscape(item.label) + "</strong>" +
+        "<small>" + spEscape(item.sub) + "</small></span></a>";
+}
+
+function spRenderCategories(activeValue, list) {
 
     const box = document.getElementById("spCategories");
+    const title = box.parentElement.querySelector("h2");
 
-   
+    const items = list || SP_CATEGORIES;
 
-    box.innerHTML = SP_CATEGORIES.map(function (item) {
+    if (title) {
+        title.textContent = list ? "Categories (" + items.length + ")" : "Categories";
+    }
+
+    box.innerHTML = items.map(function (item) {
 
         const active = String(activeValue).toLowerCase() === item.value.toLowerCase();
 
-        return '<a class="sp-cat' + (active ? " active" : "") +
-            '" href="search.html?category=' + encodeURIComponent(item.value) + '">' +
-            '<span class="sp-cat-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" ' +
-                'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" ' +
-                'stroke-linejoin="round" aria-hidden="true">' + SP_ICONS[item.icon] + "</svg></span>" +
-            '<span class="sp-cat-text"><strong>' + spEscape(item.label) + "</strong>" +
-            "<small>" + spEscape(item.sub) + "</small></span></a>";
+        return spCatHtml(item, active,
+            "search.html?category=" + encodeURIComponent(item.value));
 
     }).join("");
+}
+
+/* categories that appear in the current results (like Trustpilot) */
+function spResultCategories() {
+
+    const seen = {};
+    const out = [];
+
+    spAll.forEach(function (website) {
+
+        const value = website.category;
+
+        if (!value || seen[value.toLowerCase()]) { return; }
+
+        seen[value.toLowerCase()] = true;
+
+        out.push(spFindCategory(value) ||
+            { value: value, label: value, sub: "Category", icon: "book" });
+    });
+
+    return out;
+}
+
+function spShowAddCompany() {
+
+    let box = document.getElementById("spAdd");
+
+    if (!box) {
+        box = document.createElement("div");
+        box.id = "spAdd";
+        box.className = "sp-add";
+        box.innerHTML =
+            "<h3>Can't find a company?</h3>" +
+            "<p>It might not be listed yet. Add it and be the first to write a review.</p>" +
+            '<a class="sp-add-btn" href="write-review.html">Add company</a>';
+
+        document.getElementById("spList").parentElement.appendChild(box);
+    }
 }
 
 /* ---------- Events ---------- */

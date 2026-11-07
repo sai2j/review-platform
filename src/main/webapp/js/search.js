@@ -6,7 +6,7 @@
 
 const SP_SEARCH_API = "/review-platform/websites/search";
 const SP_FILTER_API = "/review-platform/websites/filter";
-const SP_PAGE_SIZE = 10;
+const SP_PAGE_SIZE = 8;   /* websites shown per page */
 
 const SP_ICONS = {
     bank: '<path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8"/><path d="M3 20h18"/>',
@@ -339,14 +339,9 @@ function spRowHtml(website) {
               reviewCount + (reviewCount === 1 ? " review" : " reviews")
             : "No reviews yet";
 
-        const tags =
-            (website.category
-                ? '<span class="sp-tag">' + spEscape(website.category) + "</span>"
-                : "") +
-            '<span class="sp-tag">' + spEscape(domain) + "</span>" +
-            (website.verified
-                ? '<span class="sp-tag sp-tag-green">Verified</span>'
-                : "");
+        const verifiedBadge = website.verified
+            ? '<span class="sp-verified" title="Verified business">&#10003; Verified</span>'
+            : "";
 
         return '<a class="sp-row" href="review.html?websiteId=' +
                 encodeURIComponent(website.id) + '">' +
@@ -356,11 +351,10 @@ function spRowHtml(website) {
             "</div>" +
 
             '<div class="sp-info">' +
-                '<h3 class="sp-name">' + spEscape(website.name || domain) + "</h3>" +
+                '<h3 class="sp-name">' + spEscape(website.name || domain) + verifiedBadge + "</h3>" +
                 '<p class="sp-domain">' + spEscape(domain) + "</p>" +
                 '<div class="sp-rating">' + spStars(rating) +
                     '<span class="sp-rating-text">' + ratingText + "</span></div>" +
-                '<div class="sp-tags">' + tags + "</div>" +
             "</div>" +
 
             '<div class="sp-right">' +
@@ -432,15 +426,24 @@ function spRenderPagination(totalPages) {
         return;
     }
 
-    const pages = [];
+    /* 1 2 3 4 ... 17   |   1 ... 5 6 7 ... 17   |   1 ... 14 15 16 17 */
+    let pages = [];
 
-    for (let i = 1; i <= totalPages; i++) {
+    if (totalPages <= 7) {
 
-        if (i === 1 || i === totalPages || Math.abs(i - spPage) <= 1) {
-            pages.push(i);
-        } else if (pages[pages.length - 1] !== "...") {
-            pages.push("...");
-        }
+        for (let i = 1; i <= totalPages; i++) { pages.push(i); }
+
+    } else if (spPage <= 4) {
+
+        pages = [1, 2, 3, 4, "...", totalPages];
+
+    } else if (spPage >= totalPages - 3) {
+
+        pages = [1, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+
+    } else {
+
+        pages = [1, "...", spPage - 1, spPage, spPage + 1, "...", totalPages];
     }
 
     let html = '<button type="button" data-page="' + (spPage - 1) + '"' +

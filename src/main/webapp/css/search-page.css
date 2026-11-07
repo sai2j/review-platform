@@ -366,3 +366,36 @@ body.sp-body {
 .sp-add p { margin: 0 0 14px; font-size: 13px; color: #5b796d; }
 .sp-add-btn { display: inline-block; padding: 10px 24px; border: 1.5px solid #00b67a; border-radius: 999px; font-size: 13px; font-weight: 700; color: #009765; text-decoration: none; }
 .sp-add-btn:hover { background: #e6f7f0; }
+
+/* =========================================================
+   v4 - compact Trustpilot-style rows + boxed pagination
+========================================================= */
+.sp-row { align-items: center; gap: 16px; padding: 16px 8px; }
+.sp-logo { flex: 0 0 48px; width: 48px; height: 48px; border-radius: 8px; }
+.sp-logo img { width: 30px; height: 30px; }
+.sp-name { font-size: 16px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+.sp-verified {
+	padding: 2px 8px; border-radius: 999px;
+	background: var(--sp-green-soft); border: 1px solid var(--sp-green-line);
+	font-size: 11px; font-weight: 700; color: var(--sp-green-deep);
+}
+.sp-rating { margin: 6px 0 0; gap: 8px; }
+.sp-star { width: 18px; height: 18px; font-size: 11px; }
+.sp-right { align-self: center; gap: 4px; }
+.sp-view { font-size: 12px; opacity: 0.85; }
+
+/* page switcher: one connected box, like Trustpilot */
+.sp-pagination { gap: 0; margin: 28px 0 8px; }
+.sp-pagination button {
+	min-width: 44px; padding: 10px 14px;
+	border: 1px solid #b9d4c6; border-radius: 0; margin-left: -1px;
+	background: #ffffff; font-size: 14px; font-weight: 600; color: var(--sp-green-deep);
+}
+.sp-pagination button:first-child { border-radius: 8px 0 0 8px; margin-left: 0; }
+.sp-pagination button:last-child { border-radius: 0 8px 8px 0; }
+.sp-pagination button.active { background: #e6f7f0; color: var(--sp-green-deep); border-color: var(--sp-green); position: relative; z-index: 1; }
+.sp-pagination button:disabled { opacity: 1; color: #9bb3a8; background: #f6faf8; cursor: not-allowed; }
+.sp-dots {
+	min-width: 44px; padding: 10px 0; margin-left: -1px; text-align: center;
+	border: 1px solid #b9d4c6; background: #ffffff; color: var(--sp-muted); font-size: 14px;
+}

@@ -178,7 +178,9 @@ public class SecurityConfig {
                 // SEO sitemap files
                 .requestMatchers(
                         "/sitemap.xml",
-                        "/website-sitemap.xml"
+                        "/website-sitemap.xml",
+                        "/robots.txt",
+                        "/googlecfe31992313c7236.html"
                 )
                 .permitAll()
 

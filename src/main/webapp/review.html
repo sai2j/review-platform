@@ -592,6 +592,96 @@ body {
 			image.src = "https://www.google.com/s2/favicons?sz=128&domain=" + encodeURIComponent(domain);
 		}
 
+		/* =========================================================
+		   SEO (invisible): title, description, canonical, share tags and
+		   structured data are set from the website's real data.
+		========================================================= */
+		function setMeta(attr, key, value) {
+			let el = document.head.querySelector("meta[" + attr + '="' + key + '"]');
+			if (!el) {
+				el = document.createElement("meta");
+				el.setAttribute(attr, key);
+				document.head.appendChild(el);
+			}
+			el.setAttribute("content", value);
+		}
+
+		function updateSeo() {
+			const website = currentWebsiteForStructuredData;
+			if (!website || !website.name) return;
+
+			const total = currentSummary ? Number(currentSummary.totalReview || 0) : Number(website.reviewCount || 0);
+			const average = currentSummary ? Number(currentSummary.averageRating || 0) : Number(website.averageRating || 0);
+
+			const title = (website.seoTitle && website.seoTitle.trim())
+				? website.seoTitle.trim()
+				: website.name + " Reviews | ReviewPlatform";
+
+			let description = (website.seoDescription && website.seoDescription.trim()) ? website.seoDescription.trim() : "";
+			if (!description) {
+				description = total > 0
+					? "Read " + total + " review" + (total === 1 ? "" : "s") + " of " + website.name + ". Rated " + average.toFixed(1) + " out of 5 by real users on ReviewPlatform."
+					: (website.description && website.description.trim()
+						? website.description.trim()
+						: "Read and write reviews for " + website.name + " on ReviewPlatform.");
+			}
+			if (description.length > 300) description = description.slice(0, 297) + "...";
+
+			const canonical = (website.canonicalUrl && website.canonicalUrl.trim())
+				? website.canonicalUrl.trim()
+				: window.location.origin + window.location.pathname + "?websiteId=" + encodeURIComponent(websiteId);
+
+			document.title = title;
+			setMeta("name", "description", description);
+
+			/* a page with no reviews and no description stays out of Google */
+			const thin = total === 0 && !(website.description && website.description.trim());
+			setMeta("name", "robots", thin ? "noindex, follow" : "index, follow");
+
+			let link = document.head.querySelector('link[rel="canonical"]');
+			if (!link) {
+				link = document.createElement("link");
+				link.rel = "canonical";
+				document.head.appendChild(link);
+			}
+			link.href = canonical;
+
+			setMeta("property", "og:site_name", "ReviewPlatform");
+			setMeta("property", "og:type", "website");
+			setMeta("property", "og:title", title);
+			setMeta("property", "og:description", description);
+			setMeta("property", "og:url", canonical);
+			setMeta("name", "twitter:card", "summary");
+			setMeta("name", "twitter:title", title);
+			setMeta("name", "twitter:description", description);
+
+			const data = {
+				"@context": "https://schema.org",
+				"@type": "Organization",
+				"name": website.name,
+				"url": safeHref(website.url),
+				"description": description
+			};
+			if (total > 0) {
+				data.aggregateRating = {
+					"@type": "AggregateRating",
+					"ratingValue": average.toFixed(1),
+					"reviewCount": total,
+					"bestRating": "5",
+					"worstRating": "1"
+				};
+			}
+
+			let script = document.getElementById("seoJsonLd");
+			if (!script) {
+				script = document.createElement("script");
+				script.type = "application/ld+json";
+				script.id = "seoJsonLd";
+				document.head.appendChild(script);
+			}
+			script.textContent = JSON.stringify(data);
+		}
+
 		function loadWebsiteInfo() {
 			const websiteInfo = document.getElementById("websiteInfo");
 			if (!websiteId) {
@@ -601,6 +691,7 @@ body {
 
 			fetchWebsite().then(website => {
 				currentWebsiteForStructuredData = website;
+				updateSeo();
 				showWebsiteLogo(website);
 				const nameElement = document.getElementById("websiteName");
 				if (nameElement) nameElement.textContent = website.name || "Website";
@@ -640,6 +731,7 @@ body {
 			if (!websiteId) return;
 			fetch(REVIEW_API + "/website/" + websiteId + "/summary").then(res => res.ok ? res.json() : Promise.reject()).then(summary => {
 				currentSummary = summary;
+				updateSeo();
 				renderRatingSummary(summary);
 				renderCompanyDetails();
 			}).catch(err => console.error(err));

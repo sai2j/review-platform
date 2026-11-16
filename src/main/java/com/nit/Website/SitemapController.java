@@ -70,6 +70,11 @@ public class SitemapController {
 
 		xml.append("</url>");
 
+		// Browse page
+		xml.append("<url><loc>");
+		xml.append(escapeXml(baseUrl + "/browse.html"));
+		xml.append("</loc></url>");
+
 		// Website pages
 		for (Website website : websites) {
 
@@ -87,7 +92,7 @@ public class SitemapController {
 				continue;
 			}
 
-			String websitePageUrl = baseUrl + "/website/" + website.getId();
+			String websitePageUrl = baseUrl + "/review.html?websiteId=" + website.getId();
 
 			xml.append("<url>");
 

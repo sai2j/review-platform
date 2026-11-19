@@ -153,6 +153,8 @@
 		<div class="logo">
 			Review <span>Platform</span>
 		</div>
+		<button type="button" class="nav-search-btn" id="navSearchBtn" aria-label="Search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></button>
+		<button type="button" class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false"><svg class="ic-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg><svg class="ic-close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
 		<div class="nav-links">
 			<a href="index.html" class="active"> Home </a> <a href="browse.html">
 				Websites </a> <a href="login.html" id="homeLoginLink"> Login </a> <a
@@ -218,6 +220,10 @@
 			<h2>What are you looking for?</h2>
 			<button type="button" id="seeMoreCategories" class="see-more-button">See
 				more</button>
+			<div class="cat-arrows">
+				<button type="button" class="cat-arrow cat-prev" id="catPrev" aria-label="Scroll categories left" disabled><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+				<button type="button" class="cat-arrow cat-next" id="catNext" aria-label="Scroll categories right"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg></button>
+			</div>
 		</div>
 		<div class="category-list" id="categoryList">
 			<button type="button" class="category-item" data-category="Bank">
@@ -339,7 +345,7 @@
 				<h2>Recent reviews</h2>
 				<p>Fresh feedback from our community</p>
 			</div>
-			<a href="browse.html" class="section-link">View all reviews &rarr;</a>
+			<a href="browse.html" class="section-link" aria-label="View all reviews">View all reviews &rarr;</a>
 		</div>
 		<div id="recentReviewsList" class="recent-reviews-list rv-grid">
 			<p class="recent-reviews-loading">Loading recent reviews...</p>
@@ -382,10 +388,7 @@
 		</div>
 		<div class="footer-bottom">
 			<div class="footer-social">
-				<span> Follow us </span> <a href="#" aria-label="Facebook">
-					Facebook </a> <a href="#" aria-label="Instagram"> Instagram </a> <a
-					href="#" aria-label="LinkedIn"> LinkedIn </a> <a href="#"
-					aria-label="YouTube"> YouTube </a>
+				<span> Follow us </span> <a href="#" aria-label="Facebook"><span class="fs-text">Facebook</span><svg class="fs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V8z"/></svg></a> <a href="#" aria-label="Instagram"><span class="fs-text">Instagram</span><svg class="fs-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.6"/></svg></a> <a href="#" aria-label="LinkedIn"><span class="fs-text">LinkedIn</span><svg class="fs-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9v11M6 4.5v.5M10 20v-6a3 3 0 0 1 6 0v6M10 9v11"/></svg></a> <a href="#" aria-label="YouTube"><span class="fs-text">YouTube</span><svg class="fs-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="4"/><path d="M10 9.5v5l4.5-2.5z"/></svg></a>
 			</div>
 			<p>© 2026 Review Platform. All rights reserved.</p>
 		</div>

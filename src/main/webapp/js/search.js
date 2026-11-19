@@ -655,3 +655,145 @@ document.addEventListener("DOMContentLoaded", function () {
 
     spLoad();
 });
+
+
+/* =========================================================
+   COMMON RESPONSIVE NAVBAR
+   Adds a search icon + menu (hamburger) button to the black
+   navbar on phones. Desktop (769px+) is not changed.
+   (Header code lives in this file - no extra file needed.)
+========================================================= */
+(function () {
+
+    "use strict";
+
+    var SEARCH_ICON =
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>';
+    var CLOSE_ICON =
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>';
+    var MENU_ICON =
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>';
+
+    function closeAll(nav) {
+
+        nav.classList.remove("nav-open", "nav-search-open");
+
+        var buttons = nav.querySelectorAll(".nav-icon-btn");
+
+        buttons.forEach(function (button) {
+            button.setAttribute("aria-expanded", "false");
+        });
+    }
+
+    function enhance(nav) {
+
+        var links = nav.querySelector(".nav-links");
+
+        if (!links || nav.classList.contains("has-mobile-nav")) {
+            return;
+        }
+
+        nav.classList.add("has-mobile-nav");
+
+        /* the dropdown is positioned against the navbar */
+        if (window.getComputedStyle(nav).position === "static") {
+            nav.classList.add("nav-rel");
+        }
+
+        var tools = document.createElement("div");
+        tools.className = "nav-tools";
+
+        tools.innerHTML =
+            '<button type="button" class="nav-icon-btn nav-search-btn" aria-label="Search" aria-expanded="false">' +
+                '<span class="ic-open">' + SEARCH_ICON + "</span>" +
+                '<span class="ic-close">' + CLOSE_ICON + "</span>" +
+            "</button>" +
+            '<button type="button" class="nav-icon-btn nav-menu-btn" aria-label="Menu" aria-expanded="false">' +
+                '<span class="ic-open">' + MENU_ICON + "</span>" +
+                '<span class="ic-close">' + CLOSE_ICON + "</span>" +
+            "</button>";
+
+        var search = document.createElement("form");
+        search.className = "nav-search";
+        search.setAttribute("action", "search.html");
+        search.setAttribute("method", "get");
+        search.setAttribute("role", "search");
+        search.innerHTML =
+            '<input type="search" name="q" placeholder="Search by name or domain..." ' +
+            'aria-label="Search websites" autocomplete="off">';
+
+        nav.appendChild(tools);
+        nav.appendChild(search);
+
+        var searchButton = tools.querySelector(".nav-search-btn");
+        var menuButton = tools.querySelector(".nav-menu-btn");
+
+        menuButton.addEventListener("click", function () {
+
+            var open = !nav.classList.contains("nav-open");
+
+            closeAll(nav);
+
+            if (open) {
+                nav.classList.add("nav-open");
+                menuButton.setAttribute("aria-expanded", "true");
+            }
+        });
+
+        searchButton.addEventListener("click", function () {
+
+            var open = !nav.classList.contains("nav-search-open");
+
+            closeAll(nav);
+
+            if (open) {
+                nav.classList.add("nav-search-open");
+                searchButton.setAttribute("aria-expanded", "true");
+                search.querySelector("input").focus();
+            }
+        });
+
+        /* tap on a link, or on the dimmed area, closes the menu */
+        links.addEventListener("click", function (event) {
+            if (event.target.closest("a")) {
+                closeAll(nav);
+            }
+        });
+
+        nav.addEventListener("click", function (event) {
+            if (event.target === nav) {
+                closeAll(nav);
+            }
+        });
+    }
+
+    function init() {
+
+        var navs = document.querySelectorAll("nav.navbar, nav.top-navbar");
+
+        navs.forEach(enhance);
+
+        document.addEventListener("keydown", function (event) {
+
+            if (event.key !== "Escape") {
+                return;
+            }
+
+            document.querySelectorAll(".has-mobile-nav").forEach(closeAll);
+        });
+
+        window.addEventListener("resize", function () {
+
+            if (window.innerWidth > 768) {
+                document.querySelectorAll(".has-mobile-nav").forEach(closeAll);
+            }
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+
+})();

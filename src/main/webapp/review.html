@@ -276,24 +276,26 @@ body {
 
 				<!-- WEBSITE HEADER -->
 				<section class="profile-header">
-					<div class="ph-badges" id="phBadges"></div>
-					<div class="profile-main">
+					<!-- Row 1: small logo (left) + Visit website (right) -->
+					<div class="ph-top">
 						<div class="website-logo"></div>
+						<a id="visitWebsiteButton" class="visit-button" target="_blank"
+							rel="noopener noreferrer" hidden>Visit website</a>
+					</div>
 
-						<div class="website-details">
-							<div class="name-row">
-								<h1 id="websiteName">Loading...</h1>
-								<span id="verifiedSlot"></span>
-							</div>
-							<div id="headRating" class="rating-line"></div>
-							<div id="websiteInfo">Loading website information...</div>
+					<div class="ph-badges" id="phBadges"></div>
 
-							<div class="profile-actions">
-								<button type="button" class="write-review-button"
-									id="writeReviewButton">&#9998; Write a review</button>
-								<a id="visitWebsiteButton" class="visit-button" target="_blank"
-									rel="noopener noreferrer" hidden>Visit website</a>
-							</div>
+					<div class="website-details">
+						<div class="name-row">
+							<h1 id="websiteName">Loading...</h1>
+							<span id="verifiedSlot"></span>
+						</div>
+						<div id="headRating" class="rating-line"></div>
+						<div id="websiteInfo">Loading website information...</div>
+
+						<div class="profile-actions">
+							<button type="button" class="write-review-button"
+								id="writeReviewButton">&#9998; Write a review</button>
 						</div>
 					</div>
 				</section>

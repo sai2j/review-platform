@@ -504,3 +504,76 @@
 		init();
 	}
 })();
+
+/* ---------- mobile navbar: menu button + search icon ---------- */
+(function () {
+	function setup() {
+		var nav = document.querySelector("nav.navbar");
+		var toggle = document.getElementById("navToggle");
+		var searchBtn = document.getElementById("navSearchBtn");
+		if (toggle && nav) {
+			toggle.addEventListener("click", function () {
+				var open = nav.classList.toggle("nav-open");
+				toggle.setAttribute("aria-expanded", open ? "true" : "false");
+			});
+		}
+		if (nav) {
+			nav.addEventListener("click", function (e) {
+				if (e.target === nav && nav.classList.contains("nav-open")) {
+					nav.classList.remove("nav-open");
+					if (toggle) { toggle.setAttribute("aria-expanded", "false"); }
+				}
+			});
+			document.addEventListener("keydown", function (e) {
+				if (e.key === "Escape" && nav.classList.contains("nav-open")) {
+					nav.classList.remove("nav-open");
+					if (toggle) { toggle.setAttribute("aria-expanded", "false"); }
+				}
+			});
+		}
+		if (searchBtn) {
+			searchBtn.addEventListener("click", function () {
+				var input = document.getElementById("searchInput");
+				if (!input) { return; }
+				if (nav) { nav.classList.remove("nav-open"); }
+				input.scrollIntoView({ behavior: "smooth", block: "center" });
+				setTimeout(function () { input.focus(); }, 350);
+			});
+		}
+	}
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", setup);
+	} else {
+		setup();
+	}
+})();
+
+/* ---------- category row: side arrows ---------- */
+(function () {
+	function setup() {
+		var list = document.getElementById("categoryList");
+		var prev = document.getElementById("catPrev");
+		var next = document.getElementById("catNext");
+		if (!list || !prev || !next) { return; }
+
+		function update() {
+			var max = list.scrollWidth - list.clientWidth;
+			prev.disabled = list.scrollLeft <= 4;
+			next.disabled = max <= 4 || list.scrollLeft >= max - 4;
+		}
+		function scrollByStep(dir) {
+			list.scrollBy({ left: dir * Math.max(160, list.clientWidth * 0.6), behavior: "smooth" });
+		}
+		prev.addEventListener("click", function () { scrollByStep(-1); });
+		next.addEventListener("click", function () { scrollByStep(1); });
+		list.addEventListener("scroll", update, { passive: true });
+		window.addEventListener("resize", update);
+		update();
+		setTimeout(update, 600);
+	}
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", setup);
+	} else {
+		setup();
+	}
+})();

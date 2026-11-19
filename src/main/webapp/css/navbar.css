@@ -2,13 +2,13 @@
    COMMON NAVBAR - same look as the Home page
    Black bar, content on one centered 1200px line,
    brand = white "Review" + light-blue "Platform".
-
+ 
    Link this file LAST inside <head> of every page:
    <link rel="stylesheet" href="css/navbar.css">
 ========================================================= */
-
+ 
 /* ---------- Top bar (all page types) ---------- */
-
+ 
 body .navbar,
 body .top-navbar,
 body .auth-navbar {
@@ -28,7 +28,7 @@ body .auth-navbar {
     border-bottom: 1px solid #111111;
     box-shadow: none;
 }
-
+ 
 /* business-claim.html has an extra inner wrapper */
 body .navbar-inner {
     width: 100%;
@@ -37,9 +37,9 @@ body .navbar-inner {
     margin: 0;
     padding: 0;
 }
-
+ 
 /* ---------- Brand: ReviewPlatform ---------- */
-
+ 
 body .navbar .logo,
 body .top-navbar .logo,
 body .navbar .nav-brand,
@@ -56,7 +56,7 @@ body .navbar .brand {
     text-decoration: none;
     white-space: nowrap;
 }
-
+ 
 body .navbar .logo span,
 body .top-navbar .logo span,
 body .navbar .nav-brand span,
@@ -66,9 +66,9 @@ body .navbar .brand-blue {
     margin: 0;
     color: #8fe6c3;
 }
-
+ 
 /* ---------- Right side links ---------- */
-
+ 
 body .navbar .nav-links,
 body .top-navbar .nav-links,
 body .navbar .nav-right,
@@ -82,7 +82,7 @@ body .auth-navbar .nav-right {
     margin: 0;
     padding: 0;
 }
-
+ 
 body .navbar .nav-links a,
 body .top-navbar .nav-links a,
 body .navbar .nav-right a:not(.btn-business),
@@ -99,7 +99,7 @@ body .navbar .back-link {
     text-decoration: none;
     transition: color 0.2s ease;
 }
-
+ 
 body .navbar .nav-links a:hover,
 body .top-navbar .nav-links a:hover,
 body .navbar .nav-right a:not(.btn-business):hover,
@@ -110,9 +110,9 @@ body .top-navbar .nav-links a.active,
 body .auth-navbar .nav-right a.active-link {
     color: #8fe6c3;
 }
-
+ 
 /* ---------- Sidebar pages (user dashboard / profile / admin) ---------- */
-
+ 
 body .sidebar .brand,
 body .sidebar-logo {
     display: flex;
@@ -123,17 +123,17 @@ body .sidebar-logo {
     font-weight: 700;
     letter-spacing: 0.2px;
 }
-
+ 
 body .sidebar .brand .brand-accent,
 body .sidebar-logo .brand-accent,
 body .sidebar .brand-name > span {
     color: #00b67a;
 }
-
+ 
 /* ---------- Mobile ---------- */
-
+ 
 @media (max-width: 768px) {
-
+ 
     body .navbar,
     body .top-navbar,
     body .auth-navbar {
@@ -141,7 +141,7 @@ body .sidebar .brand-name > span {
         padding-right: 16px;
         gap: 12px;
     }
-
+ 
     body .navbar .logo,
     body .top-navbar .logo,
     body .navbar .nav-brand,
@@ -149,12 +149,37 @@ body .sidebar .brand-name > span {
     body .navbar .brand {
         font-size: 20px;
     }
-
+ 
     body .navbar .nav-links,
     body .top-navbar .nav-links,
     body .navbar .nav-right,
     body .auth-navbar .nav-right {
         gap: 10px;
+    }
+}
+ 
+/* Phones: logo on the first row, links on the second row (no overlap) */
+@media (max-width: 640px) {
+ 
+    body .navbar,
+    body .top-navbar {
+        flex-wrap: wrap;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        row-gap: 8px;
+        min-height: 0;
+    }
+ 
+    body .navbar .nav-links,
+    body .top-navbar .nav-links {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: flex-start;
+        gap: 8px 16px;
+    }
+ 
+    body .navbar .nav-links a.business-nav-button {
+        padding: 8px 16px;
     }
 }
 /* ===== "For Businesses" green pill button (Trustpilot style) ===== */
@@ -170,7 +195,7 @@ body .navbar .nav-links a.business-nav-button:visited {
     box-shadow: 0 2px 8px rgba(0, 182, 122, 0.35);
     transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
-
+ 
 body .navbar .nav-links a.business-nav-button:hover {
     background: #009765;
     color: #ffffff;

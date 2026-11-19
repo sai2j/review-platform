@@ -26,6 +26,20 @@ const BROWSE_CATEGORIES = [
 let browseAllSites = [];
 let browseSelectedCategory = "";
 let browseVisibleCount = BROWSE_PAGE_SIZE;
+let browseMinRating = 0;
+
+const BROWSE_RATING_OPTIONS = [
+    { value: 0, label: "Any" },
+    { value: 4, label: "4+ \u2605" },
+    { value: 3, label: "3+ \u2605" },
+    { value: 2, label: "2+ \u2605" }
+];
+
+const BROWSE_SORT_OPTIONS = [
+    { value: "rating", label: "Best rated" },
+    { value: "reviews", label: "Most reviewed" },
+    { value: "name", label: "A to Z" }
+];
 
 function browseEscape(value) {
 
@@ -84,6 +98,10 @@ function renderBrowseChips() {
 
     const chips = document.getElementById("browseChips");
 
+    if (!chips) {
+        return;
+    }
+
     chips.innerHTML = BROWSE_CATEGORIES.map(function (item) {
 
         const active =
@@ -114,6 +132,18 @@ function getBrowseFilteredSites() {
             (website.category || "").toLowerCase() !==
                 browseSelectedCategory.toLowerCase()
         ) {
+            return false;
+        }
+
+        if (
+            browseMinRating > 0 &&
+            (Number(website.reviewCount) || 0) > 0 &&
+            (Number(website.averageRating) || 0) < browseMinRating
+        ) {
+            return false;
+        }
+
+        if (browseMinRating > 0 && !(Number(website.reviewCount) > 0)) {
             return false;
         }
 
@@ -163,6 +193,19 @@ function renderBrowseList() {
     subtitle.textContent =
         sites.length + (sites.length === 1 ? " website" : " websites");
 
+    const countLabel = document.getElementById("bwCount");
+
+    if (countLabel) {
+        countLabel.textContent = "(" + sites.length + ")";
+    }
+
+    const showResults = document.getElementById("bwShowResults");
+
+    if (showResults) {
+        showResults.textContent =
+            "Show " + sites.length + (sites.length === 1 ? " website" : " websites");
+    }
+
     if (sites.length === 0) {
 
         list.innerHTML =
@@ -181,18 +224,13 @@ function renderBrowseList() {
             const rating = Number(website.averageRating) || 0;
 
             const ratingBlock = reviewCount > 0
-                ? '<div class="cat-rating">' +
-                    '<span class="cat-rating-score">' + rating.toFixed(1) + "</span>" +
-                    '<span class="cat-stars">' + browseStars(rating) + "</span>" +
-                    '<span class="cat-rating-label">' +
-                        browseEscape(browseRatingLabel(rating)) + "</span>" +
-                    '<span class="cat-review-count">' + reviewCount +
-                        (reviewCount === 1 ? " review" : " reviews") + "</span>" +
-                  "</div>"
-                : '<div class="cat-rating">' +
-                    '<span class="cat-stars">' + browseStars(0) + "</span>" +
-                    '<span class="cat-review-count">No reviews yet</span>' +
-                  "</div>";
+                ? '<div class="bw-stars cat-stars">' + browseStars(rating) + "</div>" +
+                  '<div class="bw-rate"><strong>' + rating.toFixed(1) + "</strong>" +
+                    '<span class="bw-dot">\u2022</span>' +
+                    '<span class="bw-reviews">' + reviewCount +
+                        (reviewCount === 1 ? " review" : " reviews") + "</span></div>"
+                : '<div class="bw-stars cat-stars">' + browseStars(0) + "</div>" +
+                  '<div class="bw-rate"><span class="bw-reviews">No reviews yet</span></div>';
 
             const initial =
                 (website.name || "W").trim().charAt(0).toUpperCase();
@@ -202,26 +240,20 @@ function renderBrowseList() {
                 encodeURIComponent(domain);
 
             const categoryTag = website.category
-                ? '<span class="browse-category-tag">' +
-                    browseEscape(website.category) + "</span>"
+                ? '<span class="bw-tag">' + browseEscape(website.category) + "</span>"
                 : "";
 
-            return '<article class="cat-card">' +
-                '<div class="cat-rank">#' + (index + 1) + "</div>" +
+            return '<a class="bw-row" href="review.html?websiteId=' +
+                    encodeURIComponent(website.id) + '">' +
                 '<div class="cat-logo" data-initial="' + browseEscape(initial) + '">' +
                     '<img src="' + browseEscape(favicon) + '" alt="" loading="lazy">' +
                 "</div>" +
-                '<div class="cat-body">' +
-                    '<h3 class="cat-name">' + browseEscape(website.name) +
-                        categoryTag + "</h3>" +
-                    '<p class="cat-domain">' + browseEscape(domain) + "</p>" +
-                    ratingBlock +
-                    '<p class="cat-description">' +
-                        browseEscape(website.description || "") + "</p>" +
+                '<div class="bw-body">' +
+                    '<h3 class="bw-name">' + browseEscape(website.name) + "</h3>" +
+                    '<p class="bw-domain">' + browseEscape(domain) + "</p>" +
+                    ratingBlock + categoryTag +
                 "</div>" +
-                '<a class="cat-view-button" href="review.html?websiteId=' +
-                    encodeURIComponent(website.id) + '">View reviews</a>' +
-                "</article>";
+                "</a>";
 
         }).join("");
 
@@ -240,11 +272,77 @@ function renderBrowseList() {
         browseVisibleCount < sites.length ? "inline-block" : "none";
 }
 
+function renderSheetOptions(containerId, options, current, attribute) {
+
+    const box = document.getElementById(containerId);
+
+    if (!box) {
+        return;
+    }
+
+    box.innerHTML = options.map(function (item) {
+
+        const active = String(item.value).toLowerCase() === String(current).toLowerCase();
+
+        return '<button type="button" class="bw-opt' + (active ? " active" : "") +
+            '" data-' + attribute + '="' + browseEscape(item.value) + '">' +
+            browseEscape(item.label) + "</button>";
+
+    }).join("");
+}
+
+function syncBrowseControls() {
+
+    const sort = document.getElementById("browseSort");
+    const rating = document.getElementById("browseRating");
+    const badge = document.getElementById("bwFilterBadge");
+
+    const activeCount =
+        (browseSelectedCategory ? 1 : 0) + (browseMinRating > 0 ? 1 : 0);
+
+    if (rating) {
+        rating.value = String(browseMinRating);
+        rating.parentElement.classList.toggle("on", browseMinRating > 0);
+    }
+
+    if (badge) {
+        badge.textContent = activeCount;
+        badge.hidden = activeCount === 0;
+    }
+
+    renderSheetOptions(
+        "bwSheetCats",
+        BROWSE_CATEGORIES.map(function (c) { return { value: c.value, label: c.label }; }),
+        browseSelectedCategory, "category");
+
+    renderSheetOptions("bwSheetRating", BROWSE_RATING_OPTIONS, browseMinRating, "rating");
+
+    renderSheetOptions("bwSheetSort", BROWSE_SORT_OPTIONS,
+        sort ? sort.value : "rating", "sort");
+}
+
 function refreshBrowse() {
 
     browseVisibleCount = BROWSE_PAGE_SIZE;
     renderBrowseChips();
+    syncBrowseControls();
     renderBrowseList();
+}
+
+function openBrowseSheet() {
+
+    const sheet = document.getElementById("bwSheet");
+
+    sheet.hidden = false;
+    document.body.classList.add("bw-lock");
+}
+
+function closeBrowseSheet() {
+
+    const sheet = document.getElementById("bwSheet");
+
+    sheet.hidden = true;
+    document.body.classList.remove("bw-lock");
 }
 
 function loadBrowseWebsites() {
@@ -293,18 +391,64 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("browseSort")
         .addEventListener("change", refreshBrowse);
 
-    document.getElementById("browseChips")
+
+    document.getElementById("browseRating")
+        .addEventListener("change", function (event) {
+
+            browseMinRating = Number(event.target.value) || 0;
+            refreshBrowse();
+        });
+
+    document.getElementById("bwOpenFilters")
+        .addEventListener("click", openBrowseSheet);
+
+    document.getElementById("bwSheetClose")
+        .addEventListener("click", closeBrowseSheet);
+
+    document.getElementById("bwShowResults")
+        .addEventListener("click", closeBrowseSheet);
+
+    document.getElementById("bwSheet")
         .addEventListener("click", function (event) {
 
-            const button = event.target.closest(".category-chip");
-
-            if (!button) {
+            if (event.target === event.currentTarget) {
+                closeBrowseSheet();
                 return;
             }
 
-            browseSelectedCategory = button.dataset.category || "";
+            const cat = event.target.closest("[data-category]");
+            const rating = event.target.closest("[data-rating]");
+            const sort = event.target.closest("[data-sort]");
+
+            if (cat) {
+                browseSelectedCategory = cat.dataset.category || "";
+            } else if (rating) {
+                browseMinRating = Number(rating.dataset.rating) || 0;
+            } else if (sort) {
+                document.getElementById("browseSort").value = sort.dataset.sort;
+            } else {
+                return;
+            }
+
             refreshBrowse();
         });
+
+    document.getElementById("bwClearAll")
+        .addEventListener("click", function () {
+
+            browseSelectedCategory = "";
+            browseMinRating = 0;
+            document.getElementById("browseSort").value = "rating";
+            document.getElementById("browseSearch").value = "";
+            refreshBrowse();
+        });
+
+    document.addEventListener("keydown", function (event) {
+
+        if (event.key === "Escape") {
+            closeBrowseSheet();
+        }
+    });
 
     document.getElementById("browseShowMore")
         .addEventListener("click", function () {
@@ -314,5 +458,148 @@ document.addEventListener("DOMContentLoaded", function () {
         });
 
     renderBrowseChips();
+    syncBrowseControls();
     loadBrowseWebsites();
 });
+
+
+/* =========================================================
+   COMMON RESPONSIVE NAVBAR
+   Adds a search icon + menu (hamburger) button to the black
+   navbar on phones. Desktop (769px+) is not changed.
+   (Header code lives in this file - no extra file needed.)
+========================================================= */
+(function () {
+
+    "use strict";
+
+    var SEARCH_ICON =
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>';
+    var CLOSE_ICON =
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>';
+    var MENU_ICON =
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"/></svg>';
+
+    function closeAll(nav) {
+
+        nav.classList.remove("nav-open", "nav-search-open");
+
+        var buttons = nav.querySelectorAll(".nav-icon-btn");
+
+        buttons.forEach(function (button) {
+            button.setAttribute("aria-expanded", "false");
+        });
+    }
+
+    function enhance(nav) {
+
+        var links = nav.querySelector(".nav-links");
+
+        if (!links || nav.classList.contains("has-mobile-nav")) {
+            return;
+        }
+
+        nav.classList.add("has-mobile-nav");
+
+        /* the dropdown is positioned against the navbar */
+        if (window.getComputedStyle(nav).position === "static") {
+            nav.classList.add("nav-rel");
+        }
+
+        var tools = document.createElement("div");
+        tools.className = "nav-tools";
+
+        tools.innerHTML =
+            '<button type="button" class="nav-icon-btn nav-search-btn" aria-label="Search" aria-expanded="false">' +
+                '<span class="ic-open">' + SEARCH_ICON + "</span>" +
+                '<span class="ic-close">' + CLOSE_ICON + "</span>" +
+            "</button>" +
+            '<button type="button" class="nav-icon-btn nav-menu-btn" aria-label="Menu" aria-expanded="false">' +
+                '<span class="ic-open">' + MENU_ICON + "</span>" +
+                '<span class="ic-close">' + CLOSE_ICON + "</span>" +
+            "</button>";
+
+        var search = document.createElement("form");
+        search.className = "nav-search";
+        search.setAttribute("action", "search.html");
+        search.setAttribute("method", "get");
+        search.setAttribute("role", "search");
+        search.innerHTML =
+            '<input type="search" name="q" placeholder="Search by name or domain..." ' +
+            'aria-label="Search websites" autocomplete="off">';
+
+        nav.appendChild(tools);
+        nav.appendChild(search);
+
+        var searchButton = tools.querySelector(".nav-search-btn");
+        var menuButton = tools.querySelector(".nav-menu-btn");
+
+        menuButton.addEventListener("click", function () {
+
+            var open = !nav.classList.contains("nav-open");
+
+            closeAll(nav);
+
+            if (open) {
+                nav.classList.add("nav-open");
+                menuButton.setAttribute("aria-expanded", "true");
+            }
+        });
+
+        searchButton.addEventListener("click", function () {
+
+            var open = !nav.classList.contains("nav-search-open");
+
+            closeAll(nav);
+
+            if (open) {
+                nav.classList.add("nav-search-open");
+                searchButton.setAttribute("aria-expanded", "true");
+                search.querySelector("input").focus();
+            }
+        });
+
+        /* tap on a link, or on the dimmed area, closes the menu */
+        links.addEventListener("click", function (event) {
+            if (event.target.closest("a")) {
+                closeAll(nav);
+            }
+        });
+
+        nav.addEventListener("click", function (event) {
+            if (event.target === nav) {
+                closeAll(nav);
+            }
+        });
+    }
+
+    function init() {
+
+        var navs = document.querySelectorAll("nav.navbar, nav.top-navbar");
+
+        navs.forEach(enhance);
+
+        document.addEventListener("keydown", function (event) {
+
+            if (event.key !== "Escape") {
+                return;
+            }
+
+            document.querySelectorAll(".has-mobile-nav").forEach(closeAll);
+        });
+
+        window.addEventListener("resize", function () {
+
+            if (window.innerWidth > 768) {
+                document.querySelectorAll(".has-mobile-nav").forEach(closeAll);
+            }
+        });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
+    } else {
+        init();
+    }
+
+})();

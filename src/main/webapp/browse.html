@@ -34,20 +34,63 @@
 		</header>
 		<div class="browse-toolbar">
 			<input type="text" id="browseSearch" class="browse-search"
-				placeholder="Search by name or domain..."> <select
-				id="browseSort" class="browse-sort">
-				<option value="rating">Best rated</option>
-				<option value="reviews">Most reviewed</option>
-				<option value="name">A to Z</option>
-			</select>
+				placeholder="Search by name or domain...">
 		</div>
-		<div class="category-chip-row" id="browseChips"></div>
+
+		<!-- filter chips: All filters / Rating / Sort -->
+		<div class="bw-filter-row">
+			<button type="button" id="bwOpenFilters" class="bw-fchip">
+				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+				All filters <span id="bwFilterBadge" class="bw-badge" hidden></span>
+			</button>
+			<label class="bw-fchip bw-select">
+				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.8 6.3.7-4.7 4.3 1.3 6.2L12 17l-5.6 3 1.3-6.2L3 9.5l6.3-.7z"/></svg>
+				<select id="browseRating" aria-label="Minimum rating">
+					<option value="0">Rating</option>
+					<option value="4">4 &amp; up</option>
+					<option value="3">3 &amp; up</option>
+					<option value="2">2 &amp; up</option>
+				</select>
+			</label>
+			<label class="bw-fchip bw-select">
+				<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4v16M8 4L4 8M8 4l4 4M16 20V4M16 20l-4-4M16 20l4-4"/></svg>
+				<select id="browseSort" class="browse-sort" aria-label="Sort by">
+					<option value="rating">Best rated</option>
+					<option value="reviews">Most reviewed</option>
+					<option value="name">A to Z</option>
+				</select>
+			</label>
+		</div>
+
+		<div class="bw-head">Websites <span id="bwCount"></span></div>
 		<div id="browseList" class="category-website-list"></div>
 		<div class="category-more-wrapper">
 			<button type="button" id="browseShowMore" class="category-show-more"
-				style="display: none;">Show more</button>
+				style="display: none;">Load more websites</button>
 		</div>
 	</main>
+
+	<!-- ALL FILTERS (bottom sheet on phones, centered box on desktop) -->
+	<div class="bw-sheet-overlay" id="bwSheet" hidden>
+		<div class="bw-sheet" role="dialog" aria-modal="true" aria-labelledby="bwSheetTitle">
+			<div class="bw-sheet-head">
+				<h2 id="bwSheetTitle">All filters</h2>
+				<button type="button" id="bwSheetClose" class="bw-sheet-x" aria-label="Close">&times;</button>
+			</div>
+			<div class="bw-sheet-body">
+				<div class="bw-lab">Category</div>
+				<div class="bw-opts" id="bwSheetCats"></div>
+				<div class="bw-lab">Minimum rating</div>
+				<div class="bw-opts" id="bwSheetRating"></div>
+				<div class="bw-lab">Sort by</div>
+				<div class="bw-opts" id="bwSheetSort"></div>
+			</div>
+			<div class="bw-sheet-actions">
+				<button type="button" id="bwClearAll" class="bw-btn-out">Clear all</button>
+				<button type="button" id="bwShowResults" class="bw-btn-dark">Show websites</button>
+			</div>
+		</div>
+	</div>
 	<script src="js/browse.js"></script>
 </body>
 </html>

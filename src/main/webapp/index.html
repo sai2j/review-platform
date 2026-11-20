@@ -440,70 +440,75 @@
                     document.getElementById(
                         "notificationMarkAll"
                     );
-                let loggedInUser = null;
-                try {
-                    loggedInUser =
-                        JSON.parse(
-                            localStorage.getItem(
-                                "loggedInUser"
-                            )
-                        );
-                } catch (error) {
-                    console.error(
-                        "Unable to read logged-in user:",
-                        error
-                    );
-                }
-                if (
-                    loggedInUser &&
-                    loggedInUser.id
-                ) {
+                function showLoggedIn() {
                     if (loginLink) {
-                        loginLink.style.display =
-                            "none";
+                        loginLink.style.display = "none";
                     }
                     if (registerLink) {
-                        registerLink.style.display =
-                            "none";
+                        registerLink.style.display = "none";
                     }
                     if (dashboardLink) {
-                        dashboardLink.style.display =
-                            "inline-block";
+                        dashboardLink.style.display = "inline-block";
                     }
                     if (logoutButton) {
-                        logoutButton.style.display =
-                            "inline-block";
+                        logoutButton.style.display = "inline-block";
                     }
                     if (notificationWrapper) {
-                        notificationWrapper.style.display =
-                            "inline-block";
+                        notificationWrapper.style.display = "inline-block";
                     }
-                    if (
-                        typeof loadNotificationUnreadCount ===
-                        "function"
-                    ) {
+                    if (typeof loadNotificationUnreadCount === "function") {
                         loadNotificationUnreadCount();
                     }
-                } else {
+                }
+                function showGuest() {
                     if (loginLink) {
-                        loginLink.style.display =
-                            "inline-block";
+                        loginLink.style.display = "inline-block";
                     }
                     if (registerLink) {
-                        registerLink.style.display =
-                            "inline-block";
+                        registerLink.style.display = "inline-block";
                     }
                     if (dashboardLink) {
-                        dashboardLink.style.display =
-                            "none";
+                        dashboardLink.style.display = "none";
                     }
                     if (logoutButton) {
-                        logoutButton.style.display =
-                            "none";
+                        logoutButton.style.display = "none";
                     }
                     if (notificationWrapper) {
                         notificationWrapper.style.display = "none";
                     }
+                }
+                function forgetLogin() {
+                    localStorage.removeItem("loggedInUser");
+                    localStorage.removeItem("myBusiness");
+                    localStorage.removeItem("isAdmin");
+                }
+                /* The browser may still remember an old login after the
+                   server session has ended. Ask the server before showing
+                   the logged-in menu. */
+                let loggedInUser = null;
+                try {
+                    loggedInUser = JSON.parse(
+                            localStorage.getItem("loggedInUser"));
+                } catch (error) {
+                    console.error("Unable to read logged-in user:", error);
+                }
+                showGuest();
+                if (loggedInUser && loggedInUser.id) {
+                    fetch("/review-platform/users/profile", {
+                        credentials: "include"
+                    })
+                    .then(function (response) {
+                        if (response.ok) {
+                            showLoggedIn();
+                        } else {
+                            forgetLogin();
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error("Session check failed:", error);
+                    });
+                } else {
+                    forgetLogin();
                 }
                 if (notificationButton) {
                     notificationButton.addEventListener(
@@ -591,6 +596,9 @@
                                     );
                                     localStorage.removeItem(
                                         "myBusiness"
+                                    );
+                                    localStorage.removeItem(
+                                        "isAdmin"
                                     );
                                     window.location.href =
                                        "index.html";

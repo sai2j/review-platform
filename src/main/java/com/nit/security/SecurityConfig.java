@@ -17,6 +17,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -81,6 +83,26 @@ public class SecurityConfig {
 
             .cors(cors ->
                 cors.configurationSource(corsConfigurationSource())
+            )
+
+            /*
+             * Not logged in:
+             *  - opening a protected HTML page sends the visitor to login.html
+             *  - a protected API call gets 401 Unauthorized
+             */
+            .exceptionHandling(exceptions -> exceptions
+                .authenticationEntryPoint((request, response, authException) -> {
+
+                    String path = request.getRequestURI();
+
+                    if (path.endsWith(".html")) {
+                        response.sendRedirect(
+                                request.getContextPath() + "/login.html");
+                    } else {
+                        response.sendError(
+                                HttpServletResponse.SC_UNAUTHORIZED);
+                    }
+                })
             )
 
             /*
@@ -149,10 +171,6 @@ public class SecurityConfig {
                             "/website.html",
                             "/business-signup.html",
                             "/business-claim.html",
-                            "/business-dashboard.html",
-                            "/business-response.html",
-                            "/subscription.html",
-                            "/admin.html",
                             "/forgot-password.html",
                             "/reset-password.html"
                     )
@@ -239,8 +257,8 @@ public class SecurityConfig {
                 )
                 .permitAll()
 
-                // Admin-only endpoints
-                .requestMatchers("/admins/**")
+                // Admin-only endpoints and the admin page
+                .requestMatchers("/admins/**", "/admin.html")
                 .hasRole("ADMIN")
 
                 // Subscription creation

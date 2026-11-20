@@ -577,3 +577,67 @@
 		setup();
 	}
 })();
+
+/* ---------- mobile: notification bell in the top bar (logged in users) ---------- */
+(function () {
+	function setup() {
+		var nav = document.querySelector("nav.navbar");
+		var bell = document.getElementById("navBellBtn");
+		var wrapper = document.getElementById("notificationWrapper");
+		var realButton = document.getElementById("notificationButton");
+		var dropdown = document.getElementById("notificationDropdown");
+		var badge = document.getElementById("notificationBadge");
+		var bellBadge = document.getElementById("navBellBadge");
+		if (!nav || !bell || !wrapper || !realButton || !dropdown) { return; }
+
+		var mq = window.matchMedia("(max-width: 768px)");
+
+		function syncBell() {
+			var loggedIn = wrapper.style.display === "inline-block";
+			bell.classList.toggle("show", loggedIn);
+			nav.classList.toggle("nav-has-bell", loggedIn);
+			if (bellBadge && badge) {
+				var count = badge.textContent.trim();
+				var visible = badge.style.display !== "none" && count !== "" && count !== "0";
+				bellBadge.textContent = count;
+				bellBadge.classList.toggle("show", visible);
+			}
+		}
+
+		// on phones the panel lives in the top bar (the drawer is hidden when closed)
+		function placeDropdown() {
+			if (mq.matches) {
+				if (dropdown.parentNode !== nav) { nav.appendChild(dropdown); }
+			} else if (dropdown.parentNode !== wrapper) {
+				wrapper.appendChild(dropdown);
+				dropdown.classList.remove("show");
+			}
+		}
+
+		bell.addEventListener("click", function (event) {
+			event.stopPropagation();
+			nav.classList.remove("nav-open");
+			realButton.click();
+		});
+
+		if (window.MutationObserver) {
+			var observer = new MutationObserver(syncBell);
+			observer.observe(wrapper, { attributes: true, attributeFilter: ["style"] });
+			if (badge) {
+				observer.observe(badge, { attributes: true, childList: true, characterData: true, subtree: true });
+			}
+		}
+
+		if (mq.addEventListener) { mq.addEventListener("change", placeDropdown); }
+		else if (mq.addListener) { mq.addListener(placeDropdown); }
+
+		placeDropdown();
+		syncBell();
+	}
+
+	if (document.readyState === "loading") {
+		document.addEventListener("DOMContentLoaded", setup);
+	} else {
+		setup();
+	}
+})();

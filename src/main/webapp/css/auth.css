@@ -274,3 +274,35 @@ body.au-body { background: #f6fdf9; }
 	.au-card { margin-left: 14px; margin-right: 14px; }
 	.au-business { margin-left: 14px; margin-right: 14px; text-align: center; justify-content: center; }
 }
+
+/* Phone: header in ONE line - logo left, menu button right, links in a side drawer */
+.au-nav-toggle { display: none; }
+
+@media (max-width: 768px) {
+	body.au-body .navbar { position: sticky; top: 0; z-index: 1000; flex-wrap: nowrap; align-items: center; padding: 0 16px; min-height: 60px; height: 60px; gap: 0; row-gap: 0; }
+	body.au-body .navbar .logo { font-size: 20px; flex: 1 1 auto; }
+	body.au-body .au-nav-toggle {
+		display: inline-flex; align-items: center; justify-content: center;
+		width: 40px; height: 40px; padding: 0; margin: 0 0 0 4px;
+		background: transparent; border: none; color: #ffffff; cursor: pointer; border-radius: 8px;
+	}
+	body.au-body .au-nav-toggle svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+	body.au-body .au-nav-toggle .ic-close { display: none; }
+	body.au-body .navbar.nav-open .au-nav-toggle .ic-open { display: none; }
+	body.au-body .navbar.nav-open .au-nav-toggle .ic-close { display: block; }
+
+	body.au-body .navbar.nav-open::after { content: ""; position: fixed; left: 0; right: 0; top: 60px; bottom: 0; background: rgba(0, 0, 0, 0.45); z-index: 1; }
+
+	body.au-body .navbar .nav-links {
+		display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; flex-wrap: nowrap; gap: 0;
+		position: fixed; top: 60px; right: 0; bottom: 0; width: 82%; max-width: 330px; margin: 0; padding: 20px 22px 28px;
+		background: #ffffff; border: none; box-shadow: -10px 0 28px rgba(0, 0, 0, 0.18); overflow-y: auto; z-index: 2;
+		transform: translateX(105%); visibility: hidden; transition: transform 0.25s ease, visibility 0s linear 0.25s;
+	}
+	body.au-body .navbar.nav-open .nav-links { transform: none; visibility: visible; transition: transform 0.25s ease; }
+	body.au-body .navbar .nav-links > a { width: auto; padding: 14px 0; font-size: 16px; color: #0b1712 !important; text-decoration: none; }
+	body.au-body .navbar .nav-links a.business-nav-button {
+		order: -2; display: block; text-align: center; margin: 0 0 12px; padding: 12px 18px; font-size: 15px;
+		background: #00b67a; color: #ffffff !important; border-radius: 999px; box-shadow: none;
+	}
+}

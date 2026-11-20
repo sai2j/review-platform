@@ -167,7 +167,7 @@
    MOBILE HOME (phone view only, desktop unchanged)
    navbar menu, icon search button, sliding rows
 ========================================================= */
-.nav-toggle, .nav-search-btn { display: none; }
+.nav-toggle, .nav-search-btn, .nav-bell-btn { display: none; }
 .cat-arrows { display: none; }
 .footer-social .fs-ico { display: none; }
 .footer-social a .fs-text { color: inherit !important; font-size: inherit !important; font-weight: inherit; }
@@ -183,6 +183,23 @@
 		background: transparent; border: none; color: #ffffff; cursor: pointer; border-radius: 8px;
 	}
 	.nav-search-btn svg, .nav-toggle svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+	.nav-bell-btn.show {
+		position: relative; display: inline-flex; align-items: center; justify-content: center;
+		width: 40px; height: 40px; padding: 0; margin: 0 0 0 4px;
+		background: transparent; border: none; color: #ffffff; cursor: pointer; border-radius: 8px;
+	}
+	.nav-bell-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+	.nav-bell-badge {
+		position: absolute; top: 3px; right: 1px; min-width: 16px; height: 16px; padding: 0 4px; box-sizing: border-box;
+		border-radius: 10px; background: #ef4444; color: #ffffff; font-size: 10px; font-weight: 700; line-height: 16px; text-align: center; display: none;
+	}
+	.nav-bell-badge.show { display: block; }
+	/* logged in: the bell takes the place of the search icon (search box is already on the page) */
+	body .navbar.nav-has-bell .nav-search-btn { display: none; }
+	/* the bell is in the top bar now, so it is not repeated inside the drawer */
+	body .navbar .nav-links .notification-wrapper { display: none !important; }
+	/* notification panel opens below the top bar (it is moved out of the drawer by home-extras.js) */
+	.navbar > .notification-dropdown { position: fixed; top: 66px; right: 10px; left: auto; width: min(360px, calc(100vw - 20px)); z-index: 1100; }
 	.nav-toggle .ic-close { display: none; }
 	.navbar.nav-open .nav-toggle .ic-open { display: none; }
 	.navbar.nav-open .nav-toggle .ic-close { display: block; }
@@ -208,7 +225,7 @@
 	#homeLoginLink::after { content: "\2192"; margin-left: 8px; }
 	body .navbar .nav-links .notification-wrapper { padding: 10px 0; }
 	body .navbar .nav-links .notification-button { color: #0b1712; padding: 8px 0; }
-	body .navbar .nav-links .nav-logout-btn { margin-top: 14px; width: 100%; padding: 11px 16px; background: #ffffff; color: var(--rd-gd); border: 1.5px solid var(--rd-g); border-radius: 999px; font-weight: 700; }
+	body .navbar .nav-links .nav-logout-btn { margin-top: 14px; width: 100%; padding: 11px 16px; background: #ffffff !important; color: var(--rd-gd) !important; border: 1.5px solid var(--rd-g) !important; border-radius: 999px; font-weight: 700; }
 
 	/* ---- hero: smaller, search with icon button ---- */
 	.hero { min-height: 0 !important; padding: 34px 16px 46px !important; }

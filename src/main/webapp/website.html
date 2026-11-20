@@ -6,8 +6,8 @@
 <title>Website Details | ReviewPlatform</title>
 <link rel="stylesheet" href="css/navbar.css">
 <link rel="stylesheet" href="css/navbar.css">
-/*<link rel="stylesheet" href="css/sidebar-layout.css">
-<script src="js/sidebar-layout.js"></script>*/
+<link rel="stylesheet" href="css/sidebar-layout.css">
+<script src="js/sidebar-layout.js"></script>
 </head>
 
 <style>
@@ -18,7 +18,7 @@
 body {
 	margin: 0;
 	font-family: Arial, Helvetica, sans-serif;
-	background: #f0f7ff;
+	background: #f2faf6;
 	color: #0b1117;
 	padding-bottom: 50px;
 }
@@ -70,7 +70,7 @@ body {
 }
 
 .breadcrumb-nav a {
-	color: #0369a1;
+	color: #009765;
 	text-decoration: none;
 	font-weight: 600;
 }
@@ -93,7 +93,7 @@ body {
 /* CARDS */
 .info-card {
 	background: #ffffff;
-	border: 1px solid #cbd5e1;
+	border: 1px solid #e2f0eb;
 	border-radius: 16px;
 	padding: 24px;
 	box-shadow: 0 4px 12px rgba(11, 17, 23, 0.03);
@@ -114,7 +114,7 @@ body {
 }
 
 .info-card a {
-	color: #0369a1;
+	color: #009765;
 	text-decoration: none;
 	font-weight: 600;
 }
@@ -133,7 +133,7 @@ body {
 /* BUTTONS */
 .btn-primary {
 	display: inline-block;
-	background: #0b1117;
+	background: #00b67a;
 	color: #ffffff;
 	padding: 10px 20px;
 	border-radius: 10px;
@@ -144,7 +144,13 @@ body {
 }
 
 .btn-primary:hover {
-	background: #1e293b;
+	background: #009765;
+}
+
+.info-card a.btn-primary,
+.info-card a.btn-primary:hover {
+	color: #ffffff;
+	text-decoration: none;
 }
 
 /* REVIEWS GRID */
@@ -155,8 +161,8 @@ body {
 }
 
 .verified-badge {
-	background: #e0f2fe;
-	color: #0369a1;
+	background: #e6f7f0;
+	color: #009765;
 	font-size: 11px;
 	font-weight: 700;
 	padding: 3px 8px;
@@ -164,6 +170,81 @@ body {
 	margin-left: 8px;
 	display: inline-block;
 	vertical-align: middle;
+}
+
+
+/* Phone: long names / links / comments wrap instead of widening the page */
+.info-card,
+.info-card h2,
+.info-card h3,
+.info-card p,
+.info-card a {
+	overflow-wrap: anywhere;
+	word-break: break-word;
+}
+
+.dashboard-container,
+.dashboard-section,
+.info-card {
+	min-width: 0;
+}
+
+@media (max-width: 600px) {
+	.dashboard-container {
+		margin: 18px auto;
+		padding: 0 14px;
+	}
+
+	.info-card {
+		padding: 18px;
+		border-radius: 14px;
+	}
+
+	.info-card h2 {
+		font-size: 20px;
+	}
+}
+
+/* Pager (Previous / Next) and Load more button */
+.pager {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 14px;
+	margin-top: 8px;
+}
+
+.pager-info {
+	font-size: 13px;
+	font-weight: 700;
+	color: #47695c;
+}
+
+.pager-btn {
+	background: #ffffff;
+	color: #009765;
+	border: 1.5px solid #00b67a;
+	border-radius: 999px;
+	padding: 9px 20px;
+	font-size: 13px;
+	font-weight: 700;
+	cursor: pointer;
+	transition: background 0.2s;
+}
+
+.pager-btn:hover:not(:disabled) {
+	background: #e6f7f0;
+}
+
+.pager-btn:disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.load-more-wrap {
+	display: flex;
+	justify-content: center;
+	margin-top: 4px;
 }
 </style>
 </head>
@@ -217,6 +298,11 @@ body {
 			<div id="verifiedWebsitesContainer" class="reviews-grid-slides">
 				<!-- Dynamically loaded verified websites -->
 			</div>
+			<div class="pager" id="websitesPager" style="display: none;">
+				<button type="button" class="pager-btn" id="websitesPrev">&larr; Previous</button>
+				<span class="pager-info" id="websitesPageInfo">Page 1</span>
+				<button type="button" class="pager-btn" id="websitesNext">Next &rarr;</button>
+			</div>
 		</div>
 
 		<!-- CUSTOMER REVIEWS SECTION -->
@@ -227,12 +313,21 @@ body {
 					<p>Loading reviews...</p>
 				</div>
 			</div>
+			<div class="load-more-wrap">
+				<button type="button" class="pager-btn" id="loadMoreReviews" style="display: none;">Load more reviews</button>
+			</div>
 		</div>
 
 	</div>
 
 	<!-- SCRIPT LOGIC -->
 	<script>
+        function escapeHtml(value) {
+            return String(value === undefined || value === null ? "" : value)
+                .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+        }
+
         document.addEventListener("DOMContentLoaded", async function() {
             const urlParams = new URLSearchParams(window.location.search);
             let websiteId = urlParams.get('id') || urlParams.get('websiteId');
@@ -267,12 +362,13 @@ body {
                         let targetBusiness = null;
                         if (Array.isArray(bizData) && bizData.length > 0) {
                             targetBusiness = bizData[0];
-                        } else if (bizData && (bizData.id || bizData.businessId || bizData.websiteId)) {
+                        } else if (bizData && bizData.websiteId) {
                             targetBusiness = bizData;
                         }
 
-                        if (targetBusiness) {
-                            websiteId = targetBusiness.id || targetBusiness.businessId || targetBusiness.websiteId;
+                        // Only the real website id is used (business id is a different table)
+                        if (targetBusiness && targetBusiness.websiteId) {
+                            websiteId = targetBusiness.websiteId;
                         }
                     }
                 } catch (err) {
@@ -293,18 +389,41 @@ body {
                     if (allWebsResp.ok) {
                         const websites = await allWebsResp.json();
                         if (websites && websites.length > 0) {
-                            verifiedContainer.innerHTML = "";
-                            websites.forEach(w => {
-                                const card = document.createElement("div");
-                                card.className = "info-card";
-                                card.innerHTML = `
-                                    <h3 style="margin-top:0;"><a href="website.html?id=${w.id}">${w.name}</a> <span class="verified-badge">Verified</span></h3>
-                                    <p>${w.description || 'No description available.'}</p>
-                                    <p style="font-size:13px; font-weight:600; margin-top:8px;">⭐ ${w.averageRating ? w.averageRating.toFixed(1) : '0.0'} / 5 (${w.totalReviews || 0} reviews)</p>
-                                    <a href="website.html?id=${w.id}" class="btn-primary" style="margin-top:10px; display:inline-block;">View Details & Reviews</a>
-                                `;
-                                verifiedContainer.appendChild(card);
-                            });
+                            const PAGE_SIZE = 5;
+                            const totalPages = Math.ceil(websites.length / PAGE_SIZE);
+                            let currentPage = 1;
+                            const pager = document.getElementById("websitesPager");
+                            const prevBtn = document.getElementById("websitesPrev");
+                            const nextBtn = document.getElementById("websitesNext");
+                            const pageInfo = document.getElementById("websitesPageInfo");
+
+                            const renderWebsitesPage = function () {
+                                verifiedContainer.innerHTML = "";
+                                websites.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE).forEach(w => {
+                                    const card = document.createElement("div");
+                                    card.className = "info-card";
+                                    card.innerHTML = `
+                                        <h3 style="margin-top:0;"><a href="website.html?id=${w.id}">${escapeHtml(w.name)}</a> <span class="verified-badge">Verified</span></h3>
+                                        <p>${escapeHtml(w.description || 'No description available.')}</p>
+                                        <p style="font-size:13px; font-weight:600; margin-top:8px;">⭐ ${w.averageRating ? w.averageRating.toFixed(1) : '0.0'} / 5 (${w.totalReviews || 0} reviews)</p>
+                                        <a href="website.html?id=${w.id}" class="btn-primary" style="margin-top:10px; display:inline-block;">View Details & Reviews</a>
+                                    `;
+                                    verifiedContainer.appendChild(card);
+                                });
+                                pageInfo.textContent = "Page " + currentPage + " of " + totalPages;
+                                prevBtn.disabled = currentPage === 1;
+                                nextBtn.disabled = currentPage === totalPages;
+                                pager.style.display = totalPages > 1 ? "flex" : "none";
+                            };
+
+                            prevBtn.onclick = function () {
+                                if (currentPage > 1) { currentPage--; renderWebsitesPage(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+                            };
+                            nextBtn.onclick = function () {
+                                if (currentPage < totalPages) { currentPage++; renderWebsitesPage(); window.scrollTo({ top: 0, behavior: "smooth" }); }
+                            };
+
+                            renderWebsitesPage();
                         } else {
                             verifiedContainer.innerHTML = '<div class="info-card"><p>No verified websites found at the moment.</p></div>';
                         }
@@ -353,30 +472,77 @@ body {
                     return;
                 }
 
-                // Fetch and display working customer reviews
-                const reviewsResponse = await fetch(`/review-platform/reviews/website/${websiteId}`);
+                // Fetch and display customer reviews (5 at a time)
                 const reviewsContainer = document.getElementById("customerReviewsContainer");
-                
-                if (reviewsResponse.ok) {
-                    const reviews = await reviewsResponse.json();
-                    if (reviews && reviews.length > 0) {
-                        reviewsContainer.innerHTML = "";
-                        reviews.forEach(review => {
-                            const card = document.createElement("div");
-                            card.className = "info-card";
-                            card.innerHTML = `
-                                <div style="font-weight: 700; margin-bottom: 6px; color: #d97706;">⭐ ${review.rating || 5} / 5</div>
-                                <p style="font-size: 14px; color: #0b1117; font-weight: 500;">${review.comment || review.content || "Great platform and service!"}</p>
-                                <p style="font-size: 12px; color: #64748b; margin-top: 10px;">Reviewed by: ${review.userName || review.userEmail || 'Verified User'}</p>
-                            `;
-                            reviewsContainer.appendChild(card);
-                        });
-                    } else {
-                        reviewsContainer.innerHTML = '<div class="info-card"><p>No approved reviews are available for this website yet. Be the first to write a review!</p></div>';
+                const loadMoreBtn = document.getElementById("loadMoreReviews");
+                const REVIEWS_PER_LOAD = 5;
+                let reviewPage = 0;
+                let shownReviews = 0;
+
+                const appendReview = function (review) {
+                    const card = document.createElement("div");
+                    card.className = "info-card";
+                    const rating = Number(review.rating) || 0;
+                    const filled = Math.max(0, Math.min(5, Math.round(rating)));
+                    const stars = '<span style="color:#d97706;">' + "★".repeat(filled) + '</span><span style="color:#d6e4dd;">' + "★".repeat(5 - filled) + '</span>';
+                    const when = review.createdAt || review.reviewDate || review.date;
+                    const whenText = when && !Array.isArray(when) && !isNaN(Date.parse(when))
+                        ? new Date(when).toLocaleDateString() : "";
+                    card.innerHTML = `
+                        <div style="font-weight: 700; margin-bottom: 6px;">${stars} <span style="color:#0b1117;">${rating} / 5</span></div>
+                        ${review.title ? `<p style="font-size: 15px; color: #0b1117; font-weight: 700; margin: 4px 0;">${escapeHtml(review.title)}</p>` : ""}
+                        <p style="font-size: 14px; color: #0b1117; font-weight: 500;">${escapeHtml(review.comment || review.content || "")}</p>
+                        <p style="font-size: 12px; color: #64748b; margin-top: 10px;">Reviewed by: ${escapeHtml(review.userName || review.username || review.userEmail || "Verified User")}${whenText ? " · " + whenText : ""}</p>
+                    `;
+                    reviewsContainer.appendChild(card);
+                };
+
+                const loadReviews = async function () {
+                    loadMoreBtn.disabled = true;
+                    const reviewsResponse = await fetch(`/review-platform/reviews/website/${websiteId}?page=${reviewPage}&size=${REVIEWS_PER_LOAD}`);
+
+                    if (!reviewsResponse.ok) {
+                        if (reviewPage === 0) {
+                            reviewsContainer.innerHTML = '<div class="info-card"><p>No reviews found for this website.</p></div>';
+                        }
+                        loadMoreBtn.style.display = "none";
+                        return;
                     }
-                } else {
-                    reviewsContainer.innerHTML = '<div class="info-card"><p>No reviews found for this website.</p></div>';
-                }
+
+                    // The API sends a page: { content: [...], totalElements: n }
+                    const reviewData = await reviewsResponse.json();
+                    const reviews = Array.isArray(reviewData) ? reviewData : (reviewData.content || []);
+                    const totalReviews = Array.isArray(reviewData)
+                        ? reviews.length
+                        : (reviewData.totalElements !== undefined ? reviewData.totalElements : reviews.length);
+
+                    document.getElementById("webReviewCount").textContent = `(${totalReviews} reviews)`;
+
+                    if (reviewPage === 0) {
+                        reviewsContainer.innerHTML = "";
+                    }
+
+                    if (reviewPage === 0 && reviews.length === 0) {
+                        reviewsContainer.innerHTML = '<div class="info-card"><p>No approved reviews are available for this website yet. Be the first to write a review!</p></div>';
+                        loadMoreBtn.style.display = "none";
+                        return;
+                    }
+
+                    reviews.forEach(appendReview);
+                    shownReviews += reviews.length;
+                    reviewPage++;
+
+                    const hasMore = Array.isArray(reviewData)
+                        ? false
+                        : (reviewData.last === false || shownReviews < totalReviews) && reviews.length > 0;
+
+                    loadMoreBtn.style.display = hasMore ? "inline-block" : "none";
+                    loadMoreBtn.disabled = false;
+                    loadMoreBtn.textContent = "Load more reviews";
+                };
+
+                loadMoreBtn.addEventListener("click", loadReviews);
+                await loadReviews();
 
             } catch (error) {
                 console.error("Error loading website details or reviews:", error);

@@ -808,3 +808,20 @@ svg {
     .content { padding: 24px 16px; }
 }
 #businessInfo p:last-of-type { border-bottom: none; }
+
+/* Phone: 3 stat cards in one row */
+@media (max-width: 860px) {
+    .stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .stats .stat-card { flex-direction: column; align-items: flex-start; gap: 8px; padding: 12px 10px; min-width: 0; border-radius: 14px; }
+    .stats .stat-icon { width: 34px; height: 34px; border-radius: 10px; }
+    .stats .stat-icon svg { width: 18px; height: 18px; }
+    .stats .stat-label { font-size: 11px; line-height: 1.3; }
+    .stats .stat-value { font-size: 20px; }
+}
+
+/* Phone: Browse Websites button sits beside the "Manage your business" line */
+@media (max-width: 860px) {
+    .page-header { flex-direction: row; flex-wrap: nowrap; align-items: flex-end; justify-content: space-between; gap: 10px; }
+    .page-header > div { flex: 1 1 auto; min-width: 0; }
+    .page-header .btn { flex: none; padding: 7px 14px; min-height: 0; font-size: 12px; white-space: nowrap; }
+}

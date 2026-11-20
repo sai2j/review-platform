@@ -415,3 +415,37 @@
             .catch(function () { /* email login still works */ });
     });
 })();
+
+/* Phone: menu button opens / closes the links drawer */
+(function () {
+    "use strict";
+
+    var navbar = document.querySelector("nav.navbar");
+    var toggle = document.getElementById("auNavToggle");
+
+    if (!navbar || !toggle) {
+        return;
+    }
+
+    function setOpen(open) {
+        navbar.classList.toggle("nav-open", open);
+        toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    toggle.addEventListener("click", function () {
+        setOpen(!navbar.classList.contains("nav-open"));
+    });
+
+    navbar.addEventListener("click", function (event) {
+        // tap on the dimmed background (the ::after layer) or on a link closes the menu
+        if (event.target === navbar || event.target.closest(".nav-links a")) {
+            setOpen(false);
+        }
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            setOpen(false);
+        }
+    });
+})();

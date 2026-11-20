@@ -184,47 +184,6 @@ html.rp-has-sidebar body {
     background: #17212b;
 }
 
-/* ---------- Mobile: sidebar goes on top ---------- */
-
-@media (max-width: 800px) {
-
-    .rp-shell {
-        flex-direction: column;
-    }
-
-    .rp-sidebar {
-        flex: none;
-        width: 100%;
-        height: auto;
-        position: static;
-        padding: 16px;
-        border-right: none;
-        border-bottom: 1px solid var(--rp-line);
-    }
-
-    .rp-brand {
-        padding-bottom: 10px;
-    }
-
-    .rp-nav {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-
-    .rp-link {
-        width: auto;
-    }
-
-    .rp-footer {
-        margin-top: 8px;
-        padding-top: 8px;
-    }
-
-    .rp-main {
-        width: 100%;
-    }
-}
-
 /* Colourful emoji icons (same as My Profile page) */
 .rp-icon {
     flex: 0 0 20px;
@@ -322,4 +281,318 @@ html.rp-has-sidebar body {
 .rp-logout:hover {
     background: #0b3b2e;
     color: #ffffff;
+}
+
+/* =========================================================
+   PHONE VIEW (up to 900px): top bar + full-height right drawer
+   Used by js/sidebar-layout.js (initDrawer). Desktop is untouched.
+   Works for .rp-sidebar and the pages' own <aside class="sidebar">.
+========================================================= */
+
+/* top bar / overlay / close button do not exist on desktop */
+.rp-topbar,
+.rp-overlay,
+.rp-close {
+    display: none;
+}
+
+@media (max-width: 900px) {
+
+    /* ----- page layout: sidebar leaves the flow ----- */
+    body.rp-dw .rp-shell,
+    body.rp-dw .app,
+    body.rp-dw .dashboard-layout {
+        display: block;
+        min-height: 0;
+    }
+
+    body.rp-dw .rp-main,
+    body.rp-dw .content,
+    body.rp-dw .main-content {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        min-width: 0;
+    }
+
+    body.rp-lock {
+        overflow: hidden;
+    }
+
+    /* ----- top bar ----- */
+    body.rp-dw .rp-topbar {
+        position: sticky;
+        top: 0;
+        z-index: 900;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        height: 62px;
+        padding: 0 16px;
+        box-sizing: border-box;
+        background: #ffffff;
+        border-bottom: 1px solid #e2f0eb;
+        font-family: system-ui, -apple-system, "Segoe UI", "Helvetica Neue", sans-serif;
+    }
+
+    body.rp-dw .rp-top-brand {
+        display: inline-block;
+        font-size: 21px;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+        color: #000000;
+        text-decoration: none;
+    }
+
+    body.rp-dw .rp-top-brand span {
+        color: #00b67a;
+    }
+
+    body.rp-dw .rp-top-tag {
+        margin-left: 6px;
+        font-style: normal;
+        font-size: 12px;
+        font-weight: 700;
+        color: #4b685c;
+    }
+
+    body.rp-dw .rp-top-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    body.rp-dw .rp-top-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: #e6f7f0;
+        color: #009765;
+        font-size: 14px;
+        font-weight: 800;
+        cursor: pointer;
+    }
+
+    body.rp-dw .rp-burger {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        width: 40px;
+        height: 40px;
+        padding: 0;
+        border: none;
+        border-radius: 10px;
+        background: transparent;
+        cursor: pointer;
+    }
+
+    body.rp-dw .rp-burger span {
+        display: block;
+        width: 22px;
+        height: 2px;
+        border-radius: 2px;
+        background: #111111;
+    }
+
+    /* ----- dim background ----- */
+    body.rp-dw .rp-overlay {
+        display: block;
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        background: rgba(11, 17, 23, 0.45);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.25s ease, visibility 0.25s ease;
+    }
+
+    body.rp-dw .rp-overlay.rp-open {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* ----- the drawer (from the very top to the bottom) ----- */
+    body.rp-dw aside.rp-drawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: auto;
+        z-index: 1100;
+        width: 82vw;
+        max-width: 330px;
+        height: 100%;
+        max-height: none;
+        flex: none;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        padding: 18px 16px 22px;
+        box-sizing: border-box;
+        overflow-y: auto;
+        background: #ffffff;
+        border: none;
+        border-left: 1px solid #e2f0eb;
+        box-shadow: -12px 0 32px rgba(11, 17, 23, 0.14);
+        transform: translateX(105%);
+        visibility: hidden;
+        transition: transform 0.28s ease, visibility 0.28s ease;
+    }
+
+    body.rp-dw aside.rp-drawer.rp-open {
+        transform: none;
+        visibility: visible;
+    }
+
+    /* X button: top right, beside the logo */
+    body.rp-dw aside.rp-drawer .rp-close {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        border: 1.5px solid #e2f0eb;
+        border-radius: 50%;
+        background: #ffffff;
+        color: #111111;
+        cursor: pointer;
+    }
+
+    body.rp-dw aside.rp-drawer .rp-close svg {
+        width: 18px;
+        height: 18px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+    }
+
+    /* wrappers that only group things: let their children sit in the drawer */
+    body.rp-dw aside.rp-drawer .rp-footer,
+    body.rp-dw aside.rp-drawer .sidebar-footer,
+    body.rp-dw aside.rp-drawer .side-footer,
+    body.rp-dw aside.rp-drawer .side-user,
+    body.rp-dw aside.rp-drawer .sidebar-top {
+        display: contents;
+    }
+
+    /* order inside the drawer: logo, user card, links, logout */
+    body.rp-dw aside.rp-drawer .rp-brand,
+    body.rp-dw aside.rp-drawer .sidebar-logo,
+    body.rp-dw aside.rp-drawer .sidebar-brand,
+    body.rp-dw aside.rp-drawer .brand {
+        order: 0;
+        margin: 0;
+        padding: 6px 52px 14px 6px;
+        font-size: 21px;
+        font-weight: 800;
+    }
+
+    body.rp-dw aside.rp-drawer .rp-user-card,
+    body.rp-dw aside.rp-drawer .user-pill,
+    body.rp-dw aside.rp-drawer .user-card,
+    body.rp-dw aside.rp-drawer .sf-user-card,
+    body.rp-dw aside.rp-drawer .side-user-info {
+        order: 1;
+        margin-bottom: 8px;
+    }
+
+    body.rp-dw aside.rp-drawer .rp-nav,
+    body.rp-dw aside.rp-drawer .sidebar-menu,
+    body.rp-dw aside.rp-drawer .side-nav {
+        order: 2;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        flex-basis: auto;
+        gap: 6px;
+        overflow: visible;
+        padding: 0;
+        margin: 0;
+    }
+
+    body.rp-dw aside.rp-drawer .rp-logout,
+    body.rp-dw aside.rp-drawer .logout-btn,
+    body.rp-dw aside.rp-drawer .side-user > button {
+        order: 3;
+        margin-top: auto;
+        width: 100%;
+    }
+
+    /* user text must be visible in the drawer */
+    body.rp-dw aside.rp-drawer .user-text,
+    body.rp-dw aside.rp-drawer .sf-user-text,
+    body.rp-dw aside.rp-drawer .side-user-text {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    body.rp-dw aside.rp-drawer .user-text small,
+    body.rp-dw aside.rp-drawer .sf-user-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #0b1712;
+    }
+
+    body.rp-dw aside.rp-drawer .user-text strong,
+    body.rp-dw aside.rp-drawer .sf-user-email {
+        font-size: 12px;
+        font-weight: 500;
+        color: #4b685c;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* links: full width rows, same look as the desktop sidebar */
+    body.rp-dw aside.rp-drawer .rp-link,
+    body.rp-dw aside.rp-drawer .menu-item,
+    body.rp-dw aside.rp-drawer .side-link,
+    body.rp-dw aside.rp-drawer .sidebar-item,
+    body.rp-dw aside.rp-drawer .nav-link {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        min-height: 46px;
+        box-sizing: border-box;
+        white-space: normal;
+    }
+
+    body.rp-dw aside.rp-drawer .menu-item,
+    body.rp-dw aside.rp-drawer .side-link,
+    body.rp-dw aside.rp-drawer .sidebar-item {
+        gap: 12px;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        text-align: left;
+        text-decoration: none;
+        background: transparent;
+        color: #47695c;
+    }
+
+    body.rp-dw aside.rp-drawer .menu-item.active,
+    body.rp-dw aside.rp-drawer .side-link.active,
+    body.rp-dw aside.rp-drawer .sidebar-item.active {
+        background: #e6f7f0;
+        color: #009765;
+        box-shadow: inset 3px 0 0 #00b67a;
+    }
+
+    body.rp-dw aside.rp-drawer .nav-link {
+        justify-content: space-between;
+    }
 }

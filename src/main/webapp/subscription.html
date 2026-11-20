@@ -294,6 +294,77 @@ body {
 		width: 100%;
 	}
 }
+
+/* Phone: plans in one swipe row instead of one long list */
+@media ( max-width : 650px) {
+	.plans {
+		display: flex;
+		gap: 12px;
+		overflow-x: auto;
+		scroll-snap-type: x mandatory;
+		scroll-padding-left: 15px;
+		-webkit-overflow-scrolling: touch;
+		margin: 0 -15px;
+		padding: 18px 15px 14px;
+		scrollbar-width: none;
+	}
+	.plans::-webkit-scrollbar {
+		display: none;
+	}
+	.plan-card {
+		flex: 0 0 78%;
+		scroll-snap-align: start;
+		min-height: auto;
+		padding: 20px 16px 18px;
+	}
+	.plan-card:hover {
+		transform: none;
+	}
+	.plan-card .price {
+		margin: 10px 0 8px;
+	}
+	.price-amount {
+		font-size: 30px;
+	}
+	.features li {
+		font-size: 13px;
+		padding: 8px 0;
+	}
+}
+
+/* swipe hint + dots: phone only */
+.swipe-hint,
+.plan-dots {
+	display: none;
+}
+@media ( max-width : 650px) {
+	.swipe-hint {
+		display: block;
+		margin: 14px 0 0;
+		text-align: center;
+		font-size: 12px;
+		font-weight: 700;
+		color: #009765;
+	}
+	.plan-dots {
+		display: flex;
+		justify-content: center;
+		gap: 7px;
+		margin: 0 0 26px;
+	}
+	.plan-dots span {
+		width: 7px;
+		height: 7px;
+		border-radius: 50%;
+		background: #bfe8d6;
+		transition: width 0.2s ease, background 0.2s ease;
+	}
+	.plan-dots span.active {
+		width: 20px;
+		border-radius: 4px;
+		background: #00b67a;
+	}
+}
 </style>
 </head>
 <body>
@@ -320,7 +391,8 @@ body {
 					onclick="setBilling('yearly')">Yearly</button>
 			</div>
 		</div>
-		<section class="plans">
+		<p class="swipe-hint" id="swipeHint">Swipe to see all plans &rarr;</p>
+		<section class="plans" id="plansRow">
 			<div class="plan-card">
 				<h2 class="plan-name">Free</h2>
 				<p class="plan-description">Get started with the basic tools for
@@ -423,6 +495,7 @@ body {
 					Choose Premium</button>
 			</div>
 		</section>
+		<div class="plan-dots" id="planDots" aria-hidden="true"></div>
 		<section class="enterprise-section">
 			<div class="enterprise-text">
 				<h2>Enterprise</h2>
@@ -444,19 +517,16 @@ body {
 		}
 		const BUSINESS_API = "/review-platform/business-dashboard/user/"
 				+ loggedInUser.id;
-		async
-		function loadBusiness() {
+		async function loadBusiness() {
 			try {
-				const response = await
-				fetch(BUSINESS_API, {
+				const response = await fetch(BUSINESS_API, {
 					method : "GET",
 					credentials : "include"
 				});
 				if (!response.ok) {
 					throw new Error("Business API returned " + response.status);
 				}
-				const business = await
-				response.json();
+				const business = await response.json();
 				if (!business || !business.id) {
 					throw new Error("Business not found");
 				}
@@ -494,12 +564,10 @@ body {
 		function currentPlan() {
 			alert("You are currently using the Free plan.");
 		}
-		async
-		function choosePlan(planName) {
+		async function choosePlan(planName) {
 			if (!currentBusiness || !currentBusiness.id) {
 				alert("Business information is not available.");
-				await
-				loadBusiness();
+				await loadBusiness();
 				if (!currentBusiness || !currentBusiness.id) {
 					return;
 				}
@@ -513,8 +581,7 @@ body {
 				return;
 			}
 			try {
-				const response = await
-				fetch("/review-platform/subscriptions/business/" + businessId
+				const response = await fetch("/review-platform/subscriptions/business/" + businessId
 						+ "/create?planName=" + encodeURIComponent(planName)
 						+ "&billingCycle=" + encodeURIComponent(billingCycle),
 						{
@@ -526,13 +593,11 @@ body {
 					return;
 				}
 				if (!response.ok) {
-					const errorText = await
-					response.text();
+					const errorText = await response.text();
 					throw new Error("HTTP " + response.status + ": "
 							+ errorText);
 				}
-				const subscription = await
-				response.json();
+				const subscription = await response.json();
 				console.log("Subscription created:", subscription);
 				const paymentConfirmed = confirm("Subscription created successfully.\n\n"
 						+ "Plan: "
@@ -547,8 +612,7 @@ body {
 					alert("Subscription is waiting for payment.");
 					return;
 				}
-				const paymentResponse = await
-				fetch("/review-platform/subscriptions/" + subscription.id
+				const paymentResponse = await fetch("/review-platform/subscriptions/" + subscription.id
 						+ "/test-payment", {
 					method : "POST",
 					credentials : "include"
@@ -559,12 +623,10 @@ body {
 					return;
 				}
 				if (!paymentResponse.ok) {
-					const errorText = await
-					paymentResponse.text();
+					const errorText = await paymentResponse.text();
 					throw new Error("Payment failed: " + errorText);
 				}
-				const paidSubscription = await
-				paymentResponse.json();
+				const paidSubscription = await paymentResponse.json();
 				alert("TEST PAYMENT SUCCESSFUL!\n\n" + "Plan: "
 						+ paidSubscription.planName + "\nAmount: ₹"
 						+ paidSubscription.amount + "\nStatus: "
@@ -582,6 +644,27 @@ body {
 		document.addEventListener("DOMContentLoaded", function() {
 			loadBusiness();
 		});
+	
+		// Phone: dots under the swipe row
+		(function () {
+			var row = document.getElementById("plansRow");
+			var dotsBox = document.getElementById("planDots");
+			if (!row || !dotsBox) return;
+			var cards = row.querySelectorAll(".plan-card");
+			cards.forEach(function () { dotsBox.appendChild(document.createElement("span")); });
+			var dots = dotsBox.children;
+			function update() {
+				var nearest = 0, best = Infinity;
+				cards.forEach(function (card, i) {
+					var d = Math.abs(card.offsetLeft - row.scrollLeft - row.offsetLeft - 15);
+					if (d < best) { best = d; nearest = i; }
+				});
+				if (row.scrollLeft + row.clientWidth >= row.scrollWidth - 4) nearest = cards.length - 1;
+				for (var i = 0; i < dots.length; i++) dots[i].classList.toggle("active", i === nearest);
+			}
+			row.addEventListener("scroll", update, { passive: true });
+			window.addEventListener("resize", update);
+			update();
+		})();
 	</script>
 </body>
-</html>

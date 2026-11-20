@@ -8,6 +8,12 @@
    Add this in <head> of the page, after navbar.css:
    <link rel="stylesheet" href="css/sidebar-layout.css">
    <script src="js/sidebar-layout.js"></script>
+
+   Phone view (up to 900px): a top bar (logo + avatar + menu button)
+   and the sidebar becomes a full-height drawer from the right.
+   Pages that already have their own <aside class="sidebar">
+   (My Profile, My Business, Claim Business, Admin) only get the
+   phone drawer - their desktop view is not touched.
 ========================================================= */
 
 (function () {
@@ -19,6 +25,29 @@
         user = JSON.parse(localStorage.getItem("loggedInUser"));
     } catch (error) {
         user = null;
+    }
+
+    // Pages that already contain their own sidebar: only add the phone drawer
+    var OWN_SIDEBAR_PAGES = [
+        "user-profile.html",
+        "user-dashboard.html",
+        "business-claim.html",
+        "admin.html"
+    ];
+
+    var currentPage = (
+        window.location.pathname.split("/").pop() || "index.html"
+    ).toLowerCase();
+
+    if (OWN_SIDEBAR_PAGES.indexOf(currentPage) !== -1) {
+        if (document.readyState === "loading") {
+            document.addEventListener("DOMContentLoaded", function () {
+                initDrawer(document.querySelector("aside.sidebar"));
+            });
+        } else {
+            initDrawer(document.querySelector("aside.sidebar"));
+        }
+        return;
     }
 
     // Visitors keep the normal top navbar
@@ -121,6 +150,8 @@
         shell.appendChild(main);
         document.body.appendChild(shell);
 
+        initDrawer(sidebar);
+
         var logoutButton = document.getElementById("rpLogoutButton");
 
         if (logoutButton) {
@@ -130,6 +161,118 @@
                 window.location.href = "login.html";
             });
         }
+    }
+
+    // ---------- Phone view: top bar + right side drawer ----------
+    function initDrawer(aside) {
+        if (!aside || !document.body || aside.classList.contains("rp-drawer")) {
+            return;
+        }
+
+        var body = document.body;
+
+        body.classList.add("rp-dw");
+        aside.classList.add("rp-drawer");
+
+        if (!aside.id) {
+            aside.id = "rpDrawer";
+        }
+
+        // Top bar (logo + avatar + menu button)
+        var tagEl = aside.querySelector(".brand small");
+        var tagHtml = tagEl ? '<em class="rp-top-tag">' + escapeHtml(tagEl.textContent) + "</em>" : "";
+
+        var topbar = document.createElement("header");
+        topbar.className = "rp-topbar";
+        topbar.innerHTML =
+            '<a class="rp-top-brand" href="index.html">Review<span>Platform</span>' + tagHtml + "</a>" +
+            '<div class="rp-top-actions">' +
+            '<span class="rp-top-avatar" aria-hidden="true">U</span>' +
+            '<button type="button" class="rp-burger" aria-label="Open menu" aria-expanded="false" aria-controls="' + aside.id + '">' +
+            "<span></span><span></span><span></span></button>" +
+            "</div>";
+        body.insertBefore(topbar, body.firstChild);
+
+        // Close button (X) inside the drawer, on the right of the logo
+        var closeBtn = document.createElement("button");
+        closeBtn.type = "button";
+        closeBtn.className = "rp-close";
+        closeBtn.setAttribute("aria-label", "Close menu");
+        closeBtn.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+        aside.insertBefore(closeBtn, aside.firstChild);
+
+        // Dim background
+        var overlay = document.createElement("div");
+        overlay.className = "rp-overlay";
+        body.appendChild(overlay);
+
+        // Keep the top bar avatar in sync with the sidebar avatar
+        var avatarSource = aside.querySelector(".rp-avatar, .user-avatar, .avatar, .sf-avatar");
+        var topAvatar = topbar.querySelector(".rp-top-avatar");
+
+        function syncAvatar() {
+            var text = avatarSource ? avatarSource.textContent.trim() : "";
+
+            if (!text && user && user.email) {
+                text = String(user.email).charAt(0);
+            }
+
+            topAvatar.textContent = (text || "U").slice(0, 2).toUpperCase();
+        }
+
+        syncAvatar();
+
+        if (avatarSource && window.MutationObserver) {
+            new MutationObserver(syncAvatar).observe(avatarSource, {
+                childList: true,
+                characterData: true,
+                subtree: true
+            });
+        }
+
+        var burger = topbar.querySelector(".rp-burger");
+
+        function setOpen(open) {
+            aside.classList.toggle("rp-open", open);
+            overlay.classList.toggle("rp-open", open);
+            body.classList.toggle("rp-lock", open);
+            burger.setAttribute("aria-expanded", open ? "true" : "false");
+        }
+
+        burger.addEventListener("click", function () {
+            setOpen(true);
+        });
+
+        topAvatar.addEventListener("click", function () {
+            setOpen(true);
+        });
+
+        closeBtn.addEventListener("click", function () {
+            setOpen(false);
+        });
+
+        overlay.addEventListener("click", function () {
+            setOpen(false);
+        });
+
+        // Tapping any link / button inside the drawer closes it
+        aside.addEventListener("click", function (event) {
+            if (event.target.closest("a, .side-link, .logout-btn, .rp-logout, button.btn")) {
+                setOpen(false);
+            }
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape") {
+                setOpen(false);
+            }
+        });
+
+        window.addEventListener("resize", function () {
+            if (window.innerWidth > 900) {
+                setOpen(false);
+            }
+        });
     }
 
     if (document.readyState === "loading") {

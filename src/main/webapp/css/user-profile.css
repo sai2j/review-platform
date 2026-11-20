@@ -1012,3 +1012,27 @@ body {
 .modal-x { position: absolute; top: 12px; right: 14px; width: 32px; height: 32px; border: none; border-radius: 50%; background: transparent; color: #64748b; font-size: 24px; line-height: 1; cursor: pointer; }
 .modal-x:hover { background: #f1f5f9; color: #0f172a; }
 @media (max-width: 560px) { .profile-modal .form-grid { grid-template-columns: 1fr; } }
+
+/* Phone: 4 stat boxes in one row, smaller Back button */
+@media (max-width: 900px) {
+    .stat-row { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+    .stat { padding: 10px 2px; border-radius: 10px; }
+    .stat strong { font-size: 20px; }
+    .stat span { margin-top: 4px; font-size: 10.5px; line-height: 1.25; }
+    .btn-back { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+}
+
+/* Phone: Edit profile button sits in the top right corner of the card */
+@media (max-width: 900px) {
+    .profile-hero { position: relative; }
+    .profile-hero .profile-user-row { margin-top: 26px; }
+    .profile-hero .hero-actions { position: absolute; top: 12px; right: 12px; width: auto; margin: 0; z-index: 2; }
+    .profile-hero .hero-actions .btn-dark {
+        display: inline-flex; align-items: center; gap: 5px;
+        padding: 6px 12px; font-size: 12px; border-radius: 999px;
+    }
+    .profile-hero .hero-actions .btn-dark::before {
+        content: ""; width: 12px; height: 12px;
+        background: no-repeat center / contain url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'><path d='M3 17.25V21h3.75L17.8 9.94l-3.75-3.75L3 17.25zm17.7-10.2a1 1 0 0 0 0-1.4l-2.34-2.34a1 1 0 0 0-1.4 0l-1.83 1.83 3.75 3.75 1.82-1.84z'/></svg>");
+    }
+}
